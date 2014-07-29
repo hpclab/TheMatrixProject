@@ -1,0 +1,145 @@
+Changes to the TheMatrix application
+
+Up to 24/03/2014
+- added all FLOAT comparison operators
+- added String inequality comparison operators
+- fixed string filters semantics wrt null (now synonymous of empty string)
+- several modules fixed for postprocessing ( changeIput() related fixes)
+- corrected sort crashing when using a custom iad path 
+- results/ directory is now supported, files are properly searched for there and in iad/
+- aggregate module fixed for corner cases (empty input, one input line...)
+- several fixes to aggregate and aggregation functions to support correctly typed aggregation; 
+  all subclasses complain for unacceptable types
+-- Max Min support Float, Int, Boolean, Date types in input
+-- Sum supports Float and Int
+-- Avg and StDev support Float and Int, always return a Float; they both ignore missing/null values in input
+
+Up to 30/01/14
+- command line option --iadPath (experimental)
+- aggregation functions now tolerate missing fields (under testing)
+- added utility function division()
+- bug corrected in ParametersModule 
+
+Up to 19/01/14
+- added utility functions round(), irandom(), frandom(), replace()
+- reworked all two-input modules (product, merge, union) to solve a data passing bug
+
+Up to 14/01/14
+- added utility functions floor(), ceil()
+- bugs fixed in utility functions Prod(), Year()
+- new option, preliminary support of --iadPath (in testing, currently disabled in released build)
+- new option --resultPath (experimental, disabled)
+- solved problems with empty files and FileInput / FileOutput / ScriptFileInput
+
+Up to 05/12/13
+- ScriptFileInput now either passes parameters to nested scripts, or 
+  opens the file with the results of the nested script (if existing).
+- Command line options are now case-sensitive
+- new command line option to dump the program graph in DOT format (graphviz) - experimental
+- FileOutput saves the data schema to the xml descriptor (supports ScriptInput). 
+  Changed behaviour with empty data streams (saves the header and overwrites the file anyway).
+- FileInput has a bug concerning empty files (those with no data rows)
+
+Up to 21/11/13
+- removed bug with a single FileOutput in a script.
+
+Up to 11/11/13
+- added DropModule
+- added Prod function
+- restored compatibility with 32bit Java for sorting very long files
+
+Up to 06/11/13
+- added slower copy file that is safe for 32bit JVMs
+
+Up to 24/10/13
+- MySQL support working
+- fixed bug crashing on missing xml files
+- pushed voidmapping fix to all other DBMS
+- added lookup tables compatibility with 9- and 10-digits Product AIFA codes; dotted and plain PROC_CODs
+- ProductModule now working
+- fixed resident IAD schema
+- removed mapping examples from Distribution
+
+Up to 27/09/13
+- Fixes to MySQL adapter and VoidMapping implementation
+
+Up to 17/09/13
+- Adding support for MySQL (still in alpha testing): does streaming query results, sets null date preferences.
+- Bug fixes in utility functions.
+
+Up to 10/09/13
+- External sorting subroutine replaced, now MatrixSort correctly works on files much larger than the JVM heap memory.
+
+Up to 06/09/13
+- Fixes to aggregate, changes to sort logging and debug
+
+Up to 04/09/13
+- Sorting now uses NIO to copy files (will skip copy at all when FileSorter is replaced)
+- Several fixes to sort (maximum file number for merge, use of memory, frequency of memory checks)
+
+Up to 30/07/13
+- Added new functions for lookUp tables: Atc, Duration, TypeOFWard, TypeOfFullWard, TypeOfProc (under testing)
+- Changes to the FileSorter (debugging stall on very large files)
+
+Up to 21/07/13
+- Compression on intermediate script buffers can now be enabled in settings.xml (defaults off)
+- "0000-00-00" is accepted as synonym of unknown date in a CSV, i.e. missing
+- Added memory usage information to the timeline.txt log file. Look for MEMSTAT lines.
+
+Up to 19/07/13
+- Bug fix in aggregate.sum for float values
+- Bug fixes in boolean comparison functions (LessThan, GreaterThan, EqualsTo, NotEqual)
+- Bug fixes in DBMS download code (stop running when mapping headers fails)
+- Separate log file is now kept for configuration and data problems: data_errors.text 
+- Now cleans log files at each run
+- Compressed read/writes is still experimental
+
+Up to 12/07/13
+- Support for compressed reading/writing (experimental)
+- Reduced debugging logs.
+
+Up to 10/07/13
+- Added (after test and debug) functionality for transparently buffering data in between modules 
+  if needed by the script structure
+- Multiple outputs form the same script work correctly (note that: you need to add each OutputModule in the 
+  script in this case, explicitly)
+- Corrected a bug in the Aggregate Module which was losing the last row of the input
+- The script scriptSperimentazione130623.txt is working correctly on all indicators and 
+  produces the same result as Stata on the test dataset
+
+Up to 27/06/13
+- Added modules for implicit data buffering to multiple modules (still in testing).
+
+Up to 06/06/13
+- Corrections to the types of a few IAD data fields: HOSP.
+
+Up to 24/05/13
+- Changes to error detection and exception handling: stronger checks 
+  on mapping file contents and on errors in the DBMS interaction
+
+Up to 20/05/13
+- Reworked file saving to use both the iad and results subdirectories. Default is still to use iad. 
+- Booleans are now written in CSV as 0/1 (and parsed both as integers and Java-style); 
+- Corrected behaviour of some date/boolean functions when provided missing values
+- Sanity checks are performed on the mapping configuration.
+- Declare Schema added to scripting language
+- FileOutput module added to language (optional, only one per script allowed)
+
+Up to 26/04/2013
+- Corrected RenameAttributes (tested, working)
+- Corrected errors in RenameDataset (tested, working)
+- Added Union module (tested, working)
+- Corrected schema changing via command line parameters (modified initialization)
+- Added esteem of the schema size once output to csv (very rough).
+
+Before 12/04/2013
+
+- Function names in the ApplyFunction module are now case-insensitive
+- Added RenameDataset (to be tested)
+- Added RenameAttributes module (incomplete implementation) 
+- Added Sum function  
+- Added support for multiple IAD built-in schemas (command line param. --fullIADschema )
+- Corrected support for Microsoft SQLserver. Added some support for SAS (incomplete)
+- Added VoidMapping tag in the configuration file mapping.xml
+
+File restarted on 11/04/2013 to keep track of changes for upcoming release

@@ -1,0 +1,21 @@
+<theMatrix>
+	<version>1.03</version>
+	<dbConnection>
+		<serverName>oracle1.arsanita.toscana.it</serverName>
+		<portNumber>1521</portNumber>
+		<sid>arst</sid>
+		<user>matrix</user>
+		<type>oracle</type>
+	</dbConnection>
+	<path>
+		<results>results/</results>
+		<iad>iad/</iad>
+		<mapping>mapping/ars_test_mapping.xml</mapping>
+		<scripts>scripts/</scripts>
+		<lookupTables>lookups/</lookupTables>
+		<queries>queries/</queries>
+	</path>
+	<!-- currently undocumented -->
+	<TestQuerySizeLimit>100000</TestQuerySizeLimit>
+<!--	<BufferCompression>no</BufferCompression> -->
+</theMatrix>

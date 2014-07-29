@@ -1,0 +1,387 @@
+<iadMapping>
+<!-- this file is modified for testing:
+	order of definitions is changed to define first
+	those tables which are smaller in the database 
+	
+	New change: reordering attributes of HOSP to match the IAD definitions of
+	the new TheMatrix implementation in Neverlang -->
+
+	<!-- mapping of EXE -->
+	<dataset name="EXE">
+		<joinName>EXE_JOIN</joinName>
+		<joinClause>FLUSSI.U_SEA1_EXT JOIN FLUSSI.U_SEA2_EXT ON FLUSSI.U_SEA1_EXT.ID_SEA1_ARSNEW=FLUSSI.U_SEA2_EXT.ID_SEA1_ARSNEW</joinClause>
+		<simpleMapping name="EXEMPTION_CODE">
+			<sourceTable>FLUSSI.U_SEA2_EXT</sourceTable>
+			<sourceAttribute>ICD9CM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="EXE_END_DATE">
+			<sourceTable>FLUSSI.U_SEA2_EXT</sourceTable>
+			<sourceAttribute>SCADENZA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="EXE_START_DATE">
+			<sourceTable>FLUSSI.U_SEA2_EXT</sourceTable>
+			<sourceAttribute>RILASCIO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SEA1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+
+	<!-- mapping of PERSON -->
+	<dataset name="PERSON">
+		<joinName>PERSON</joinName>
+		<joinClause>ANAGRAFARS.U_ANA1_EXT</joinClause>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="GENDER_CONCEPT_ID">
+			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>
+			<sourceAttribute>SESSO</sourceAttribute>
+		</simpleMapping> 
+		<simpleMapping name="DATE_OF_BIRTH">
+			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>
+			<sourceAttribute>DATA_NASCITA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="STARTDATE">
+			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>
+			<sourceAttribute>INGRESSO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="ENDDATE">
+			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>
+			<sourceAttribute>USCITA</sourceAttribute>
+		</simpleMapping>
+<!--		<simpleMapping name="GP_ID" >                              -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>IDUNI_ME</sourceAttribute>            -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="ENDDATE_GP">                          -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>DATREVOC</sourceAttribute>            -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="LHU_LOCATION_CONCEPT_ID">             -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>USLRESU</sourceAttribute>             -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="LHU_PROVIDER_CONCEPT_ID">             -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>USLINVIA</sourceAttribute>            -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="LOCATION_CONCEPT_ID">                 -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>COMRESU</sourceAttribute>             -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="REG_CONCEPT_ID">                      -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>REGRESU</sourceAttribute>             -->
+<!--		</simpleMapping>                                           -->
+<!--		<simpleMapping name="STARTDATE_GP">                        -->
+<!--			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!--			<sourceAttribute>DATSCELT</sourceAttribute>            -->
+<!--		</simpleMapping>                                           -->
+<!-- 		<simpleMapping name="BIRTH_LOCATION_CONCEPT_ID">           -->
+<!-- 			<sourceTable>ANAGRAFARS.U_ANA1_EXT</sourceTable>       -->
+<!-- 			<sourceAttribute>COMNASC</sourceAttribute>             -->
+<!-- 		</simpleMapping>                                           -->
+		<voidMapping name="BIRTH_LOCATION_CONCEPT_ID"></voidMapping>
+		<voidMapping name="GP_ID"></voidMapping>
+		<voidMapping name="ENDDATE_GP"></voidMapping>
+		<voidMapping name="STARTDATE_GP"></voidMapping>
+		<voidMapping name="CENSUS_LOCATION_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="DATE_OF_DEATH" ></voidMapping>
+		<voidMapping name="DIED" ></voidMapping>
+		<voidMapping name="ENDDATE_LHU" ></voidMapping>
+		<voidMapping name="LHU_LOCATION_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="LHU_PROVIDER_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="LOCATION_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="REG_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="STARTDATE_LHU" ></voidMapping>
+	</dataset>
+
+	<!-- mapping of HOSP -->
+	<dataset name="HOSP">
+		<joinName>HOSP</joinName>
+		<joinClause>FLUSSI.U_SKNO_EXT</joinClause>
+		<!--                                           -->
+		<simpleMapping name="PATIENT_ID">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="ORIGIN"></voidMapping>
+		<voidMapping name="BOOKING_DATE"></voidMapping>
+		<voidMapping name="PRIORITY"></voidMapping>
+		<voidMapping name="LENGTH_DH"></voidMapping>
+		<voidMapping name="EXTERNAL_CAUSE"></voidMapping>
+		<voidMapping name="TRAUMA"></voidMapping>
+		<voidMapping name="TYPE"></voidMapping>
+		<voidMapping name="AUTOPTIC"></voidMapping>
+		<voidMapping name="DH_CAUSE"></voidMapping>
+		<voidMapping name="MARITAL_STATUS">
+		<!--	<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>STATCIV</sourceAttribute> -->
+		</voidMapping>
+		<simpleMapping name="DRG">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>DRG</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="VALUE">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>IMPTOT_ARSNEW</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="CITIZENSHIP">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CITTU_ARSNEW</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REGIME">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>REGIME</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="START_DATE">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>DATAMM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="END_DATE">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>DATDIM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="WARD_DISCHARGE">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>REPDIM</sourceAttribute>
+		</simpleMapping>
+	    <simpleMapping name="TYPE_DISCHARGE">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>MODIM</sourceAttribute>
+		</simpleMapping>
+	    <!-- Type Discharge era commentato.... problemi? -->	
+		<simpleMapping name="MAIN_DIAGNOSIS">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>DIADIM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_1">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PAT1</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_2">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PAT2</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_3">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PAT3</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_4">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PAT4</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_5">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PAT5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="DATE_MAIN_PROC">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>DATCHI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="MAIN_PROC">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_1">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI2</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_2">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI3</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_3">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI4</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_4">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_5">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>CODCHI6</sourceAttribute>
+		</simpleMapping>
+		<!-- manca TYPE -->
+		<!-- mancano ANPRAT e NPRAT che sono pero' specifici ARS -->
+		<!-- cos'e birth_weight ? -->
+		<simpleMapping name="BIRTH_WEIGTH">
+			<sourceTable>FLUSSI.U_SKNO_EXT</sourceTable>
+			<sourceAttribute>PESONASC</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+	
+	<!-- mapping of DDRUG -->
+	<dataset name="DDRUG">
+		<joinName>DDRUG_JOIN</joinName>
+		<joinClause>FLUSSI.U_FED1_EXT JOIN FLUSSI.U_FED2_EXT ON FLUSSI.U_FED1_EXT.ID_FED1_ARSNEW=FLUSSI.U_FED2_EXT.ID_FED1_ARSNEW JOIN FLUSSI.U_COD_FARMACI_SPF ON FLUSSI.U_COD_FARMACI_SPF.COD_PRESTAZIONE=FLUSSI.U_FED2_EXT.CODFARM</joinClause>
+		<simpleMapping name="ATC" >
+			<sourceTable>FLUSSI.U_COD_FARMACI_SPF</sourceTable>
+			<sourceAttribute>COD_ATC5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="COST" >
+			<sourceTable>FLUSSI.U_FED2_EXT</sourceTable>
+			<sourceAttribute>IMPORTO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="DRUG_DISPENSING_DATE" >
+			<sourceTable>FLUSSI.U_FED2_EXT</sourceTable>
+			<sourceAttribute>DATERO</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="DRUG_PRESCRIPTION" ></voidMapping>
+		<simpleMapping name="DURATION" >
+			<sourceTable>FLUSSI.U_COD_FARMACI_SPF</sourceTable>
+			<sourceAttribute>GIORNI</sourceAttribute>
+		</simpleMapping>
+<!--		<multiMapping name="DURATION" >                                -->
+<!--			<sourceTable>FLUSSI.U_FED2_EXT</sourceTable>               -->
+<!--			<sourceAttribute>PEZZI_ARSNEW</sourceAttribute>            -->
+<!--			<sourceTable>FLUSSI.U_COD_FARMACI_SPF</sourceTable>        -->
+<!--			<sourceAttribute>GIORNI</sourceAttribute>                  -->
+<!--			<function>multiply</function>                              -->
+<!--		</multiMapping>                                                -->
+		<voidMapping name="EXEMPTION_CODE" ></voidMapping>
+		<voidMapping name="EXEMPTION_LOWWAGE" ></voidMapping>
+		<voidMapping name="FOREIGN_COUNTRY" ></voidMapping>
+		<voidMapping name="LHU_PROVIDER_CONCEPT_ID" ></voidMapping>
+		<simpleMapping name="NUMBER_OF_BOXES" >
+			<sourceTable>FLUSSI.U_FED2_EXT</sourceTable>
+			<sourceAttribute>PEZZI_ARSNEW</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_FED1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PRODUCT_CODE" >
+			<sourceTable>FLUSSI.U_FED2_EXT</sourceTable>
+			<sourceAttribute>CODFARM</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="REG_PROVIDER_ID" ></voidMapping>
+	</dataset>
+
+	<!-- mapping of DRUGS -->
+	<dataset name="DRUGS">
+		<joinName>DRUGS_JOIN</joinName>
+		<joinClause>FLUSSI.U_SPF1_EXT JOIN FLUSSI.U_SPF2_EXT ON FLUSSI.U_SPF1_EXT.ID_SPF1_ARSNEW=FLUSSI.U_SPF2_EXT.ID_SPF1_ARSNEW JOIN FLUSSI.U_COD_FARMACI_SPF ON FLUSSI.U_COD_FARMACI_SPF.COD_PRESTAZIONE=FLUSSI.U_SPF2_EXT.CODFARM</joinClause>
+		<simpleMapping name="ATC" >
+			<sourceTable>FLUSSI.U_COD_FARMACI_SPF</sourceTable>
+			<sourceAttribute>COD_ATC5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="COST" >
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>IMPFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="DRUG_DISPENSING_DATE" >
+			<sourceTable>FLUSSI.U_SPF1_EXT</sourceTable>
+			<sourceAttribute>DATAERO</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="DRUG_PRESCRIPTION" ></voidMapping>
+		<multiMapping name="DURATION" >
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>NUMFARM</sourceAttribute>
+			<sourceTable>FLUSSI.U_COD_FARMACI_SPF</sourceTable>
+			<sourceAttribute>GIORNI</sourceAttribute>
+			<function>multiply</function>
+		</multiMapping>
+		<voidMapping name="EXEMPTION_CODE" ></voidMapping>
+		<voidMapping name="EXEMPTION_LOWWAGE" ></voidMapping>
+		<voidMapping name="FOREIGN_COUNTRY" ></voidMapping>
+		<voidMapping name="LHU_PROVIDER_CONCEPT_ID" ></voidMapping>
+		<simpleMapping name="NUMBER_OF_BOXES" >
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>NUMFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SPF1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PRODUCT_CODE" >
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>CODFARM</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="REG_PROVIDER_ID" ></voidMapping>
+	</dataset>
+	
+	<!-- mapping of OUTPAT -->
+	<dataset name="OUTPAT">
+		<joinName>OUTPAT_JOIN</joinName>
+		<joinClause>FLUSSI.U_SPA1_EXT JOIN FLUSSI.U_SPA2_EXT ON FLUSSI.U_SPA1_EXT.ID_SPA1_ARSNEW=FLUSSI.U_SPA2_EXT.ID_SPA1_ARSNEW</joinClause>
+		<voidMapping name="DIAGNOSIS" ></voidMapping>
+		<voidMapping name="EXEMPTION_CODE" ></voidMapping>
+		<voidMapping name="EXEMPTION_LOWWAGE" ></voidMapping>
+		<voidMapping name="FIRST_ACCESS" ></voidMapping>
+		<simpleMapping name="GROUP_CODE" >
+			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>
+			<sourceAttribute>SPECIALI</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="LHU_PROVIDER_CONCEPT_ID" ></voidMapping>
+		<voidMapping name="MAX_WAITING_TIME" ></voidMapping>
+		<voidMapping name="NUMBER_OF_PROC" ></voidMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SPA1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="PROC_BOOKING_DATE" ></voidMapping>
+		<simpleMapping name="PROC_COD" >
+			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>
+			<sourceAttribute>CODPRES</sourceAttribute>
+		</simpleMapping>
+<!--		<simpleMapping name="PROC_DATE" >                 -->
+<!--			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>  -->
+<!--			<sourceAttribute>DATAINI</sourceAttribute>    -->
+<!--		</simpleMapping>                                  -->
+		<voidMapping name="PROC_DATE" ></voidMapping>
+		<voidMapping name="PROC_END_DATE" ></voidMapping>
+		<voidMapping name="PROC_PRESCRIPTION" ></voidMapping>
+		<simpleMapping name="PROC_START_DATE" >
+			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>
+			<sourceAttribute>DATAINI</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="QUANTITY" ></voidMapping>
+		<voidMapping name="REG_PROVIDER_ID" ></voidMapping>
+		<voidMapping name="TYPE_PROC" ></voidMapping>
+		<simpleMapping name="VALUE" >
+			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>
+			<sourceAttribute>LORDO</sourceAttribute>
+		</simpleMapping>
+		<voidMapping name="WARD_CODE" ></voidMapping>
+<!--		<simpleMapping name="WARD_CODE" >                      -->
+<!--			<sourceTable>FLUSSI.U_SPA2_EXT</sourceTable>       -->
+<!--			<sourceAttribute>SPECIALI</sourceAttribute>        -->
+<!--		</simpleMapping>                                       -->
+	</dataset>
+	
+	<!-- mapping of DRUG -->
+	<dataset name="DRUG">
+		<joinName>DRUG_JOIN</joinName>
+		<joinClause>FLUSSI.U_SPF1_EXT JOIN FLUSSI.U_SPF2_EXT ON FLUSSI.U_SPF1_EXT.ID_SPF1_ARSNEW=FLUSSI.U_SPF2_EXT.ID_SPF1_ARSNEW</joinClause>
+		<simpleMapping name="DRUG_EXPOSURE_START_DATE">
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>DATAERO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LHU_PROVIDER_CONCEPT_ID">
+			<sourceTable>FLUSSI.U_SPF1_EXT</sourceTable>
+			<sourceAttribute>USLFARMA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="NUMBER_OF_BOXES">
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>NUMFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SPF1_EXT</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PRODUCT_CODE">
+			<sourceTable>FLUSSI.U_SPF2_EXT</sourceTable>
+			<sourceAttribute>CODFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REG_PROVIDER_ID">
+			<sourceTable>FLUSSI.U_SPF1_EXT</sourceTable>
+			<sourceAttribute>REGFARMA</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+ 
+</iadMapping>

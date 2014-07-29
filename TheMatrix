@@ -1,0 +1,8 @@
+#!/bin/bash
+# --dry-run 
+
+
+VM_PAR="-Xms128m -Xmx1024m -XX:MaxPermSize=256m" 
+CP_PAR="-classpath TheMatrixB.jar:lib/Dexter.jar:lib/Lexter.jar:lib/Neverlang.jar:lib/ojdbc6-11.1.0.7.0.jar:lib/mysql-connector-java-5.1.18.jar:lib/sqljdbc4.jar:lib/commons-io-2.4.jar:lib/jopt-simple-4.5.jar"
+
+java $VM_PAR $CP_PAR it.cnr.isti.thematrix.scripting.sys.TheMatrixSys --ignoreDBconnection --scriptPath scripts $@

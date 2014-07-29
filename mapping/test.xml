@@ -1,0 +1,32 @@
+<iadMapping>
+        <dataset name="all go down in history">
+                <joinName>banana banana</joinName>
+                <joinClause>she's like</joinClause>
+		<simpleMapping name="survived">
+			<sourceTable>nothing less</sourceTable>
+			<sourceAttribute>save my ass</sourceAttribute>
+			<recodingTable>
+				<value src="miss" dest="mine"/>
+			</recodingTable>
+		</simpleMapping>
+		<lookupMapping name="lalalala" inverseLookup="lalala">
+			<lookupTable>blast off</lookupTable>
+			<lookupAttribute>sunshine</lookupAttribute>
+			<mapping>
+				<sourceTable>my sweet clementine</sourceTable>
+				<sourceAttribute>my sweet revenge</sourceAttribute>
+			</mapping>
+		</lookupMapping>
+		<complexMapping name="they take me away from" inverseLookup="forse">
+			<function>among the radio</function>
+			<lookupOperation> 
+				<lookupTable>blast off</lookupTable>
+				<lookupAttribute>sunshine</lookupAttribute>
+                        <mapping>
+                                <sourceTable>my sweet clementine</sourceTable>
+                                <sourceAttribute>my sweet revenge</sourceAttribute>
+                        </mapping>
+			</lookupOperation>
+		</complexMapping>
+	</dataset>
+</iadMapping>	

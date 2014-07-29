@@ -1,0 +1,12 @@
+Aggregated data file (FileInputModule)
+parameters
+  outputFilename = Mergeaggregatedtables.txt
+end
+
+
+Compress and encrypt data file (GiftWrapperModule)
+inputs 
+  input = Aggregated data file
+parameters
+  outputFilename = Data.enc
+end

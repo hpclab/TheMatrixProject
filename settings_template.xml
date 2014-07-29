@@ -1,0 +1,18 @@
+<theMatrix>
+	<version>1.03</version>
+	<dbConnection>
+		<serverName>name of DBMS server</serverName>
+		<portNumber>port number to contact</portNumber>
+		<sid>SID of the database to contact</sid>
+		<user>username when connecting</user>
+		<type>oracle</type>
+	</dbConnection>
+	<path>
+		<results>results/</results>
+		<iad>iad/</iad>
+		<mapping>mapping/ars_mapping.xml</mapping>
+		<scripts>scripts/</scripts>
+		<lookupTables>lookups/</lookupTables>
+		<queries>queries/</queries>
+	</path>
+</theMatrix>

@@ -1,0 +1,800 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Unix)">
+	<META NAME="CREATED" CONTENT="20091130;1105000">
+	<META NAME="CHANGED" CONTENT="20100331;10505900">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Arial", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "DejaVu Sans"; font-size: 16pt }
+		H1.ctl { font-family: "DejaVu Sans"; font-size: 16pt }
+		H2 { margin-bottom: 0.08in }
+		H2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "DejaVu Sans"; font-size: 14pt; font-style: italic }
+		H3 { margin-bottom: 0.08in }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.ctl { font-family: "DejaVu Sans" }
+		TD P { margin-bottom: 0in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P STYLE="margin-top: 0.17in; page-break-after: avoid"><BR><BR>
+</P>
+<P><BR><BR>
+</P>
+<P STYLE="margin-top: 0.17in; page-break-after: avoid"><BR><BR>
+</P>
+<P STYLE="margin-top: 0.17in; page-break-after: avoid"><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-top: 0.17in; page-break-after: avoid"><IMG SRC="Jerboa_v2.4_html_49badf3e.jpg" NAME="graphics1" ALIGN=LEFT WIDTH=447 HEIGHT=144 BORDER=0><BR CLEAR=LEFT><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-top: 0.17in; page-break-after: avoid"><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-top: 0.17in; page-break-after: avoid"><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-top: 0.17in; page-break-after: avoid"><FONT FACE="Arial, sans-serif"><FONT SIZE=4>User
+Manual</FONT></FONT></P>
+<P ALIGN=CENTER><BR><BR>
+</P>
+<P ALIGN=CENTER>EU-ADR internal document</P>
+<P ALIGN=CENTER>Version 2.4</P>
+<P ALIGN=CENTER>M.J. Schuemie</P>
+<P STYLE="page-break-before: always"><BR><BR>
+</P>
+<DIV ID="Table of Contents1" DIR="LTR">
+	<DIV ID="Table of Contents1_Head" DIR="LTR">
+		<P STYLE="margin-top: 0.17in; page-break-after: avoid"><FONT FACE="Arial, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Table
+		of Contents</B></FONT></FONT></P>
+	</DIV>
+	<P STYLE="margin-bottom: 0in">1.Starting Jerboa	3</P>
+	<P STYLE="margin-bottom: 0in">2.Using Jerboa	3</P>
+	<P STYLE="margin-bottom: 0in">3.Input formats	3</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">3.1.Table:
+	Prescriptions	4</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">3.2.Table:
+	Events	4</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">3.3.Table:
+	Patients	4</P>
+	<P STYLE="margin-bottom: 0in">4.Tools	5</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">4.1.Test Input
+	Files	5</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">4.2.Encrypt file	5</P>
+	<P STYLE="margin-bottom: 0in">5.Setting files	5</P>
+	<P STYLE="margin-bottom: 0in">6.Modules	5</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.1.TestInputFilesModule	5</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.2.AggregateModule	5</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.3.EventPrescriptionProfilingModule	6</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.4.EventExposureProfilingModule	6</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.5.CohortEntryDateModule	7</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.6.ExposureCodingModule	7</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.7.GiftWrapperModule	8</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.8.RelativeRiskModule	8</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.9.MergeAggregatedTablesModule	9</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.10.CombineConcomitantModule	9</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.11.FilterEventsModule	9</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.12.CaseSetModule	10</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.13.MergeDataModule	11</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.14.MergeRepeatPrescriptionsModule	12</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.15.FileInputModule	12</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.16.NonMedicationCodingModule	13</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.17.MergeByATC	13</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.18.AggregateByATCModule	13</P>
+	<P STYLE="margin-left: 0.2in; margin-bottom: 0in">6.19.IncidenceRateModule	14</P>
+	<P STYLE="margin-bottom: 0in">7.Change log	15</P>
+</DIV>
+<P><BR><BR>
+</P>
+<H1 CLASS="western"><BR><BR>
+</H1>
+<H1 CLASS="western"><BR><BR>
+</H1>
+<H1 CLASS="western" STYLE="page-break-before: always">1.Starting
+Jerboa</H1>
+<P STYLE="margin-bottom: 0in">Jerboa requires Java in order to run.
+You can download the latest version from:</P>
+<P STYLE="margin-bottom: 0in"><A HREF="http://www.java.com/getjava/">http://www.java.com/getjava/</A></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Double-click on the Jerboa Jar file to
+start Jerboa. Alternatively, you can start Jerboa from the command
+line using:</P>
+<P STYLE="margin-bottom: 0in"><I>java –jar Jerboa.jar</I></P>
+<H3 CLASS="western">Giving Jerboa more memory</H3>
+<P STYLE="margin-bottom: 0in">By default, Java allows each program to
+use a maximum of 128MB of RAM. Especially for larger data sets,
+Jerboa will run faster if it can use more memory. To give Jerboa
+1024MB of RAM, use the following command:</P>
+<P STYLE="margin-bottom: 0in"><I>java –Xmx1024m –jar Jerboa.jar</I></P>
+<H1 CLASS="western">2.Using Jerboa</H1>
+<P STYLE="margin-bottom: 0in"><IMG SRC="Jerboa_v2.4_html_6454648.png" NAME="graphics2" ALIGN=RIGHT WIDTH=225 HEIGHT=227 BORDER=0>After
+startup, Jerboa will display its main screen, as shown on the right. 
+</P>
+<H3 CLASS="western">Working folder</H3>
+<P STYLE="margin-bottom: 0in">Here you must specify a valid folder on
+the hard disc where Jerboa can write the final and intermediate
+results, as well as several temporary files.</P>
+<H3 CLASS="western">Workflow</H3>
+<P STYLE="margin-bottom: 0in">This shows the main workflow for
+processing the input data (specified in the section Input formats),
+using several processing steps (specified in the section M).</P>
+<P STYLE="margin-bottom: 0in">You can load a workflow using the <I>Load
+workflow parameters</I> option in the File menu.</P>
+<H3 CLASS="western">Console</H3>
+<P STYLE="margin-bottom: 0in">This will show output generated by
+Jerboa during processing.</P>
+<H3 CLASS="western">Run</H3>
+<P STYLE="margin-bottom: 0in">Executes the main workflow, and
+generates the encrypted file containing the aggregated data.</P>
+<H1 CLASS="western">3.Input formats</H1>
+<P STYLE="margin-bottom: 0in">Three tables serve as input:</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">Prescriptions: Describes the
+	prescriptions taken by patients.</P>
+	<LI><P STYLE="margin-bottom: 0in">Events: Describes the events.</P>
+	<LI><P STYLE="margin-bottom: 0in">Patients: Describes the patients
+	included in the study.</P>
+</UL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">All tables are in CSV (Comma Separated
+Values) format. The first row should contain the column headers. The
+order of the columns and rows is not important.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Tip: you can use the tool “Test Input
+Files” to test your input files!</P>
+<H3 CLASS="western">Dates</H3>
+<P STYLE="margin-bottom: 0in">All dates are formatted as follows:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">YYYYMMDD</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">For example: the 4th of July, 2008, is
+formatted as:</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">20080704</P>
+<H3 CLASS="western">Patient IDs</H3>
+<P STYLE="margin-bottom: 0in">A patient ID is an alphanumeric string
+that uniquely identifies a patient. So patient IDs can be numbers (1,
+2, 3, etc.) or combination of numbers and letters (a01, a02, b01,
+etc).</P>
+<H2 CLASS="western">3.1.Table: Prescriptions</H2>
+<P STYLE="margin-bottom: 0in">Fields:</P>
+<P STYLE="margin-bottom: 0in"><B>Date</B>		The start date of the
+prescription.</P>
+<P STYLE="margin-bottom: 0in"><B>PatientID</B>	Patient ID.</P>
+<P STYLE="margin-bottom: 0in"><B>Duration</B>	The duration (in days)
+of the prescription.</P>
+<P STYLE="margin-bottom: 0in"><B>ATC</B>		The ATC code corresponding
+to the medication.</P>
+<H2 CLASS="western">3.2.Table: Events</H2>
+<P STYLE="margin-bottom: 0in">Fields:</P>
+<P STYLE="margin-bottom: 0in"><B>PatientID</B>	Patient ID.</P>
+<P STYLE="margin-bottom: 0in"><B>Date</B>		Date of the event.</P>
+<P STYLE="margin-bottom: 0in"><B>EventType</B>	Type of event. This
+must be one of the currently supported events:</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in">UGIB		(Upper GastroIntestinal
+	Bleeding)</P>
+	<LI><P STYLE="margin-bottom: 0in">AS		(Anaphylactic Shock)</P>
+	<LI><P STYLE="margin-bottom: 0in">BE		(Bullous Eruptions)</P>
+	<LI><P STYLE="margin-bottom: 0in">ARF		(Acute Renal Failure)</P>
+	<LI><P STYLE="margin-bottom: 0in">AMI		(Acute Myocardial Infarction)</P>
+	<LI><P STYLE="margin-bottom: 0in">RHABD	(Rhabdomyolysis)</P>
+</UL>
+<H2 CLASS="western">3.3.Table: Patients</H2>
+<P STYLE="margin-bottom: 0in">Fields:</P>
+<P STYLE="margin-bottom: 0in"><B>PatientID</B>	Patient ID.</P>
+<P STYLE="margin-bottom: 0in"><B>Birthdate</B>	Date of birth.</P>
+<P STYLE="margin-bottom: 0in"><B>Gender</B>	Gender. Can be either F
+or M, for Female or Male respectively.</P>
+<P STYLE="margin-bottom: 0in"><B>Startdate</B>	Date from which the
+patient is eligible to be included in the study. 
+</P>
+<P STYLE="margin-bottom: 0in">		This is typically the date the
+patient is entered into the registration sytem.</P>
+<P STYLE="margin-bottom: 0in"><B>Enddate</B>	Date after which the
+patient is no longer eligible for inclusion in the study.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<H1 CLASS="western">4.Tools</H1>
+<P STYLE="margin-bottom: 0in">Jerboa offers tools for users.
+Currently, there are two tools:</P>
+<H2 CLASS="western">4.1.Test Input Files</H2>
+<P STYLE="margin-bottom: 0in">This can be used to test whether the
+input files can be read by Jerboa. First select the working folder in
+the main window, then select ‘Tools’ and ‘Test input files’.
+Here you can specifiy the names of the input files. 
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">It is possible to disable the test of
+particular files (for instance when you know they are ok). Uncheck
+the box labelled “Test this file”.</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in">Click ‘Run’ to perform the test(s).
+When Jerboa encounters an error, it will show ‘Error’ for the
+particular file. To show the part of the input file containing the
+error, click on ‘Show’. If everything is ok, Jerboa will generate
+some statistics in the main console that can be used to verify if the
+data is not only formatted correctly, but also contains the correct
+data.</P>
+<H2 CLASS="western">4.2.Encrypt file</H2>
+<P STYLE="margin-bottom: 0in">This workflow can be used to compress
+and encrypt a file using the public key. The resulting file can only
+be decrypted using the private key.</P>
+<H1 CLASS="western">5.Setting files</H1>
+<P>todo</P>
+<H1 CLASS="western">6.Modules</H1>
+<H2 CLASS="western">6.1.TestInputFilesModule</H2>
+<P>Module for testing whether the input files adhere to the defined
+format. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>prescriptions</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>patients</STRONG> 
+	</P>
+	<LI><P><STRONG>events</STRONG> 
+	</P>
+</UL>
+<H2 CLASS="western">6.2.AggregateModule</H2>
+<P>Aggregates data from a merged data file by age and gender, and
+optionally by calendar year and month. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>mergedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>minSubjectsPerRow</STRONG>
+	(int) The minimum number of subjects in a row of the resulting
+	aggregated table. Rows with fewer subjects are deleted, and
+	deletions will be summarized in the last line of the table.<BR>default
+	= 0 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>includeYear</STRONG>
+	(boolean) Create aggregates for each calendar year.<BR>Warning: the
+	input table should be split by calendar year (i.e it should not
+	contain episodes spanning two years).<BR>default = false <BR>&nbsp;</P>
+	<LI><P><STRONG>includeMonth</STRONG> (boolean) Create aggregates for
+	each calendar month.<BR>Warning: the input table should be split by
+	calendar month (i.e it should not contain episodes spanning two
+	months).<BR>default = false <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.3.EventPrescriptionProfilingModule</H2>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>prescriptions</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>patients</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>events</STRONG> 
+	</P>
+	<LI><P><STRONG>relativeRisks</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P><STRONG>dataPointCount</STRONG> (int) <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.4.EventExposureProfilingModule</H2>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>relativeRisks</STRONG> 
+	</P>
+	<LI><P><STRONG>mergedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>dataPointCount</STRONG>
+	(int) <BR>&nbsp;</P>
+	<LI><P><STRONG>dataPointSpacing</STRONG> (int) <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.5.CohortEntryDateModule</H2>
+<P>Calculates, based on the system entry and exit dates in the input
+patients file, the cohort entry and exit dates. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>patients</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>followUpTime</STRONG>
+	(int) The default amount of follow-up time (i.e. number of days
+	between system and cohort entry date).<BR>default = 365 <BR>&nbsp;</P>
+	<LI><P><STRONG>maxDaysFromBirth</STRONG> (int) If the system entry
+	date is less than this number of days from the birthdate of the
+	patient, the cohort entry date is set to the birthdate.<BR>default =
+	265 <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.6.ExposureCodingModule</H2>
+<P>This module performs three functions:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0in">The exclusive patient time of the
+	input merged data file is converted to non-exclusive patient time
+	(i.e. exposure to each drug is coded separately, indepent of any
+	other drugs). The resulting merged data file will have at most 1 ATC
+	code per row. 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in">(optional) Exposure to a drug is
+	split into various exposure episodes according to accumulated
+	exposure. 
+	</P>
+	<LI><P>(optional) The time after an exposure is coded separately. 
+	</P>
+</OL>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>mergedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>historyLength</STRONG>
+	(long) Number of days over which exposure to a drug should be
+	accumulated for assigning the exposure codes.<BR>default = 365 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>enableExposureCoding</STRONG>
+	(boolean) default = false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>enablePostExposureCoding</STRONG>
+	(boolean) default = false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>exposureCode</STRONG>
+	(List) The list of exposure codes used when exposure coding is
+	enabled. Each code should be represented as three semicolon
+	separated values: 
+	</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">The start number of days of
+		accumulated exposure 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The end number of days of
+		accumulated exposure 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The label of the code 
+		</P>
+	</OL>
+	<P STYLE="margin-bottom: 0in">For example: 0;7;VS <BR>&nbsp;</P>
+	<LI><P><STRONG>postExposureCode</STRONG> (List) The list of post
+	exposure codes. See exposureCode for the format. Post exposure code
+	labels should always start with the letter P. <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.7.GiftWrapperModule</H2>
+<P>Module for compressing and encrypting files. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>input</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P><STRONG>outputFilename</STRONG> (String) Name of the output
+	file (relative to the working folder).<BR>default = data.enc <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.8.RelativeRiskModule</H2>
+<P>Generates relative risks from the aggregated input data. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>aggregatedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>atcLevel</STRONG> (int)
+	ATC level (number of characters) at which the analysis should be
+	performed.<BR>default = 7 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>minEvents</STRONG> (int)
+	Minimum number of events to include a signal in the resulting
+	table.<BR>default = 5 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>compareToSubATC</STRONG>
+	(boolean) Compare exposure to exposure to other drugs with the same
+	indication.<BR>default = false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>subATCLevel</STRONG> (int)
+	Specifies the ATC level for indications (for
+	compareToSubATC).<BR>default = 3 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputStandardError</STRONG>
+	(boolean) Output the standard error in the resuls file.<BR>default =
+	false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputSorted</STRONG>
+	(boolean) Sort the output table by RRmh (will take a lot of memory
+	for extremely large numbers signals).<BR>default = true <BR>&nbsp;</P>
+	<LI><P><STRONG>outputFilename</STRONG> (String) Name of the output
+	file (relative to the working folder).<BR>default =
+	RelativeRisks.csv <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.9.MergeAggregatedTablesModule</H2>
+<P>Merges up to three tables into a single file, and will include the
+settings of the current workflow. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>table1</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>table2</STRONG> 
+	</P>
+	<LI><P><STRONG>table3</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P><STRONG>outputFilename</STRONG> (String) Name of the output
+	file (relative to the working folder).<BR>default =
+	AggregatedData.txt <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.10.CombineConcomitantModule</H2>
+<P>Combines concomittant drug use into single episodes. After
+applying this method, there will be no overlapping episodes in the
+prescriptions table. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>prescriptions</STRONG> 
+	</P>
+</UL>
+<H2 CLASS="western">6.11.FilterEventsModule</H2>
+<P>Filters the input event file for events of the event types
+specified in the types parameter. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>events</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P><STRONG>types</STRONG> (List) The event types that are
+	retained in the events table. <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.12.CaseSetModule</H2>
+<P>Generates case sets for a case-control type analysis. For every
+case (event), controls are identified based on the index date, and a
+number of optional matching criteria. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>mergedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>matchOnGender</STRONG>
+	(boolean) Specifies whether controls should have the same gender as
+	the case.<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>matchOnAge</STRONG>
+	(boolean) Specifies whether controls should be in the same age group
+	as the case (at the time of the event).<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>matchOnChronicDiseaseScore</STRONG>
+	(boolean) Specifies whether controls should have the same Chronic
+	Disease Score as the case.<BR>default = false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>matchOnDrugCount</STRONG>
+	(boolean) Specifies whether controls should have the same drug count
+	as the case.<BR>default = false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputYear</STRONG>
+	(boolean) Output the calendar year of the index date.<BR>default =
+	true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputMonth</STRONG>
+	(boolean) Output the calendar month of the index date.<BR>default =
+	true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputGender</STRONG>
+	(boolean) Output the gender of the cases and controls.<BR>default =
+	true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputAge</STRONG>
+	(boolean) Output the age group of the cases and controls.<BR>default
+	= true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputChronicDiseaseScore</STRONG>
+	(boolean) Output the Chronic Disease score of the cases and
+	controls.<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputDrugCount</STRONG>
+	(boolean) Output the drug counts for the cases and controls.<BR>default
+	= true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputCaseChronicDiseaseScore</STRONG>
+	(boolean) Output, for both cases and controls, the Chronic Disease
+	Score of the corresponding case.<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputCaseDrugCount</STRONG>
+	(boolean) Output, for both cases and controls, the drug count of the
+	corresponding case.<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>outputNumbers</STRONG>
+	(boolean) If set to true, for each drug the days of use and days
+	since use are added to the table.<BR>default = false <BR>&nbsp;</P>
+	<LI><P><STRONG>outputFilename</STRONG> (String) <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.13.MergeDataModule</H2>
+<P>Merges patient, event, and optionally prescription data into one
+file. Optionally, the patient time is split by calendar year and/or
+month. Optionally, patient data after an event is censored. Patient
+time outside the patient cohort time is marked separately. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>prescriptions</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>patients</STRONG> 
+	</P>
+	<LI><P><STRONG>events</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>ageCode</STRONG> (List)
+	The list of age ranges used when coding patient age. Each range
+	should be represented as three semicolon separated values: 
+	</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">The start year since birth 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The end year since birth
+		(exclusive) 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The label of age range 
+		</P>
+	</OL>
+	<P STYLE="margin-bottom: 0in">For example: 0;5;0-4 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>removeAfterEvent</STRONG>
+	(boolean) Specifies whether patient time after an event should be
+	censored.<BR>default = true <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>splitByYear</STRONG>
+	(boolean) Specifies whether patient time should be split by calendar
+	year. If set to true, no episode will span two years.<BR>default =
+	false <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>splitByMonth</STRONG>
+	(boolean) Specifies whether patient time should be split by calendar
+	month. If set to true, no episode will span two months.<BR>default =
+	false <BR>&nbsp;</P>
+	<LI><P><STRONG>censorPeriod</STRONG> (int) The number of days the
+	patient time should be censored after an event, if censoring is
+	enabled.<BR>default = 999999 <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.14.MergeRepeatPrescriptionsModule</H2>
+<P>Merges repeat prescriptions with the same ATC code. A merged
+prescription will start at the start date of the first prescription,
+and end at the end date of the last prescription. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>prescriptions</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>extentionMultiplier</STRONG>
+	(double) If a new prescription occurs within this fraction of the
+	original prescription duration after the prescription ended, the new
+	and old prescription are assumed to be repeats, and are
+	merged.<BR>default = 0 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>extentionInDays</STRONG>
+	(int) If a new prescription occurs within this number of days after
+	the prescription ended, the new and old prescription are assumed to
+	be repeats, and are merged.<BR>default = 0 <BR>&nbsp;</P>
+	<LI><P><STRONG>addToDuration</STRONG> (int) Prolong each duration
+	with this number of days.<BR>default = 0 <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.15.FileInputModule</H2>
+<P>Module that points to an input file. 
+</P>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P><STRONG>filename</STRONG> (String) The path to the file,
+	relative to the working folder <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.16.NonMedicationCodingModule</H2>
+<P>Fills the patient time between cohort entry date and cohort exit
+date with non-exposure episodes. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>prescriptions</STRONG> 
+	</P>
+	<LI><P><STRONG>patients</STRONG> 
+	</P>
+</UL>
+<H2 CLASS="western">6.17.MergeByATC</H2>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>prescriptions</STRONG> 
+	</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>patients</STRONG> 
+	</P>
+	<LI><P><STRONG>events</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>ageCode</STRONG> (List)
+	The list of age ranges used when coding patient age. Each range
+	should be represented as three semicolon separated values: 
+	</P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0in">The start year since birth 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The end year since birth
+		(exclusive) 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The label of age range 
+		</P>
+	</OL>
+	<P STYLE="margin-bottom: 0in">For example: 0;5;0-4 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>removeAfterEvent</STRONG>
+	(boolean) Specifies whether patient time after an event should be
+	censored.<BR>default = true <BR>&nbsp;</P>
+	<LI><P><STRONG>censorPeriod</STRONG> (int) The number of days the
+	patient time should be censored after an event, if censoring is
+	enabled.<BR>default = 999999 <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.18.AggregateByATCModule</H2>
+<P>Aggregates a merged data file at the level of unique values in the
+ATC field. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>mergedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>minSubjectsPerRow</STRONG>
+	(int) The minimum number of subjects in a row of the resulting
+	aggregated table. Rows with fewer subjects are deleted, and
+	deletions will be summarized in the last line of the table.<BR>default
+	= 0 <BR>&nbsp;</P>
+	<LI><P><STRONG>includeYear</STRONG> (boolean) Create aggregates for
+	each calendar year.<BR>Warning: the input table should be split by
+	calendar year (i.e it should not contain episodes spanning two
+	years).<BR>default = false <BR>&nbsp;</P>
+</UL>
+<H2 CLASS="western">6.19.IncidenceRateModule</H2>
+<P>Generates incidence rate tables from the aggregated input data. 
+</P>
+<H3 CLASS="western">Inputs</H3>
+<UL>
+	<LI><P><STRONG>aggregatedData</STRONG> 
+	</P>
+</UL>
+<H3 CLASS="western">Parameters</H3>
+<UL>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>referencePopulationFile</STRONG>
+	(String) Specifies the path to the file containing information on
+	the reference population, for calculation of the standardized
+	incidence rate. <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>referencePopulationType</STRONG>
+	(String) Specifies the type of reference population: 
+	</P>
+	<UL>
+		<LI><P STYLE="margin-bottom: 0in">none - do not calculate
+		standardized IR 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">perAge - specified by age only 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">perAgeGender - specified by both
+		age and gender 
+		</P>
+	</UL>
+	<P STYLE="margin-bottom: 0in"><BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>referencePopulationSubgroups</STRONG>
+	(List) Specifies any subgroups to be identified for calculation
+	additional standardized rates. Each code should be represented as
+	two semicolon separated values: 
+	</P>
+	<UL>
+		<LI><P STYLE="margin-bottom: 0in">The label of the subgroup (the
+		same label can be used in multiple rows) 
+		</P>
+		<LI><P STYLE="margin-bottom: 0in">The age range 
+		</P>
+	</UL>
+	<P STYLE="margin-bottom: 0in">For example: children;0-5 <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>postFix</STRONG> (String)
+	Specifies the string that will be added to the age ranges in the
+	output table so Excel does not mistake age-ranges for dates.<BR>default
+	= years <BR>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0in"><STRONG>perNYears</STRONG> (int)
+	Incidence rates are divided by this number of years.<BR>default =
+	100000 <BR>&nbsp;</P>
+	<LI><P><STRONG>outputFilename</STRONG> (String) Name of the output
+	file (relative to the working folder).<BR>default =
+	IncidenceRates.csv <BR>&nbsp;</P>
+</UL>
+<P><BR><BR>
+</P>
+<H1 CLASS="western">7.Change log</H1>
+<P STYLE="margin-bottom: 0in">Changes made in Jerboa over time:</P>
+<TABLE WIDTH=100% BORDER=0 CELLPADDING=0 CELLSPACING=0>
+	<COL WIDTH=17*>
+	<COL WIDTH=239*>
+	<TR VALIGN=TOP>
+		<TD WIDTH=7%>
+			<P>1.1</P>
+			<P>1.2</P>
+			<P><BR>
+			</P>
+			<P>1.3</P>
+			<P><BR>
+			</P>
+			<P><BR>
+			</P>
+			<P>1.4</P>
+			<P><BR>
+			</P>
+			<P><BR>
+			</P>
+			<P>1.5</P>
+			<P><BR>
+			</P>
+			<P><BR>
+			</P>
+			<P><BR>
+			</P>
+			<P>1.6</P>
+			<P>1.7</P>
+			<P>2.0</P>
+			<P>2.1</P>
+			<P>2.2</P>
+			<P><BR>
+			</P>
+			<P>2.3</P>
+			<P><BR>
+			</P>
+			<P>2.4</P>
+		</TD>
+		<TD WIDTH=93%>
+			<P STYLE="margin-bottom: 0in">Added module for calculation of
+			cohort entry date.</P>
+			<P STYLE="margin-bottom: 0in">Added command line interface. Added
+			inclusion of higher aggregation tables. 
+			</P>
+			<P STYLE="margin-bottom: 0in">Added filter on number of subjects
+			per line in aggregated table.</P>
+			<P STYLE="margin-bottom: 0in">Multiple patient entries with same
+			patientID allowed (for patient leaving and returning to
+			population)</P>
+			<P STYLE="margin-bottom: 0in">Extended error messaging when
+			reading input files</P>
+			<P STYLE="margin-bottom: 0in">Added ‘Test input files’ tool.</P>
+			<P STYLE="margin-bottom: 0in">Added Busy signaling (‘Working..”)</P>
+			<P STYLE="margin-bottom: 0in">Input file headers are now case
+			insensitive.</P>
+			<P STYLE="margin-bottom: 0in">Added calendar year support</P>
+			<P STYLE="margin-bottom: 0in">Added Relative Risk calculations</P>
+			<P STYLE="margin-bottom: 0in">Added report of deleted data to
+			aggregated file</P>
+			<P STYLE="margin-bottom: 0in">Changed the project logo</P>
+			<P STYLE="margin-bottom: 0in">More efficient support for exposure
+			coding</P>
+			<P STYLE="margin-bottom: 0in">Support for multiple event types</P>
+			<P STYLE="margin-bottom: 0in">Workflow layouts are no longer
+			hard-coded but part of the workflow layout</P>
+			<P STYLE="margin-bottom: 0in">Post exposure coding added</P>
+			<P STYLE="margin-bottom: 0in">Added flexible censor periods</P>
+			<P STYLE="margin-bottom: 0in">Added calendar month support</P>
+			<P STYLE="margin-bottom: 0in">Redesign of underlying framework.</P>
+			<P STYLE="margin-bottom: 0in">Parameters can only be edited in the
+			settings file. Display is now auto-generated</P>
+			<P>Timestamping option added. Event profiling for LEOPARD method
+			added.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<DIV TYPE=FOOTER>
+	<P ALIGN=CENTER STYLE="margin-top: 0.2in; margin-bottom: 0in"><SDFIELD TYPE=PAGE SUBTYPE=RANDOM FORMAT=PAGE>15</SDFIELD></P>
+</DIV>
+</BODY>
+</HTML>

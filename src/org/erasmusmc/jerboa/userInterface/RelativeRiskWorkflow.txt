@@ -1,0 +1,14 @@
+Aggregated data file (FileInputModule)
+parameters
+  outputFilename = AggregatebyATC.txt
+end
+
+
+Calculate relative risks (RelativeRiskModule)
+inputs 
+  aggregatedData = Aggregated data file
+parameters
+  outputFilename = RelativeRisks.csv 
+  minEvents = 1
+  outputExactP = true
+end

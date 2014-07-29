@@ -1,0 +1,31 @@
+Prescriptions file (FileInputModule)
+parameters
+  outputFilename = Prescriptions.txt
+  stopWhenNotFound = false
+end
+
+Patients file (FileInputModule)
+parameters
+  outputFilename = Patients.txt
+  stopWhenNotFound = false
+end
+
+Events file (FileInputModule)
+parameters
+  outputFilename = Events.txt
+  stopWhenNotFound = false
+end
+
+#Exposure file (FileInputModule)
+#parameters
+#  outputFilename = Exposure.txt
+#  stopWhenNotFound = false
+#end
+
+File tester (TestInputFilesModule)
+inputs
+  prescriptions = Prescriptions file
+  patients = Patients file
+  events = Events file
+#  exposure = Exposure file
+end

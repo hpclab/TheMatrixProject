@@ -1,0 +1,259 @@
+<!-- mapping template based on the mapping of ARS' LIAD into IAD    -->
+<!-- revision 18/07/2012                                            -->
+<!-- note that all tag contents are examples and most of them shall -->
+<!-- be customized according to your local database schema          -->
+<!-- Please refer to the documentation and report problems on the mailing list -->
+<iadMapping>
+	<!-- mapping of PERSON -->
+	<dataset name="PERSON">
+	<tableSource>
+		<joinName>aLocalFileNameForPERSON</joinName>
+		<joinClause>theJoinClauseForPERSON</joinClause>
+	</tableSource>
+		<simpleMapping name="BIRTH_LOCATION_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>COMNASC</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="DATE_OF_BIRTH" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>DATANASC</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="ENDDATE" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>ASSDACES</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="ENDDATE_GP" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>DATREVOC</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="GENDER_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>SEXU</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="GP_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>IDUNI_ME</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LHU_LOCATION_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>USLRESU</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LHU_PROVIDER_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>USLINVIA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LOCATION_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>COMRESU</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REG_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>REGRESU</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="STARTDATE" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>ASSDECOR</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="STARTDATE_GP" >
+			<sourceTable>FLUSSI.U_ATA_F</sourceTable>
+			<sourceAttribute>DATSCELT</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+
+	<!-- mapping of OUTPAT -->
+	<dataset name="OUTPAT">
+	<tableSource>
+		<joinName>aLocalFileNameForOUTPAT</joinName>
+		<joinClause>FLUSSI.U_SPA1_F JOIN FLUSSI.U_SPA2_F ON FLUSSI.U_SPA1_F.ID_SPA2=FLUSSI.U_SPA1.ID_SPA2</joinClause>
+	</tableSource>
+		<simpleMapping name="GROUP_CODE" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>SPECIALI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LHU_PROVIDER_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_SPA1_F</sourceTable>
+			<sourceAttribute>AZIENDA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="NUMBER_OF_PROC" >
+			<sourceTable>FLUSSI.U_SPA1_F</sourceTable>
+			<sourceAttribute>NUMPRESTEFF</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SPA1_F</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PROC_COD" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>CODPRES</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PROC_END_DATE" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>DATAFINE</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PROC_START_DATE" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>DATAINI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="QUANTITY" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>QUANTUNI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REG_PROVIDER_ID" >
+			<sourceTable>FLUSSI.U_SPA1_F</sourceTable>
+			<sourceAttribute>REGAZIE</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="WARD_CODE" >
+			<sourceTable>FLUSSI.U_SPA2_F</sourceTable>
+			<sourceAttribute>REPARTO</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+
+	<!-- mapping of DRUG -->
+	<dataset name="DRUG">
+	<tableSource>
+		<joinName>aLocalFileNameForDRUG</joinName>
+		<joinClause>FLUSSI.U_SPF1_F JOIN FLUSSI.U_SPF2_F ON FLUSSI.U_SPF1_F.ID_SPF1=FLUSSI.U_SPF2_F.ID_SPF1</joinClause>
+	</tableSource>
+		<simpleMapping name="DRUG_EXPOSURE_START_DATE" >
+			<sourceTable>FLUSSI.U_SPF2_F</sourceTable>
+			<sourceAttribute>DATAERO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="LHU_PROVIDER_CONCEPT_ID" >
+			<sourceTable>FLUSSI.U_SPF1_F</sourceTable>
+			<sourceAttribute>USLFARMA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="NUMBER_OF_BOXES" >
+			<sourceTable>FLUSSI.U_SPF2_F</sourceTable>
+			<sourceAttribute>NUMFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SPF1_F</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PRODUCT_CODE" >
+			<sourceTable>FLUSSI.U_SPF2_F</sourceTable>
+			<sourceAttribute>CODFARM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REG_PROVIDER_ID" >
+			<sourceTable>FLUSSI.U_SPF1_F</sourceTable>
+			<sourceAttribute>REGFARMA</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+
+	<!-- mapping of EXE -->
+	<dataset name="EXE">
+	<tableSource>
+		<joinName>aLocalFileNameForEXE</joinName>
+		<joinClause>FLUSSI.U_SEA1_F JOIN FLUSSI.U_SEA2_F ON FLUSSI.U_SEA1_F.ID_SEA1=FLUSSI.U_SEA2_F.ID_SEA1</joinClause>
+	</tableSource>
+		<simpleMapping name="EXEMPTION_CODE" >
+			<sourceTable>FLUSSI.U_SEA2_F</sourceTable>
+			<sourceAttribute>GRUPPO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="EXE_END_DATE" >
+			<sourceTable>FLUSSI.U_SEA2_F</sourceTable>
+			<sourceAttribute>SCADENZA</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="EXE_START_DATE" >
+			<sourceTable>FLUSSI.U_SEA2_F</sourceTable>
+			<sourceAttribute>RILASCIO</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PERSON_ID" isSensible="true">
+			<sourceTable>FLUSSI.U_SEA1</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+
+	<!-- mapping of HOSP -->
+	<dataset name="HOSP">
+	<tableSource>
+		<joinName>aLocalFileNameForHOSP</joinName>
+		<joinClause>theJoinClauseForHOSP</joinClause>
+	</tableSource>
+		<simpleMapping name="BIRTH_WEIGTH" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PESONASC</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="DATE_MAIN_PROC" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>DATCHI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="END_DATE" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>DATDIM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="MAIN_DIAGNOSIS" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>DIADIM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="MAIN_PROC" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="PATIENT_ID" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>IDARS</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="REGIME" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>REGIME</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_1" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PAT1</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_2" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PAT2</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_3" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PAT3</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_4" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PAT4</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_DIAGNOSIS_5" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>PAT5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_1" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI2</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_2" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI3</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_3" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI4</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_4" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI5</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="SECONDARY_PROC_5" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>CODCHI6</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="START_DATE" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>DATAMM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="TYPE_DISCHARGE" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>MODDIM</sourceAttribute>
+		</simpleMapping>
+		<simpleMapping name="WARD_DISCHARGE" >
+			<sourceTable>FLUSSI.U_SKNO_F</sourceTable>
+			<sourceAttribute>REPDIM</sourceAttribute>
+		</simpleMapping>
+	</dataset>
+</iadMapping>
+

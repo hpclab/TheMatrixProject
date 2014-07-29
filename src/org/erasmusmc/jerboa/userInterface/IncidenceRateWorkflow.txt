@@ -1,0 +1,12 @@
+Aggregated data file (FileInputModule)
+parameters
+  outputFilename = Aggregate.txt
+end
+
+Calculate incidence rates (IncidenceRateModule)
+inputs 
+  aggregatedData = Aggregated data file
+parameters
+  perNYears = 100000 
+  outputFilename = IncidenceRates.csv
+end
