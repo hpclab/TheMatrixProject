@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="org/erasmusmc/jerboa/calculations/Disproportionality.java|org/erasmusmc/jerboa/manual/ManualDoclet.java|org/erasmusmc/jerboa/postProcessing/PRRRORCalculator.java" kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/Dexter.jar"/>
+	<classpathentry kind="lib" path="lib/jopt-simple-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="lib/Lexter.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.18.jar"/>
+	<classpathentry kind="lib" path="lib/Neverlang.jar"/>
+	<classpathentry kind="lib" path="lib/ojdbc6-11.1.0.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/super-csv-2.1.0.jar"/>
+	<classpathentry kind="lib" path="TheMatrixB.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
