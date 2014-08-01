@@ -1,0 +1,5928 @@
+HOSP (ScriptInputModule)
+parameters
+	scriptFilename = LoadHOSP.txt
+	inputName = HOSP
+	expectedSchema = IADhosp
+end
+EXE (ScriptInputModule)
+parameters
+	scriptFilename = LoadEXE.txt
+	inputName = EXE
+	expectedSchema = IADexe
+end
+PERSON (ScriptInputModule)
+parameters
+	scriptFilename = LoadPERSON.txt
+	inputName = PERSON
+	expectedSchema = IADperson
+end
+DRUGS (ScriptInputModule)
+parameters
+	scriptFilename = LoadDRUGS.txt
+	inputName = DRUGS
+	expectedSchema = IADdrug
+end
+OUTPAT (ScriptInputModule)
+parameters
+	scriptFilename = LoadOUTPAT.txt
+	inputName = OUTPAT
+	expectedSchema = IADoutpat
+end
+DDRUG (ScriptInputModule)
+parameters
+	scriptFilename = LoadDDRUG.txt
+	inputName = DDRUG
+	expectedSchema = IADdrug
+end
+
+// PREVALENT: mark prevalent at date 2012-01-01 
+
+ClFinalPrev12M (ExtendDataModule)
+inputs
+	IADperson = PERSON
+parameters
+  attributes = [ {IsPrev12M : boolean } ]
+end
+FinalPrev12M (ApplyFunction)
+inputs
+	custom = ClFinalPrev12M
+parameters
+	function = Id(true)
+	result   = IsPrev12M
+	conditions = [ {ENDDATE > 2012-01-01};{STARTDATE <= 2012-01-01} ]
+	boolExpr = AND
+end
+
+// PREVALENT: mark prevalent at date 2012-12-31
+
+ClFinalPrevDATEENDFUP (ExtendDataModule)
+inputs
+	custom = FinalPrev12M
+parameters
+  attributes = [ {IsPrevDATEENDFUP : boolean } ]
+end
+FinalPrevDATEENDFUP (ApplyFunction)
+inputs
+	custom = ClFinalPrevDATEENDFUP
+parameters
+	function = Id(true)
+	result   = IsPrevDATEENDFUP
+	conditions = [ {ENDDATE > 2012-12-31};{STARTDATE <= 2012-12-31} ]
+	boolExpr = AND
+end
+
+// PREVALENT: mark prevalent at date 2012-01-01 
+
+// PREVALENT: filter prevalent at either date 2012-01-01 or date 2012-12-31
+Cohort (FilterModule)
+inputs
+	custom = FinalPrevDATEENDFUP
+parameters
+	conditions = [{IsPrev12M = true}]
+	
+end
+
+// DIAB: select from source HOSP 
+FFirst_DIAB_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  matches "250*"};{SECONDARY_DIAGNOSIS_1 matches "250*"};{SECONDARY_DIAGNOSIS_2 matches "250*"};{SECONDARY_DIAGNOSIS_3 matches "250*"};{SECONDARY_DIAGNOSIS_4 matches "250*"};{SECONDARY_DIAGNOSIS_5 matches "250*"}]
+	boolExpr = OR 
+end
+
+sortedFirst_DIAB_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_DIAB_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_DIAB_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_DIAB_HOSP : date } ]
+end
+
+// PREVALENT: mark prevalent at date 2012-12-31
+
+// DIAB: select from source DRUGS 
+FFirst_DIAB_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+FinalPrevDATEENDFUP (ApplyFunction)
+inputs
+	custom = ClFinalPrevDATEENDFUP
+parameters
+	function = Id(true)
+	result   = IsPrevDATEENDFUP
+	conditions = [ {ENDDATE > 2012-12-31};{STARTDATE <= 2012-12-31} ]
+	boolExpr = AND
+end
+FFirst_DIAB_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+
+// PREVALENT: filter prevalent at either date 2012-01-01 or date 2012-12-31
+FFirst_DIAB_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSDDRUG
+	IADdrug = FFirst_DIAB_DRUGSDRUGS
+end
+
+ClYearFirst_DIAB_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSTot
+parameters
+  attributes = [ { YearFirst_DIAB_DRUGS: int } ]
+end
+YearFirst_DIAB_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DIAB_DRUGS
+	
+	
+end
+Cohort (FilterModule)
+inputs
+	custom = FinalPrevDATEENDFUP
+parameters
+	conditions = [{IsPrev12M = true}]
+	
+end
+sortedYearFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+end
+
+// DIAB: select from source HOSP 
+NumberFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DIAB_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DIAB_DRUGS : int };{ DateFirstFirst_DIAB_DRUGS : date } ]
+end
+FFirst_DIAB_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  matches "250*"};{SECONDARY_DIAGNOSIS_1 matches "250*"};{SECONDARY_DIAGNOSIS_2 matches "250*"};{SECONDARY_DIAGNOSIS_3 matches "250*"};{SECONDARY_DIAGNOSIS_4 matches "250*"};{SECONDARY_DIAGNOSIS_5 matches "250*"}]
+	boolExpr = OR 
+end
+FilterTwoFirst_DIAB_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DRUGS
+parameters
+	conditions = [{NumberFirst_DIAB_DRUGS>1}]
+	
+end
+sortedFirst_DIAB_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DRUGS) ]
+	results =  [ {First_DIAB_DRUGS : date} ]
+end
+FinalFirst_DIAB_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_DIAB_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_DIAB_HOSP : date } ]
+end
+
+// DIAB: select from source EXE 
+
+// DIAB: select from source DRUGS 
+FFirst_DIAB_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*250"}]
+	
+end
+sortedFirst_DIAB_EXE (SortModule)
+inputs
+	IADexe = FFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_DIAB_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_DIAB_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_DIAB_EXE : date } ]
+end
+FFirst_DIAB_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+
+// IHD: select from source HOSP 
+FFirst_DIAB_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+FFirst_IHD_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS = MISSING};{MAIN_DIAGNOSIS  matches "410*"};{SECONDARY_DIAGNOSIS_1 matches "410*"};{SECONDARY_DIAGNOSIS_2 matches "410*"};{SECONDARY_DIAGNOSIS_3 matches "410*"};{SECONDARY_DIAGNOSIS_4 matches "410*"};{SECONDARY_DIAGNOSIS_5 matches "410*"};{MAIN_DIAGNOSIS  matches "411*"};{SECONDARY_DIAGNOSIS_1 matches "411*"};{SECONDARY_DIAGNOSIS_2 matches "411*"};{SECONDARY_DIAGNOSIS_3 matches "411*"};{SECONDARY_DIAGNOSIS_4 matches "411*"};{SECONDARY_DIAGNOSIS_5 matches "411*"};{MAIN_DIAGNOSIS  matches "412*"};{SECONDARY_DIAGNOSIS_1 matches "412*"};{SECONDARY_DIAGNOSIS_2 matches "412*"};{SECONDARY_DIAGNOSIS_3 matches "412*"};{SECONDARY_DIAGNOSIS_4 matches "412*"};{SECONDARY_DIAGNOSIS_5 matches "412*"};{MAIN_DIAGNOSIS  matches "413*"};{SECONDARY_DIAGNOSIS_1 matches "413*"};{SECONDARY_DIAGNOSIS_2 matches "413*"};{SECONDARY_DIAGNOSIS_3 matches "413*"};{SECONDARY_DIAGNOSIS_4 matches "413*"};{SECONDARY_DIAGNOSIS_5 matches "413*"};{MAIN_DIAGNOSIS  matches "414*"};{SECONDARY_DIAGNOSIS_1 matches "414*"};{SECONDARY_DIAGNOSIS_2 matches "414*"};{SECONDARY_DIAGNOSIS_3 matches "414*"};{SECONDARY_DIAGNOSIS_4 matches "414*"};{SECONDARY_DIAGNOSIS_5 matches "414*"}]
+	boolExpr = OR 
+end
+sortedFirst_IHD_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FFirst_DIAB_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSDDRUG
+	IADdrug = FFirst_DIAB_DRUGSDRUGS
+end
+
+FinalFirst_IHD_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_IHD_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_IHD_HOSP : date } ]
+end
+
+// IHD: select from source DRUGS 
+ClYearFirst_DIAB_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSTot
+parameters
+  attributes = [ { YearFirst_DIAB_DRUGS: int } ]
+end
+FFirst_IHD_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+FFirst_IHD_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+YearFirst_DIAB_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DIAB_DRUGS
+	
+	
+end
+FFirst_IHD_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_IHD_DRUGSDDRUG
+	IADdrug = FFirst_IHD_DRUGSDRUGS
+end
+
+sortedYearFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+end
+NumberFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DIAB_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DIAB_DRUGS : int };{ DateFirstFirst_DIAB_DRUGS : date } ]
+end
+ClYearFirst_IHD_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_IHD_DRUGSTot
+parameters
+  attributes = [ { YearFirst_IHD_DRUGS: int } ]
+end
+FilterTwoFirst_DIAB_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DRUGS
+parameters
+	conditions = [{NumberFirst_DIAB_DRUGS>1}]
+	
+end
+YearFirst_IHD_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_IHD_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_IHD_DRUGS
+	
+	
+end
+sortedYearFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = YearFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_IHD_DRUGS ]
+end
+NumberFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_IHD_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_IHD_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_IHD_DRUGS : int };{ DateFirstFirst_IHD_DRUGS : date } ]
+end
+FinalFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DRUGS) ]
+	results =  [ {First_DIAB_DRUGS : date} ]
+end
+FilterTwoFirst_IHD_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_IHD_DRUGS
+parameters
+	conditions = [{NumberFirst_IHD_DRUGS>1}]
+	
+end
+
+// DIAB: select from source EXE 
+FinalFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_IHD_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_IHD_DRUGS) ]
+	results =  [ {First_IHD_DRUGS : date} ]
+end
+
+// IHD: select from source EXE 
+FFirst_DIAB_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*250"}]
+	
+end
+FFirst_IHD_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*414"}]
+	
+end
+sortedFirst_IHD_EXE (SortModule)
+inputs
+	IADexe = FFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_IHD_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_IHD_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_IHD_EXE : date } ]
+end
+sortedFirst_DIAB_EXE (SortModule)
+inputs
+	IADexe = FFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// HF: select from source HOSP 
+FinalFirst_DIAB_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_DIAB_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_DIAB_EXE : date } ]
+end
+FFirst_HF_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  = MISSING };{MAIN_DIAGNOSIS  matches "428*"};{SECONDARY_DIAGNOSIS_1 matches "428*"};{SECONDARY_DIAGNOSIS_2 matches "428*"};{SECONDARY_DIAGNOSIS_3 matches "428*"};{SECONDARY_DIAGNOSIS_4 matches "428*"};{SECONDARY_DIAGNOSIS_5 matches "428*"};{MAIN_DIAGNOSIS  matches "39891*"};{SECONDARY_DIAGNOSIS_1 matches "39891*"};{SECONDARY_DIAGNOSIS_2 matches "39891*"};{SECONDARY_DIAGNOSIS_3 matches "39891*"};{SECONDARY_DIAGNOSIS_4 matches "39891*"};{SECONDARY_DIAGNOSIS_5 matches "39891*"};{MAIN_DIAGNOSIS  matches "40201*"};{SECONDARY_DIAGNOSIS_1 matches "40201*"};{SECONDARY_DIAGNOSIS_2 matches "40201*"};{SECONDARY_DIAGNOSIS_3 matches "40201*"};{SECONDARY_DIAGNOSIS_4 matches "40201*"};{SECONDARY_DIAGNOSIS_5 matches "40201*"};{MAIN_DIAGNOSIS  matches "40211*"};{SECONDARY_DIAGNOSIS_1 matches "40211*"};{SECONDARY_DIAGNOSIS_2 matches "40211*"};{SECONDARY_DIAGNOSIS_3 matches "40211*"};{SECONDARY_DIAGNOSIS_4 matches "40211*"};{SECONDARY_DIAGNOSIS_5 matches "40211*"};{MAIN_DIAGNOSIS  matches "40291*"};{SECONDARY_DIAGNOSIS_1 matches "40291*"};{SECONDARY_DIAGNOSIS_2 matches "40291*"};{SECONDARY_DIAGNOSIS_3 matches "40291*"};{SECONDARY_DIAGNOSIS_4 matches "40291*"};{SECONDARY_DIAGNOSIS_5 matches "40291*"};{MAIN_DIAGNOSIS  matches "40401*"};{SECONDARY_DIAGNOSIS_1 matches "40401*"};{SECONDARY_DIAGNOSIS_2 matches "40401*"};{SECONDARY_DIAGNOSIS_3 matches "40401*"};{SECONDARY_DIAGNOSIS_4 matches "40401*"};{SECONDARY_DIAGNOSIS_5 matches "40401*"};{MAIN_DIAGNOSIS  matches "40403*"};{SECONDARY_DIAGNOSIS_1 matches "40403*"};{SECONDARY_DIAGNOSIS_2 matches "40403*"};{SECONDARY_DIAGNOSIS_3 matches "40403*"};{SECONDARY_DIAGNOSIS_4 matches "40403*"};{SECONDARY_DIAGNOSIS_5 matches "40403*"};{MAIN_DIAGNOSIS  matches "40411*"};{SECONDARY_DIAGNOSIS_1 matches "40411*"};{SECONDARY_DIAGNOSIS_2 matches "40411*"};{SECONDARY_DIAGNOSIS_3 matches "40411*"};{SECONDARY_DIAGNOSIS_4 matches "40411*"};{SECONDARY_DIAGNOSIS_5 matches "40411*"};{MAIN_DIAGNOSIS  matches "40413*"};{SECONDARY_DIAGNOSIS_1 matches "40413*"};{SECONDARY_DIAGNOSIS_2 matches "40413*"};{SECONDARY_DIAGNOSIS_3 matches "40413*"};{SECONDARY_DIAGNOSIS_4 matches "40413*"};{SECONDARY_DIAGNOSIS_5 matches "40413*"};{MAIN_DIAGNOSIS  matches "40491*"};{SECONDARY_DIAGNOSIS_1 matches "40491*"};{SECONDARY_DIAGNOSIS_2 matches "40491*"};{SECONDARY_DIAGNOSIS_3 matches "40491*"};{SECONDARY_DIAGNOSIS_4 matches "40491*"};{SECONDARY_DIAGNOSIS_5 matches "40491*"};{MAIN_DIAGNOSIS  matches "40493*"};{SECONDARY_DIAGNOSIS_1 matches "40493*"};{SECONDARY_DIAGNOSIS_2 matches "40493*"};{SECONDARY_DIAGNOSIS_3 matches "40493*"};{SECONDARY_DIAGNOSIS_4 matches "40493*"};{SECONDARY_DIAGNOSIS_5 matches "40493*"}]
+	boolExpr = OR 
+end
+
+// IHD: select from source HOSP 
+sortedFirst_HF_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FFirst_IHD_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS = MISSING};{MAIN_DIAGNOSIS  matches "410*"};{SECONDARY_DIAGNOSIS_1 matches "410*"};{SECONDARY_DIAGNOSIS_2 matches "410*"};{SECONDARY_DIAGNOSIS_3 matches "410*"};{SECONDARY_DIAGNOSIS_4 matches "410*"};{SECONDARY_DIAGNOSIS_5 matches "410*"};{MAIN_DIAGNOSIS  matches "411*"};{SECONDARY_DIAGNOSIS_1 matches "411*"};{SECONDARY_DIAGNOSIS_2 matches "411*"};{SECONDARY_DIAGNOSIS_3 matches "411*"};{SECONDARY_DIAGNOSIS_4 matches "411*"};{SECONDARY_DIAGNOSIS_5 matches "411*"};{MAIN_DIAGNOSIS  matches "412*"};{SECONDARY_DIAGNOSIS_1 matches "412*"};{SECONDARY_DIAGNOSIS_2 matches "412*"};{SECONDARY_DIAGNOSIS_3 matches "412*"};{SECONDARY_DIAGNOSIS_4 matches "412*"};{SECONDARY_DIAGNOSIS_5 matches "412*"};{MAIN_DIAGNOSIS  matches "413*"};{SECONDARY_DIAGNOSIS_1 matches "413*"};{SECONDARY_DIAGNOSIS_2 matches "413*"};{SECONDARY_DIAGNOSIS_3 matches "413*"};{SECONDARY_DIAGNOSIS_4 matches "413*"};{SECONDARY_DIAGNOSIS_5 matches "413*"};{MAIN_DIAGNOSIS  matches "414*"};{SECONDARY_DIAGNOSIS_1 matches "414*"};{SECONDARY_DIAGNOSIS_2 matches "414*"};{SECONDARY_DIAGNOSIS_3 matches "414*"};{SECONDARY_DIAGNOSIS_4 matches "414*"};{SECONDARY_DIAGNOSIS_5 matches "414*"}]
+	boolExpr = OR 
+end
+FinalFirst_HF_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_HF_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_HF_HOSP : date } ]
+end
+sortedFirst_IHD_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+
+// HF: select from source EXE 
+FFirst_HF_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*428"}]
+	
+end
+FinalFirst_IHD_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_IHD_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_IHD_HOSP : date } ]
+end
+sortedFirst_HF_EXE (SortModule)
+inputs
+	IADexe = FFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_HF_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HF_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HF_EXE : date } ]
+end
+
+// IHD: select from source DRUGS 
+
+// HYPERTE: select from source EXE 
+FFirst_IHD_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+FFirst_IHD_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+FFirst_HYPERTE_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*401"};{EXEMPTION_CODE  matches "*402"};{EXEMPTION_CODE  matches "*403"};{EXEMPTION_CODE  matches "*404"};{EXEMPTION_CODE  matches "*405"}]
+	boolExpr = OR 
+end
+sortedFirst_HYPERTE_EXE (SortModule)
+inputs
+	IADexe = FFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FFirst_IHD_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_IHD_DRUGSDDRUG
+	IADdrug = FFirst_IHD_DRUGSDRUGS
+end
+
+FinalFirst_HYPERTE_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HYPERTE_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HYPERTE_EXE : date } ]
+end
+
+// DEMEN: select from source DRUGS 
+FFirst_DEMEN_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC = "N06DA02"}]
+	
+end
+FFirst_DEMEN_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC = "N06DA02"}]
+	
+end
+ClYearFirst_IHD_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_IHD_DRUGSTot
+parameters
+  attributes = [ { YearFirst_IHD_DRUGS: int } ]
+end
+FFirst_DEMEN_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_DEMEN_DRUGSDDRUG
+	IADdrug = FFirst_DEMEN_DRUGSDRUGS
+end
+
+YearFirst_IHD_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_IHD_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_IHD_DRUGS
+	
+	
+end
+ClYearFirst_DEMEN_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DEMEN_DRUGSTot
+parameters
+  attributes = [ { YearFirst_DEMEN_DRUGS: int } ]
+end
+sortedYearFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = YearFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_IHD_DRUGS ]
+end
+YearFirst_DEMEN_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DEMEN_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DEMEN_DRUGS
+	
+	
+end
+sortedYearFirst_DEMEN_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DEMEN_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DEMEN_DRUGS ]
+end
+NumberFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_IHD_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_IHD_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_IHD_DRUGS : int };{ DateFirstFirst_IHD_DRUGS : date } ]
+end
+NumberFirst_DEMEN_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DEMEN_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DEMEN_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DEMEN_DRUGS : int };{ DateFirstFirst_DEMEN_DRUGS : date } ]
+end
+FilterTwoFirst_IHD_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_IHD_DRUGS
+parameters
+	conditions = [{NumberFirst_IHD_DRUGS>1}]
+	
+end
+FilterTwoFirst_DEMEN_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DEMEN_DRUGS
+parameters
+	conditions = [{NumberFirst_DEMEN_DRUGS>1}]
+	
+end
+FinalFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_IHD_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_IHD_DRUGS) ]
+	results =  [ {First_IHD_DRUGS : date} ]
+end
+FinalFirst_DEMEN_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DEMEN_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DEMEN_DRUGS) ]
+	results =  [ {First_DEMEN_DRUGS : date} ]
+end
+
+// OLDAMI: select from source HOSP 
+
+// IHD: select from source EXE 
+FFirst_OLDAMI_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  = MISSING };{MAIN_DIAGNOSIS  matches "410*"};{SECONDARY_DIAGNOSIS_1 matches "410*"};{SECONDARY_DIAGNOSIS_2 matches "410*"};{SECONDARY_DIAGNOSIS_3 matches "410*"};{SECONDARY_DIAGNOSIS_4 matches "410*"};{SECONDARY_DIAGNOSIS_5 matches "410*"};{MAIN_DIAGNOSIS  matches "412*"};{SECONDARY_DIAGNOSIS_1 matches "412*"};{SECONDARY_DIAGNOSIS_2 matches "412*"};{SECONDARY_DIAGNOSIS_3 matches "412*"};{SECONDARY_DIAGNOSIS_4 matches "412*"};{SECONDARY_DIAGNOSIS_5 matches "412*"}]
+	boolExpr = OR 
+end
+FFirst_IHD_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*414"}]
+	
+end
+sortedFirst_OLDAMI_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_OLDAMI_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_OLDAMI_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_OLDAMI_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_OLDAMI_HOSP : date } ]
+end
+
+// GENERAL INDICATORS PREPARE SOURCES: filter period, enrich with auxiliary variables and sort
+sortedFirst_IHD_EXE (SortModule)
+inputs
+	IADexe = FFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare OUTPAT
+FinalFirst_IHD_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_IHD_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_IHD_EXE : date } ]
+end
+LastYearOUTPAT (FilterModule)
+inputs
+	IADoutpat = OUTPAT
+parameters
+	conditions = [{PROC_START_DATE >= 2012-01-01};{PROC_START_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+
+// Generate TypeOfProc in OUTPAT
+ClLastYearOUTPATEnriched1 (ExtendDataModule)
+inputs
+	IADoutpat = LastYearOUTPAT
+parameters
+  attributes = [ { TypeOfProc: string } ]
+end
+
+// HF: select from source HOSP 
+LastYearOUTPATEnriched1 (ApplyFunction)
+inputs
+	custom = ClLastYearOUTPATEnriched1
+parameters
+	function = TypeOfProc(PROC_COD)
+	result   = TypeOfProc
+	
+	
+end
+FFirst_HF_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  = MISSING };{MAIN_DIAGNOSIS  matches "428*"};{SECONDARY_DIAGNOSIS_1 matches "428*"};{SECONDARY_DIAGNOSIS_2 matches "428*"};{SECONDARY_DIAGNOSIS_3 matches "428*"};{SECONDARY_DIAGNOSIS_4 matches "428*"};{SECONDARY_DIAGNOSIS_5 matches "428*"};{MAIN_DIAGNOSIS  matches "39891*"};{SECONDARY_DIAGNOSIS_1 matches "39891*"};{SECONDARY_DIAGNOSIS_2 matches "39891*"};{SECONDARY_DIAGNOSIS_3 matches "39891*"};{SECONDARY_DIAGNOSIS_4 matches "39891*"};{SECONDARY_DIAGNOSIS_5 matches "39891*"};{MAIN_DIAGNOSIS  matches "40201*"};{SECONDARY_DIAGNOSIS_1 matches "40201*"};{SECONDARY_DIAGNOSIS_2 matches "40201*"};{SECONDARY_DIAGNOSIS_3 matches "40201*"};{SECONDARY_DIAGNOSIS_4 matches "40201*"};{SECONDARY_DIAGNOSIS_5 matches "40201*"};{MAIN_DIAGNOSIS  matches "40211*"};{SECONDARY_DIAGNOSIS_1 matches "40211*"};{SECONDARY_DIAGNOSIS_2 matches "40211*"};{SECONDARY_DIAGNOSIS_3 matches "40211*"};{SECONDARY_DIAGNOSIS_4 matches "40211*"};{SECONDARY_DIAGNOSIS_5 matches "40211*"};{MAIN_DIAGNOSIS  matches "40291*"};{SECONDARY_DIAGNOSIS_1 matches "40291*"};{SECONDARY_DIAGNOSIS_2 matches "40291*"};{SECONDARY_DIAGNOSIS_3 matches "40291*"};{SECONDARY_DIAGNOSIS_4 matches "40291*"};{SECONDARY_DIAGNOSIS_5 matches "40291*"};{MAIN_DIAGNOSIS  matches "40401*"};{SECONDARY_DIAGNOSIS_1 matches "40401*"};{SECONDARY_DIAGNOSIS_2 matches "40401*"};{SECONDARY_DIAGNOSIS_3 matches "40401*"};{SECONDARY_DIAGNOSIS_4 matches "40401*"};{SECONDARY_DIAGNOSIS_5 matches "40401*"};{MAIN_DIAGNOSIS  matches "40403*"};{SECONDARY_DIAGNOSIS_1 matches "40403*"};{SECONDARY_DIAGNOSIS_2 matches "40403*"};{SECONDARY_DIAGNOSIS_3 matches "40403*"};{SECONDARY_DIAGNOSIS_4 matches "40403*"};{SECONDARY_DIAGNOSIS_5 matches "40403*"};{MAIN_DIAGNOSIS  matches "40411*"};{SECONDARY_DIAGNOSIS_1 matches "40411*"};{SECONDARY_DIAGNOSIS_2 matches "40411*"};{SECONDARY_DIAGNOSIS_3 matches "40411*"};{SECONDARY_DIAGNOSIS_4 matches "40411*"};{SECONDARY_DIAGNOSIS_5 matches "40411*"};{MAIN_DIAGNOSIS  matches "40413*"};{SECONDARY_DIAGNOSIS_1 matches "40413*"};{SECONDARY_DIAGNOSIS_2 matches "40413*"};{SECONDARY_DIAGNOSIS_3 matches "40413*"};{SECONDARY_DIAGNOSIS_4 matches "40413*"};{SECONDARY_DIAGNOSIS_5 matches "40413*"};{MAIN_DIAGNOSIS  matches "40491*"};{SECONDARY_DIAGNOSIS_1 matches "40491*"};{SECONDARY_DIAGNOSIS_2 matches "40491*"};{SECONDARY_DIAGNOSIS_3 matches "40491*"};{SECONDARY_DIAGNOSIS_4 matches "40491*"};{SECONDARY_DIAGNOSIS_5 matches "40491*"};{MAIN_DIAGNOSIS  matches "40493*"};{SECONDARY_DIAGNOSIS_1 matches "40493*"};{SECONDARY_DIAGNOSIS_2 matches "40493*"};{SECONDARY_DIAGNOSIS_3 matches "40493*"};{SECONDARY_DIAGNOSIS_4 matches "40493*"};{SECONDARY_DIAGNOSIS_5 matches "40493*"}]
+	boolExpr = OR 
+end
+
+// Generate IsGeneralVisit in OUTPAT
+sortedFirst_HF_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+ClLastYearOUTPATEnriched (ExtendDataModule)
+inputs
+	IADoutpat = LastYearOUTPATEnriched1
+parameters
+  attributes = [ { IsGeneralVisit: boolean } ]
+end
+FinalFirst_HF_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_HF_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_HF_HOSP : date } ]
+end
+LastYearOUTPATEnriched (ApplyFunction)
+inputs
+	custom = ClLastYearOUTPATEnriched
+parameters
+	function = Id(true)
+	result   = IsGeneralVisit
+	conditions = [{PROC_COD  = "89.7"} ; {PROC_COD  = "89.01"} ; {PROC_COD  = "89.07"} ; {PROC_COD  = "89.03"}; {PROC_COD  = "897"} ; {PROC_COD  = "8901"} ; {PROC_COD  = "8907"} ; {PROC_COD  = "8903"}]
+	boolExpr = OR
+end
+sortedLastYearOUTPAT (SortModule)
+inputs
+	custom = LastYearOUTPATEnriched
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// HF: select from source EXE 
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare DRUGS
+FFirst_HF_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*428"}]
+	
+end
+LastYearDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE >= 2012-01-01};{DRUG_DISPENSING_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+LastYearDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{DRUG_DISPENSING_DATE >= 2012-01-01};{DRUG_DISPENSING_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+sortedFirst_HF_EXE (SortModule)
+inputs
+	IADexe = FFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+LastYearDRUGSTot (UnionModule)
+inputs
+	IADdrug = LastYearDDRUG
+	IADdrug = LastYearDRUGS
+end
+
+LastYearDRUGSEnriched (ExtendDataModule)
+inputs
+	IADdrug = LastYearDRUGSTot
+parameters
+  attributes = [ {Aux: string} ]
+end
+FinalFirst_HF_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HF_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HF_EXE : date } ]
+end
+sortedLastYearDRUGS (SortModule)
+inputs
+	custom = LastYearDRUGSEnriched
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare HOSP
+
+// HYPERTE: select from source EXE 
+LastYearHOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{START_DATE >= 2012-01-01};{START_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+
+// Generate TypeOfFullWard in HOSP
+FFirst_HYPERTE_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*401"};{EXEMPTION_CODE  matches "*402"};{EXEMPTION_CODE  matches "*403"};{EXEMPTION_CODE  matches "*404"};{EXEMPTION_CODE  matches "*405"}]
+	boolExpr = OR 
+end
+ClLastYearHOSPEnriched1 (ExtendDataModule)
+inputs
+	IADhosp = LastYearHOSP
+parameters
+  attributes = [ { TypeOfFullWard: string } ]
+end
+sortedFirst_HYPERTE_EXE (SortModule)
+inputs
+	IADexe = FFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+LastYearHOSPEnriched1 (ApplyFunction)
+inputs
+	custom = ClLastYearHOSPEnriched1
+parameters
+	function = TypeOfFullWard(WARD_DISCHARGE)
+	result   = TypeOfFullWard
+	
+	
+end
+FinalFirst_HYPERTE_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HYPERTE_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HYPERTE_EXE : date } ]
+end
+
+// Generate TypeOfDRG
+
+// DEMEN: select from source DRUGS 
+ClLastYearHOSPEnriched2 (ExtendDataModule)
+inputs
+	custom = LastYearHOSPEnriched1
+parameters
+  attributes = [ { TypeOfDRG: string } ]
+end
+LastYearHOSPEnriched2 (ApplyFunction)
+inputs
+	custom = ClLastYearHOSPEnriched2
+parameters
+	function = Id("MED")
+	result   = TypeOfDRG
+	conditions = [ {START_DATE<1900-01-01} ; {DRG = "9"} ; {DRG = "10"} ; {DRG = "11"} ; {DRG = "12"} ; {DRG = "13"} ; {DRG = "14"} ; {DRG = "15"} ; {DRG = "16"} ; {DRG = "17"} ; {DRG = "18"} ; {DRG = "19"} ; {DRG = "21"} ; {DRG = "22"} ; {DRG = "23"} ; {DRG = "26"} ; {DRG = "27"} ; {DRG = "28"} ; {DRG = "29"} ; {DRG = "30"} ; {DRG = "31"} ; {DRG = "32"} ; {DRG = "33"} ; {DRG = "34"} ; {DRG = "35"} ; {DRG = "43"} ; {DRG = "44"} ; {DRG = "45"} ; {DRG = "46"} ; {DRG = "47"} ; {DRG = "48"} ; {DRG = "64"} ; {DRG = "65"} ; {DRG = "66"} ; {DRG = "67"} ; {DRG = "68"} ; {DRG = "69"} ; {DRG = "70"} ; {DRG = "71"} ; {DRG = "72"} ; {DRG = "73"} ; {DRG = "74"} ; {DRG = "78"} ; {DRG = "79"} ; {DRG = "80"} ; {DRG = "81"} ; {DRG = "82"} ; {DRG = "83"} ; {DRG = "84"} ; {DRG = "85"} ; {DRG = "86"} ; {DRG = "87"} ; {DRG = "88"} ; {DRG = "89"} ; {DRG = "90"} ; {DRG = "91"} ; {DRG = "92"} ; {DRG = "93"} ; {DRG = "94"} ; {DRG = "95"} ; {DRG = "96"} ; {DRG = "97"} ; {DRG = "98"} ; {DRG = "99"} ; {DRG = "100"} ; {DRG = "101"} ; {DRG = "102"} ; {DRG = "121"} ; {DRG = "122"} ; {DRG = "123"} ; {DRG = "124"} ; {DRG = "125"} ; {DRG = "126"} ; {DRG = "127"} ; {DRG = "128"} ; {DRG = "129"} ; {DRG = "130"} ; {DRG = "131"} ; {DRG = "132"} ; {DRG = "133"} ; {DRG = "134"} ; {DRG = "135"} ; {DRG = "136"} ; {DRG = "137"} ; {DRG = "138"} ; {DRG = "139"} ; {DRG = "140"} ; {DRG = "141"} ; {DRG = "142"} ; {DRG = "143"} ; {DRG = "144"} ; {DRG = "145"} ; {DRG = "172"} ; {DRG = "173"} ; {DRG = "174"} ; {DRG = "175"} ; {DRG = "176"} ; {DRG = "177"} ; {DRG = "178"} ; {DRG = "179"} ; {DRG = "180"} ; {DRG = "181"} ; {DRG = "182"} ; {DRG = "183"} ; {DRG = "184"} ; {DRG = "185"} ; {DRG = "186"} ; {DRG = "187"} ; {DRG = "188"} ; {DRG = "189"} ; {DRG = "190"} ; {DRG = "202"} ; {DRG = "203"} ; {DRG = "204"} ; {DRG = "205"} ; {DRG = "206"} ; {DRG = "207"} ; {DRG = "208"} ; {DRG = "235"} ; {DRG = "236"} ; {DRG = "237"} ; {DRG = "238"} ; {DRG = "239"} ; {DRG = "240"} ; {DRG = "241"} ; {DRG = "242"} ; {DRG = "243"} ; {DRG = "244"} ; {DRG = "245"} ; {DRG = "246"} ; {DRG = "247"} ; {DRG = "248"} ; {DRG = "249"} ; {DRG = "250"} ; {DRG = "251"} ; {DRG = "252"} ; {DRG = "253"} ; {DRG = "254"} ; {DRG = "255"} ; {DRG = "256"} ; {DRG = "271"} ; {DRG = "272"} ; {DRG = "273"} ; {DRG = "274"} ; {DRG = "275"} ; {DRG = "276"} ; {DRG = "277"} ; {DRG = "278"} ; {DRG = "279"} ; {DRG = "280"} ; {DRG = "281"} ; {DRG = "282"} ; {DRG = "283"} ; {DRG = "284"} ; {DRG = "294"} ; {DRG = "295"} ; {DRG = "296"} ; {DRG = "297"} ; {DRG = "298"} ; {DRG = "299"} ; {DRG = "300"} ; {DRG = "301"} ; {DRG = "316"} ; {DRG = "317"} ; {DRG = "318"} ; {DRG = "319"} ; {DRG = "320"} ; {DRG = "321"} ; {DRG = "322"} ; {DRG = "323"} ; {DRG = "324"} ; {DRG = "325"} ; {DRG = "326"} ; {DRG = "327"} ; {DRG = "328"} ; {DRG = "329"} ; {DRG = "330"} ; {DRG = "331"} ; {DRG = "332"} ; {DRG = "333"} ; {DRG = "346"} ; {DRG = "347"} ; {DRG = "348"} ; {DRG = "349"} ; {DRG = "350"} ; {DRG = "351"} ; {DRG = "352"} ; {DRG = "366"} ; {DRG = "367"} ; {DRG = "368"} ; {DRG = "369"} ; {DRG = "372"} ; {DRG = "373"} ; {DRG = "376"} ; {DRG = "378"} ; {DRG = "379"} ; {DRG = "380"} ; {DRG = "382"} ; {DRG = "383"} ; {DRG = "384"} ; {DRG = "385"} ; {DRG = "386"} ; {DRG = "387"} ; {DRG = "388"} ; {DRG = "389"} ; {DRG = "390"} ; {DRG = "391"} ; {DRG = "395"} ; {DRG = "396"} ; {DRG = "397"} ; {DRG = "398"} ; {DRG = "399"} ; {DRG = "403"} ; {DRG = "404"} ; {DRG = "405"} ; {DRG = "409"} ; {DRG = "410"} ; {DRG = "411"} ; {DRG = "412"} ; {DRG = "413"} ; {DRG = "414"} ; {DRG = "417"} ; {DRG = "418"} ; {DRG = "419"} ; {DRG = "420"} ; {DRG = "421"} ; {DRG = "422"} ; {DRG = "423"} ; {DRG = "425"} ; {DRG = "426"} ; {DRG = "427"} ; {DRG = "428"} ; {DRG = "429"} ; {DRG = "430"} ; {DRG = "431"} ; {DRG = "432"} ; {DRG = "433"} ; {DRG = "444"} ; {DRG = "445"} ; {DRG = "446"} ; {DRG = "447"} ; {DRG = "448"} ; {DRG = "449"} ; {DRG = "450"} ; {DRG = "451"} ; {DRG = "452"} ; {DRG = "453"} ; {DRG = "454"} ; {DRG = "455"} ; {DRG = "462"} ; {DRG = "463"} ; {DRG = "464"} ; {DRG = "465"} ; {DRG = "466"} ; {DRG = "467"} ; {DRG = "469"} ; {DRG = "470"} ; {DRG = "473"} ; {DRG = "487"} ; {DRG = "489"} ; {DRG = "490"} ; {DRG = "492"} ; {DRG = "505"} ; {DRG = "508"} ; {DRG = "509"} ; {DRG = "510"} ; {DRG = "511"} ; {DRG = "521"} ; {DRG = "522"} ; {DRG = "523"} ; {DRG = "524"} ; {DRG = "559"} ; {DRG = "560"} ; {DRG = "561"} ; {DRG = "562"} ; {DRG = "563"} ; {DRG = "564"} ; {DRG = "565"} ; {DRG = "566"} ; {DRG = "571"} ; {DRG = "572"} ; {DRG = "574"} ; {DRG = "575"} ; {DRG = "576"} ]
+	boolExpr = OR
+end
+LastYearHOSPEnriched (ApplyFunction)
+inputs
+	custom = LastYearHOSPEnriched2
+parameters
+	function = Id("CHI")
+	result   = TypeOfDRG
+	conditions = [ {START_DATE<1900-01-01} ; {DRG = "1"} ; {DRG = "2"} ; {DRG = "3"} ; {DRG = "6"} ; {DRG = "7"} ; {DRG = "8"} ; {DRG = "36"} ; {DRG = "37"} ; {DRG = "38"} ; {DRG = "39"} ; {DRG = "40"} ; {DRG = "41"} ; {DRG = "42"} ; {DRG = "49"} ; {DRG = "50"} ; {DRG = "51"} ; {DRG = "52"} ; {DRG = "53"} ; {DRG = "54"} ; {DRG = "55"} ; {DRG = "56"} ; {DRG = "57"} ; {DRG = "58"} ; {DRG = "59"} ; {DRG = "60"} ; {DRG = "61"} ; {DRG = "62"} ; {DRG = "63"} ; {DRG = "75"} ; {DRG = "76"} ; {DRG = "77"} ; {DRG = "103"} ; {DRG = "104"} ; {DRG = "105"} ; {DRG = "106"} ; {DRG = "108"} ; {DRG = "110"} ; {DRG = "111"} ; {DRG = "113"} ; {DRG = "114"} ; {DRG = "117"} ; {DRG = "118"} ; {DRG = "119"} ; {DRG = "120"} ; {DRG = "146"} ; {DRG = "147"} ; {DRG = "149"} ; {DRG = "150"} ; {DRG = "151"} ; {DRG = "152"} ; {DRG = "153"} ; {DRG = "155"} ; {DRG = "156"} ; {DRG = "157"} ; {DRG = "158"} ; {DRG = "159"} ; {DRG = "160"} ; {DRG = "161"} ; {DRG = "162"} ; {DRG = "163"} ; {DRG = "164"} ; {DRG = "165"} ; {DRG = "166"} ; {DRG = "167"} ; {DRG = "168"} ; {DRG = "169"} ; {DRG = "170"} ; {DRG = "171"} ; {DRG = "191"} ; {DRG = "192"} ; {DRG = "193"} ; {DRG = "194"} ; {DRG = "195"} ; {DRG = "196"} ; {DRG = "197"} ; {DRG = "198"} ; {DRG = "199"} ; {DRG = "200"} ; {DRG = "201"} ; {DRG = "210"} ; {DRG = "211"} ; {DRG = "212"} ; {DRG = "213"} ; {DRG = "216"} ; {DRG = "217"} ; {DRG = "218"} ; {DRG = "219"} ; {DRG = "220"} ; {DRG = "223"} ; {DRG = "224"} ; {DRG = "225"} ; {DRG = "226"} ; {DRG = "227"} ; {DRG = "228"} ; {DRG = "229"} ; {DRG = "230"} ; {DRG = "232"} ; {DRG = "233"} ; {DRG = "234"} ; {DRG = "257"} ; {DRG = "258"} ; {DRG = "259"} ; {DRG = "260"} ; {DRG = "261"} ; {DRG = "262"} ; {DRG = "263"} ; {DRG = "264"} ; {DRG = "265"} ; {DRG = "266"} ; {DRG = "267"} ; {DRG = "268"} ; {DRG = "269"} ; {DRG = "270"} ; {DRG = "285"} ; {DRG = "286"} ; {DRG = "287"} ; {DRG = "288"} ; {DRG = "289"} ; {DRG = "290"} ; {DRG = "291"} ; {DRG = "292"} ; {DRG = "293"} ; {DRG = "302"} ; {DRG = "303"} ; {DRG = "304"} ; {DRG = "305"} ; {DRG = "306"} ; {DRG = "307"} ; {DRG = "308"} ; {DRG = "309"} ; {DRG = "310"} ; {DRG = "311"} ; {DRG = "312"} ; {DRG = "313"} ; {DRG = "314"} ; {DRG = "315"} ; {DRG = "334"} ; {DRG = "335"} ; {DRG = "336"} ; {DRG = "337"} ; {DRG = "338"} ; {DRG = "339"} ; {DRG = "340"} ; {DRG = "341"} ; {DRG = "342"} ; {DRG = "343"} ; {DRG = "344"} ; {DRG = "345"} ; {DRG = "353"} ; {DRG = "354"} ; {DRG = "355"} ; {DRG = "356"} ; {DRG = "357"} ; {DRG = "358"} ; {DRG = "359"} ; {DRG = "360"} ; {DRG = "361"} ; {DRG = "362"} ; {DRG = "363"} ; {DRG = "364"} ; {DRG = "365"} ; {DRG = "370"} ; {DRG = "371"} ; {DRG = "374"} ; {DRG = "375"} ; {DRG = "377"} ; {DRG = "381"} ; {DRG = "392"} ; {DRG = "393"} ; {DRG = "394"} ; {DRG = "401"} ; {DRG = "402"} ; {DRG = "406"} ; {DRG = "407"} ; {DRG = "408"} ; {DRG = "424"} ; {DRG = "439"} ; {DRG = "440"} ; {DRG = "441"} ; {DRG = "442"} ; {DRG = "443"} ; {DRG = "461"} ; {DRG = "468"} ; {DRG = "471"} ; {DRG = "476"} ; {DRG = "477"} ; {DRG = "479"} ; {DRG = "480"} ; {DRG = "481"} ; {DRG = "482"} ; {DRG = "484"} ; {DRG = "485"} ; {DRG = "486"} ; {DRG = "488"} ; {DRG = "491"} ; {DRG = "493"} ; {DRG = "494"} ; {DRG = "495"} ; {DRG = "496"} ; {DRG = "497"} ; {DRG = "498"} ; {DRG = "499"} ; {DRG = "500"} ; {DRG = "501"} ; {DRG = "502"} ; {DRG = "503"} ; {DRG = "504"} ; {DRG = "506"} ; {DRG = "507"} ; {DRG = "512"} ; {DRG = "513"} ; {DRG = "515"} ; {DRG = "518"} ; {DRG = "519"} ; {DRG = "520"} ; {DRG = "525"} ; {DRG = "528"} ; {DRG = "529"} ; {DRG = "530"} ; {DRG = "531"} ; {DRG = "532"} ; {DRG = "533"} ; {DRG = "534"} ; {DRG = "535"} ; {DRG = "536"} ; {DRG = "537"} ; {DRG = "538"} ; {DRG = "539"} ; {DRG = "540"} ; {DRG = "541"} ; {DRG = "542"} ; {DRG = "543"} ; {DRG = "544"} ; {DRG = "545"} ; {DRG = "546"} ; {DRG = "547"} ; {DRG = "548"} ; {DRG = "549"} ; {DRG = "550"} ; {DRG = "551"} ; {DRG = "552"} ; {DRG = "553"} ; {DRG = "554"} ; {DRG = "555"} ; {DRG = "556"} ; {DRG = "557"} ; {DRG = "558"} ; {DRG = "567"} ; {DRG = "568"} ; {DRG = "569"} ; {DRG = "570"} ; {DRG = "573"} ; {DRG = "577"} ; {DRG = "578"} ; {DRG = "579"} ]
+	boolExpr = OR
+end
+sortedLastYearHOSP (SortModule)
+inputs
+	custom = LastYearHOSPEnriched
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FFirst_DEMEN_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC = "N06DA02"}]
+	
+end
+
+// INDICATORS FOR GENERAL POPULATION: TARIFFA_LORDO_FARMACI 
+FTARIFFA_LORDO_FARMACI (FilterModule)
+inputs
+	custom = sortedLastYearDRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE>1900-01-01}]
+	
+end
+FFirst_DEMEN_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC = "N06DA02"}]
+	
+end
+ATARIFFA_LORDO_FARMACI (AggregateModule)
+inputs
+	custom = FTARIFFA_LORDO_FARMACI
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(DRUG_DISPENSING_DATE),SUM(COST) ]
+	results =  [ { NumberTARIFFA_LORDO_FARMACI: int };{ CostTARIFFA_LORDO_FARMACI: float } ]
+end
+FinalTARIFFA_LORDO_FARMACI (RenameAttributesModule)
+inputs
+	custom = ATARIFFA_LORDO_FARMACI
+parameters
+	inputAttributes = [ CostTARIFFA_LORDO_FARMACI ]
+	outputAttributes   = [ TARIFFA_LORDO_FARMACI ]
+end
+
+
+
+// INDICATORS FOR GENERAL POPULATION: NUM_PRESC_FARM 
+FFirst_DEMEN_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_DEMEN_DRUGSDDRUG
+	IADdrug = FFirst_DEMEN_DRUGSDRUGS
+end
+
+FNUM_PRESC_FARM (FilterModule)
+inputs
+	custom = sortedLastYearDRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE>1900-01-01}]
+	
+end
+ANUM_PRESC_FARM (AggregateModule)
+inputs
+	custom = FNUM_PRESC_FARM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(DRUG_DISPENSING_DATE),SUM(COST) ]
+	results =  [ { NumberNUM_PRESC_FARM: int };{ CostNUM_PRESC_FARM: float } ]
+end
+ClYearFirst_DEMEN_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DEMEN_DRUGSTot
+parameters
+  attributes = [ { YearFirst_DEMEN_DRUGS: int } ]
+end
+FinalNUM_PRESC_FARM (RenameAttributesModule)
+inputs
+	custom = ANUM_PRESC_FARM
+parameters
+	inputAttributes = [ NumberNUM_PRESC_FARM ]
+	outputAttributes   = [ NUM_PRESC_FARM ]
+end
+
+
+YearFirst_DEMEN_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DEMEN_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DEMEN_DRUGS
+	
+	
+end
+
+// INDICATORS FOR GENERAL POPULATION: NUM_RIC 
+sortedYearFirst_DEMEN_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DEMEN_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DEMEN_DRUGS ]
+end
+FNUM_RIC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{START_DATE>1900-01-01}]
+	
+end
+NumberFirst_DEMEN_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DEMEN_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DEMEN_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DEMEN_DRUGS : int };{ DateFirstFirst_DEMEN_DRUGS : date } ]
+end
+ANUM_RIC (AggregateModule)
+inputs
+	custom = FNUM_RIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberNUM_RIC: int };{ CostNUM_RIC: float } ]
+end
+FilterTwoFirst_DEMEN_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DEMEN_DRUGS
+parameters
+	conditions = [{NumberFirst_DEMEN_DRUGS>1}]
+	
+end
+FinalNUM_RIC (RenameAttributesModule)
+inputs
+	custom = ANUM_RIC
+parameters
+	inputAttributes = [ NumberNUM_RIC ]
+	outputAttributes   = [ NUM_RIC ]
+end
+
+
+FinalFirst_DEMEN_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DEMEN_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DEMEN_DRUGS) ]
+	results =  [ {First_DEMEN_DRUGS : date} ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: TARIFFA_LORDO_RIC 
+FTARIFFA_LORDO_RIC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{START_DATE>1900-01-01}]
+	
+end
+
+// OLDAMI: select from source HOSP 
+ATARIFFA_LORDO_RIC (AggregateModule)
+inputs
+	custom = FTARIFFA_LORDO_RIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTARIFFA_LORDO_RIC: int };{ CostTARIFFA_LORDO_RIC: float } ]
+end
+FFirst_OLDAMI_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  = MISSING };{MAIN_DIAGNOSIS  matches "410*"};{SECONDARY_DIAGNOSIS_1 matches "410*"};{SECONDARY_DIAGNOSIS_2 matches "410*"};{SECONDARY_DIAGNOSIS_3 matches "410*"};{SECONDARY_DIAGNOSIS_4 matches "410*"};{SECONDARY_DIAGNOSIS_5 matches "410*"};{MAIN_DIAGNOSIS  matches "412*"};{SECONDARY_DIAGNOSIS_1 matches "412*"};{SECONDARY_DIAGNOSIS_2 matches "412*"};{SECONDARY_DIAGNOSIS_3 matches "412*"};{SECONDARY_DIAGNOSIS_4 matches "412*"};{SECONDARY_DIAGNOSIS_5 matches "412*"}]
+	boolExpr = OR 
+end
+FinalTARIFFA_LORDO_RIC (RenameAttributesModule)
+inputs
+	custom = ATARIFFA_LORDO_RIC
+parameters
+	inputAttributes = [ CostTARIFFA_LORDO_RIC ]
+	outputAttributes   = [ TARIFFA_LORDO_RIC ]
+end
+
+
+sortedFirst_OLDAMI_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_OLDAMI_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPACDRGMED 
+FinalFirst_OLDAMI_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_OLDAMI_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_OLDAMI_HOSP : date } ]
+end
+FTAR_OSPACDRGMED (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="MED"} ; {TypeOfFullWard="AC"} ; {REGIME="1"}]
+	boolExpr = AND
+end
+
+// GENERAL INDICATORS PREPARE SOURCES: filter period, enrich with auxiliary variables and sort
+ATAR_OSPACDRGMED (AggregateModule)
+inputs
+	custom = FTAR_OSPACDRGMED
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPACDRGMED: int };{ CostTAR_OSPACDRGMED: float } ]
+end
+FinalTAR_OSPACDRGMED (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPACDRGMED
+parameters
+	inputAttributes = [ CostTAR_OSPACDRGMED ]
+	outputAttributes   = [ TAR_OSPACDRGMED ]
+end
+
+
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare OUTPAT
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPACDRGCHI 
+LastYearOUTPAT (FilterModule)
+inputs
+	IADoutpat = OUTPAT
+parameters
+	conditions = [{PROC_START_DATE >= 2012-01-01};{PROC_START_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+FTAR_OSPACDRGCHI (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="CHI"} ; {TypeOfFullWard="AC"} ; {REGIME="1"}]
+	boolExpr = AND
+end
+
+// Generate TypeOfProc in OUTPAT
+ATAR_OSPACDRGCHI (AggregateModule)
+inputs
+	custom = FTAR_OSPACDRGCHI
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPACDRGCHI: int };{ CostTAR_OSPACDRGCHI: float } ]
+end
+FinalTAR_OSPACDRGCHI (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPACDRGCHI
+parameters
+	inputAttributes = [ CostTAR_OSPACDRGCHI ]
+	outputAttributes   = [ TAR_OSPACDRGCHI ]
+end
+
+
+ClLastYearOUTPATEnriched1 (ExtendDataModule)
+inputs
+	IADoutpat = LastYearOUTPAT
+parameters
+  attributes = [ { TypeOfProc: string } ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPNAC 
+LastYearOUTPATEnriched1 (ApplyFunction)
+inputs
+	custom = ClLastYearOUTPATEnriched1
+parameters
+	function = TypeOfProc(PROC_COD)
+	result   = TypeOfProc
+	
+	
+end
+FTAR_OSPNAC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfFullWard = "NAC"}; {REGIME="1"}]
+	boolExpr = AND
+end
+
+// Generate IsGeneralVisit in OUTPAT
+ATAR_OSPNAC (AggregateModule)
+inputs
+	custom = FTAR_OSPNAC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPNAC: int };{ CostTAR_OSPNAC: float } ]
+end
+ClLastYearOUTPATEnriched (ExtendDataModule)
+inputs
+	IADoutpat = LastYearOUTPATEnriched1
+parameters
+  attributes = [ { IsGeneralVisit: boolean } ]
+end
+FinalTAR_OSPNAC (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPNAC
+parameters
+	inputAttributes = [ CostTAR_OSPNAC ]
+	outputAttributes   = [ TAR_OSPNAC ]
+end
+
+
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHDRGMED 
+LastYearOUTPATEnriched (ApplyFunction)
+inputs
+	custom = ClLastYearOUTPATEnriched
+parameters
+	function = Id(true)
+	result   = IsGeneralVisit
+	conditions = [{PROC_COD  = "89.7"} ; {PROC_COD  = "89.01"} ; {PROC_COD  = "89.07"} ; {PROC_COD  = "89.03"}; {PROC_COD  = "897"} ; {PROC_COD  = "8901"} ; {PROC_COD  = "8907"} ; {PROC_COD  = "8903"}]
+	boolExpr = OR
+end
+FTAR_OSPDHDRGMED (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="MED"}  ; {REGIME="2"}]
+	boolExpr = AND
+end
+ATAR_OSPDHDRGMED (AggregateModule)
+inputs
+	custom = FTAR_OSPDHDRGMED
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHDRGMED: int };{ CostTAR_OSPDHDRGMED: float } ]
+end
+sortedLastYearOUTPAT (SortModule)
+inputs
+	custom = LastYearOUTPATEnriched
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalTAR_OSPDHDRGMED (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHDRGMED
+parameters
+	inputAttributes = [ CostTAR_OSPDHDRGMED ]
+	outputAttributes   = [ TAR_OSPDHDRGMED ]
+end
+
+
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare DRUGS
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHDRGCHI 
+FTAR_OSPDHDRGCHI (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="CHI"} ; {REGIME="2"}]
+	boolExpr = AND
+end
+LastYearDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE >= 2012-01-01};{DRUG_DISPENSING_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+ATAR_OSPDHDRGCHI (AggregateModule)
+inputs
+	custom = FTAR_OSPDHDRGCHI
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHDRGCHI: int };{ CostTAR_OSPDHDRGCHI: float } ]
+end
+LastYearDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{DRUG_DISPENSING_DATE >= 2012-01-01};{DRUG_DISPENSING_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+FinalTAR_OSPDHDRGCHI (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHDRGCHI
+parameters
+	inputAttributes = [ CostTAR_OSPDHDRGCHI ]
+	outputAttributes   = [ TAR_OSPDHDRGCHI ]
+end
+
+
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHPOSTACUTO 
+LastYearDRUGSTot (UnionModule)
+inputs
+	IADdrug = LastYearDDRUG
+	IADdrug = LastYearDRUGS
+end
+
+FTAR_OSPDHPOSTACUTO (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfFullWard = "NAC"} ; {REGIME="2"}]
+	boolExpr = AND
+end
+LastYearDRUGSEnriched (ExtendDataModule)
+inputs
+	IADdrug = LastYearDRUGSTot
+parameters
+  attributes = [ {Aux: string} ]
+end
+sortedLastYearDRUGS (SortModule)
+inputs
+	custom = LastYearDRUGSEnriched
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ATAR_OSPDHPOSTACUTO (AggregateModule)
+inputs
+	custom = FTAR_OSPDHPOSTACUTO
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHPOSTACUTO: int };{ CostTAR_OSPDHPOSTACUTO: float } ]
+end
+
+// GENERAL INDICATORS PREPARE SOURCES - prepare HOSP
+FinalTAR_OSPDHPOSTACUTO (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHPOSTACUTO
+parameters
+	inputAttributes = [ CostTAR_OSPDHPOSTACUTO ]
+	outputAttributes   = [ TAR_OSPDHPOSTACUTO ]
+end
+
+
+LastYearHOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{START_DATE >= 2012-01-01};{START_DATE <= 2012-12-31}]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: CREATININ
+FCREATININ (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.16.3"};{PROC_COD  = "90.16.4"};{PROC_COD  = "90163"};{PROC_COD  = "9.164"}]
+	boolExpr = OR
+end
+
+// Generate TypeOfFullWard in HOSP
+ACREATININ (AggregateModule)
+inputs
+	IADoutpat = FCREATININ
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCREATININ: date };{ MaxDateCREATININ: date };{ NumberCREATININ: int } ]
+end
+ClLastYearHOSPEnriched1 (ExtendDataModule)
+inputs
+	IADhosp = LastYearHOSP
+parameters
+  attributes = [ { TypeOfFullWard: string } ]
+end
+ClFinalCREATININ (ExtendDataModule)
+inputs
+	IADoutpat = ACREATININ
+parameters
+  attributes = [ {IsCREATININ : boolean } ]
+end
+LastYearHOSPEnriched1 (ApplyFunction)
+inputs
+	custom = ClLastYearHOSPEnriched1
+parameters
+	function = TypeOfFullWard(WARD_DISCHARGE)
+	result   = TypeOfFullWard
+	
+	
+end
+FinalCREATININ (ApplyFunction)
+inputs
+	custom = ClFinalCREATININ
+parameters
+	function = GreaterThan(NumberCREATININ,0)
+	result   = IsCREATININ
+	
+	
+end
+
+// Generate TypeOfDRG
+
+// INDICATORS FOR POPULATION WITH DISEASES: MICROALB
+FMICROALB (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.33.4"} ; {PROC_COD  = "90334"} ]
+	boolExpr = OR
+end
+AMICROALB (AggregateModule)
+inputs
+	IADoutpat = FMICROALB
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateMICROALB: date };{ MaxDateMICROALB: date };{ NumberMICROALB: int } ]
+end
+ClLastYearHOSPEnriched2 (ExtendDataModule)
+inputs
+	custom = LastYearHOSPEnriched1
+parameters
+  attributes = [ { TypeOfDRG: string } ]
+end
+ClFinalMICROALB (ExtendDataModule)
+inputs
+	IADoutpat = AMICROALB
+parameters
+  attributes = [ {IsMICROALB : boolean } ]
+end
+LastYearHOSPEnriched2 (ApplyFunction)
+inputs
+	custom = ClLastYearHOSPEnriched2
+parameters
+	function = Id("MED")
+	result   = TypeOfDRG
+	conditions = [ {START_DATE<1900-01-01} ; {DRG = "9"} ; {DRG = "10"} ; {DRG = "11"} ; {DRG = "12"} ; {DRG = "13"} ; {DRG = "14"} ; {DRG = "15"} ; {DRG = "16"} ; {DRG = "17"} ; {DRG = "18"} ; {DRG = "19"} ; {DRG = "21"} ; {DRG = "22"} ; {DRG = "23"} ; {DRG = "26"} ; {DRG = "27"} ; {DRG = "28"} ; {DRG = "29"} ; {DRG = "30"} ; {DRG = "31"} ; {DRG = "32"} ; {DRG = "33"} ; {DRG = "34"} ; {DRG = "35"} ; {DRG = "43"} ; {DRG = "44"} ; {DRG = "45"} ; {DRG = "46"} ; {DRG = "47"} ; {DRG = "48"} ; {DRG = "64"} ; {DRG = "65"} ; {DRG = "66"} ; {DRG = "67"} ; {DRG = "68"} ; {DRG = "69"} ; {DRG = "70"} ; {DRG = "71"} ; {DRG = "72"} ; {DRG = "73"} ; {DRG = "74"} ; {DRG = "78"} ; {DRG = "79"} ; {DRG = "80"} ; {DRG = "81"} ; {DRG = "82"} ; {DRG = "83"} ; {DRG = "84"} ; {DRG = "85"} ; {DRG = "86"} ; {DRG = "87"} ; {DRG = "88"} ; {DRG = "89"} ; {DRG = "90"} ; {DRG = "91"} ; {DRG = "92"} ; {DRG = "93"} ; {DRG = "94"} ; {DRG = "95"} ; {DRG = "96"} ; {DRG = "97"} ; {DRG = "98"} ; {DRG = "99"} ; {DRG = "100"} ; {DRG = "101"} ; {DRG = "102"} ; {DRG = "121"} ; {DRG = "122"} ; {DRG = "123"} ; {DRG = "124"} ; {DRG = "125"} ; {DRG = "126"} ; {DRG = "127"} ; {DRG = "128"} ; {DRG = "129"} ; {DRG = "130"} ; {DRG = "131"} ; {DRG = "132"} ; {DRG = "133"} ; {DRG = "134"} ; {DRG = "135"} ; {DRG = "136"} ; {DRG = "137"} ; {DRG = "138"} ; {DRG = "139"} ; {DRG = "140"} ; {DRG = "141"} ; {DRG = "142"} ; {DRG = "143"} ; {DRG = "144"} ; {DRG = "145"} ; {DRG = "172"} ; {DRG = "173"} ; {DRG = "174"} ; {DRG = "175"} ; {DRG = "176"} ; {DRG = "177"} ; {DRG = "178"} ; {DRG = "179"} ; {DRG = "180"} ; {DRG = "181"} ; {DRG = "182"} ; {DRG = "183"} ; {DRG = "184"} ; {DRG = "185"} ; {DRG = "186"} ; {DRG = "187"} ; {DRG = "188"} ; {DRG = "189"} ; {DRG = "190"} ; {DRG = "202"} ; {DRG = "203"} ; {DRG = "204"} ; {DRG = "205"} ; {DRG = "206"} ; {DRG = "207"} ; {DRG = "208"} ; {DRG = "235"} ; {DRG = "236"} ; {DRG = "237"} ; {DRG = "238"} ; {DRG = "239"} ; {DRG = "240"} ; {DRG = "241"} ; {DRG = "242"} ; {DRG = "243"} ; {DRG = "244"} ; {DRG = "245"} ; {DRG = "246"} ; {DRG = "247"} ; {DRG = "248"} ; {DRG = "249"} ; {DRG = "250"} ; {DRG = "251"} ; {DRG = "252"} ; {DRG = "253"} ; {DRG = "254"} ; {DRG = "255"} ; {DRG = "256"} ; {DRG = "271"} ; {DRG = "272"} ; {DRG = "273"} ; {DRG = "274"} ; {DRG = "275"} ; {DRG = "276"} ; {DRG = "277"} ; {DRG = "278"} ; {DRG = "279"} ; {DRG = "280"} ; {DRG = "281"} ; {DRG = "282"} ; {DRG = "283"} ; {DRG = "284"} ; {DRG = "294"} ; {DRG = "295"} ; {DRG = "296"} ; {DRG = "297"} ; {DRG = "298"} ; {DRG = "299"} ; {DRG = "300"} ; {DRG = "301"} ; {DRG = "316"} ; {DRG = "317"} ; {DRG = "318"} ; {DRG = "319"} ; {DRG = "320"} ; {DRG = "321"} ; {DRG = "322"} ; {DRG = "323"} ; {DRG = "324"} ; {DRG = "325"} ; {DRG = "326"} ; {DRG = "327"} ; {DRG = "328"} ; {DRG = "329"} ; {DRG = "330"} ; {DRG = "331"} ; {DRG = "332"} ; {DRG = "333"} ; {DRG = "346"} ; {DRG = "347"} ; {DRG = "348"} ; {DRG = "349"} ; {DRG = "350"} ; {DRG = "351"} ; {DRG = "352"} ; {DRG = "366"} ; {DRG = "367"} ; {DRG = "368"} ; {DRG = "369"} ; {DRG = "372"} ; {DRG = "373"} ; {DRG = "376"} ; {DRG = "378"} ; {DRG = "379"} ; {DRG = "380"} ; {DRG = "382"} ; {DRG = "383"} ; {DRG = "384"} ; {DRG = "385"} ; {DRG = "386"} ; {DRG = "387"} ; {DRG = "388"} ; {DRG = "389"} ; {DRG = "390"} ; {DRG = "391"} ; {DRG = "395"} ; {DRG = "396"} ; {DRG = "397"} ; {DRG = "398"} ; {DRG = "399"} ; {DRG = "403"} ; {DRG = "404"} ; {DRG = "405"} ; {DRG = "409"} ; {DRG = "410"} ; {DRG = "411"} ; {DRG = "412"} ; {DRG = "413"} ; {DRG = "414"} ; {DRG = "417"} ; {DRG = "418"} ; {DRG = "419"} ; {DRG = "420"} ; {DRG = "421"} ; {DRG = "422"} ; {DRG = "423"} ; {DRG = "425"} ; {DRG = "426"} ; {DRG = "427"} ; {DRG = "428"} ; {DRG = "429"} ; {DRG = "430"} ; {DRG = "431"} ; {DRG = "432"} ; {DRG = "433"} ; {DRG = "444"} ; {DRG = "445"} ; {DRG = "446"} ; {DRG = "447"} ; {DRG = "448"} ; {DRG = "449"} ; {DRG = "450"} ; {DRG = "451"} ; {DRG = "452"} ; {DRG = "453"} ; {DRG = "454"} ; {DRG = "455"} ; {DRG = "462"} ; {DRG = "463"} ; {DRG = "464"} ; {DRG = "465"} ; {DRG = "466"} ; {DRG = "467"} ; {DRG = "469"} ; {DRG = "470"} ; {DRG = "473"} ; {DRG = "487"} ; {DRG = "489"} ; {DRG = "490"} ; {DRG = "492"} ; {DRG = "505"} ; {DRG = "508"} ; {DRG = "509"} ; {DRG = "510"} ; {DRG = "511"} ; {DRG = "521"} ; {DRG = "522"} ; {DRG = "523"} ; {DRG = "524"} ; {DRG = "559"} ; {DRG = "560"} ; {DRG = "561"} ; {DRG = "562"} ; {DRG = "563"} ; {DRG = "564"} ; {DRG = "565"} ; {DRG = "566"} ; {DRG = "571"} ; {DRG = "572"} ; {DRG = "574"} ; {DRG = "575"} ; {DRG = "576"} ]
+	boolExpr = OR
+end
+FinalMICROALB (ApplyFunction)
+inputs
+	custom = ClFinalMICROALB
+parameters
+	function = GreaterThan(NumberMICROALB,0)
+	result   = IsMICROALB
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: EMOGLIC
+FEMOGLIC (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.28.1"} ; {PROC_COD  = "90281"}]
+	boolExpr = OR
+end
+LastYearHOSPEnriched (ApplyFunction)
+inputs
+	custom = LastYearHOSPEnriched2
+parameters
+	function = Id("CHI")
+	result   = TypeOfDRG
+	conditions = [ {START_DATE<1900-01-01} ; {DRG = "1"} ; {DRG = "2"} ; {DRG = "3"} ; {DRG = "6"} ; {DRG = "7"} ; {DRG = "8"} ; {DRG = "36"} ; {DRG = "37"} ; {DRG = "38"} ; {DRG = "39"} ; {DRG = "40"} ; {DRG = "41"} ; {DRG = "42"} ; {DRG = "49"} ; {DRG = "50"} ; {DRG = "51"} ; {DRG = "52"} ; {DRG = "53"} ; {DRG = "54"} ; {DRG = "55"} ; {DRG = "56"} ; {DRG = "57"} ; {DRG = "58"} ; {DRG = "59"} ; {DRG = "60"} ; {DRG = "61"} ; {DRG = "62"} ; {DRG = "63"} ; {DRG = "75"} ; {DRG = "76"} ; {DRG = "77"} ; {DRG = "103"} ; {DRG = "104"} ; {DRG = "105"} ; {DRG = "106"} ; {DRG = "108"} ; {DRG = "110"} ; {DRG = "111"} ; {DRG = "113"} ; {DRG = "114"} ; {DRG = "117"} ; {DRG = "118"} ; {DRG = "119"} ; {DRG = "120"} ; {DRG = "146"} ; {DRG = "147"} ; {DRG = "149"} ; {DRG = "150"} ; {DRG = "151"} ; {DRG = "152"} ; {DRG = "153"} ; {DRG = "155"} ; {DRG = "156"} ; {DRG = "157"} ; {DRG = "158"} ; {DRG = "159"} ; {DRG = "160"} ; {DRG = "161"} ; {DRG = "162"} ; {DRG = "163"} ; {DRG = "164"} ; {DRG = "165"} ; {DRG = "166"} ; {DRG = "167"} ; {DRG = "168"} ; {DRG = "169"} ; {DRG = "170"} ; {DRG = "171"} ; {DRG = "191"} ; {DRG = "192"} ; {DRG = "193"} ; {DRG = "194"} ; {DRG = "195"} ; {DRG = "196"} ; {DRG = "197"} ; {DRG = "198"} ; {DRG = "199"} ; {DRG = "200"} ; {DRG = "201"} ; {DRG = "210"} ; {DRG = "211"} ; {DRG = "212"} ; {DRG = "213"} ; {DRG = "216"} ; {DRG = "217"} ; {DRG = "218"} ; {DRG = "219"} ; {DRG = "220"} ; {DRG = "223"} ; {DRG = "224"} ; {DRG = "225"} ; {DRG = "226"} ; {DRG = "227"} ; {DRG = "228"} ; {DRG = "229"} ; {DRG = "230"} ; {DRG = "232"} ; {DRG = "233"} ; {DRG = "234"} ; {DRG = "257"} ; {DRG = "258"} ; {DRG = "259"} ; {DRG = "260"} ; {DRG = "261"} ; {DRG = "262"} ; {DRG = "263"} ; {DRG = "264"} ; {DRG = "265"} ; {DRG = "266"} ; {DRG = "267"} ; {DRG = "268"} ; {DRG = "269"} ; {DRG = "270"} ; {DRG = "285"} ; {DRG = "286"} ; {DRG = "287"} ; {DRG = "288"} ; {DRG = "289"} ; {DRG = "290"} ; {DRG = "291"} ; {DRG = "292"} ; {DRG = "293"} ; {DRG = "302"} ; {DRG = "303"} ; {DRG = "304"} ; {DRG = "305"} ; {DRG = "306"} ; {DRG = "307"} ; {DRG = "308"} ; {DRG = "309"} ; {DRG = "310"} ; {DRG = "311"} ; {DRG = "312"} ; {DRG = "313"} ; {DRG = "314"} ; {DRG = "315"} ; {DRG = "334"} ; {DRG = "335"} ; {DRG = "336"} ; {DRG = "337"} ; {DRG = "338"} ; {DRG = "339"} ; {DRG = "340"} ; {DRG = "341"} ; {DRG = "342"} ; {DRG = "343"} ; {DRG = "344"} ; {DRG = "345"} ; {DRG = "353"} ; {DRG = "354"} ; {DRG = "355"} ; {DRG = "356"} ; {DRG = "357"} ; {DRG = "358"} ; {DRG = "359"} ; {DRG = "360"} ; {DRG = "361"} ; {DRG = "362"} ; {DRG = "363"} ; {DRG = "364"} ; {DRG = "365"} ; {DRG = "370"} ; {DRG = "371"} ; {DRG = "374"} ; {DRG = "375"} ; {DRG = "377"} ; {DRG = "381"} ; {DRG = "392"} ; {DRG = "393"} ; {DRG = "394"} ; {DRG = "401"} ; {DRG = "402"} ; {DRG = "406"} ; {DRG = "407"} ; {DRG = "408"} ; {DRG = "424"} ; {DRG = "439"} ; {DRG = "440"} ; {DRG = "441"} ; {DRG = "442"} ; {DRG = "443"} ; {DRG = "461"} ; {DRG = "468"} ; {DRG = "471"} ; {DRG = "476"} ; {DRG = "477"} ; {DRG = "479"} ; {DRG = "480"} ; {DRG = "481"} ; {DRG = "482"} ; {DRG = "484"} ; {DRG = "485"} ; {DRG = "486"} ; {DRG = "488"} ; {DRG = "491"} ; {DRG = "493"} ; {DRG = "494"} ; {DRG = "495"} ; {DRG = "496"} ; {DRG = "497"} ; {DRG = "498"} ; {DRG = "499"} ; {DRG = "500"} ; {DRG = "501"} ; {DRG = "502"} ; {DRG = "503"} ; {DRG = "504"} ; {DRG = "506"} ; {DRG = "507"} ; {DRG = "512"} ; {DRG = "513"} ; {DRG = "515"} ; {DRG = "518"} ; {DRG = "519"} ; {DRG = "520"} ; {DRG = "525"} ; {DRG = "528"} ; {DRG = "529"} ; {DRG = "530"} ; {DRG = "531"} ; {DRG = "532"} ; {DRG = "533"} ; {DRG = "534"} ; {DRG = "535"} ; {DRG = "536"} ; {DRG = "537"} ; {DRG = "538"} ; {DRG = "539"} ; {DRG = "540"} ; {DRG = "541"} ; {DRG = "542"} ; {DRG = "543"} ; {DRG = "544"} ; {DRG = "545"} ; {DRG = "546"} ; {DRG = "547"} ; {DRG = "548"} ; {DRG = "549"} ; {DRG = "550"} ; {DRG = "551"} ; {DRG = "552"} ; {DRG = "553"} ; {DRG = "554"} ; {DRG = "555"} ; {DRG = "556"} ; {DRG = "557"} ; {DRG = "558"} ; {DRG = "567"} ; {DRG = "568"} ; {DRG = "569"} ; {DRG = "570"} ; {DRG = "573"} ; {DRG = "577"} ; {DRG = "578"} ; {DRG = "579"} ]
+	boolExpr = OR
+end
+AEMOGLIC (AggregateModule)
+inputs
+	IADoutpat = FEMOGLIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateEMOGLIC: date };{ MaxDateEMOGLIC: date };{ NumberEMOGLIC: int } ]
+end
+sortedLastYearHOSP (SortModule)
+inputs
+	custom = LastYearHOSPEnriched
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+ClFinalEMOGLIC (ExtendDataModule)
+inputs
+	IADoutpat = AEMOGLIC
+parameters
+  attributes = [ {IsEMOGLIC : boolean } ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: TARIFFA_LORDO_FARMACI 
+FinalEMOGLIC (ApplyFunction)
+inputs
+	custom = ClFinalEMOGLIC
+parameters
+	function = GreaterThan(NumberEMOGLIC,1)
+	result   = IsEMOGLIC
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: STATINE
+FTARIFFA_LORDO_FARMACI (FilterModule)
+inputs
+	custom = sortedLastYearDRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE>1900-01-01}]
+	
+end
+FSTATINE (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C10*"}]
+	
+end
+ATARIFFA_LORDO_FARMACI (AggregateModule)
+inputs
+	custom = FTARIFFA_LORDO_FARMACI
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(DRUG_DISPENSING_DATE),SUM(COST) ]
+	results =  [ { NumberTARIFFA_LORDO_FARMACI: int };{ CostTARIFFA_LORDO_FARMACI: float } ]
+end
+ASTATINE (AggregateModule)
+inputs
+	IADdrug = FSTATINE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateSTATINE: date };{ MaxDateSTATINE: date };{ NumberSTATINE: int } ]
+end
+FinalTARIFFA_LORDO_FARMACI (RenameAttributesModule)
+inputs
+	custom = ATARIFFA_LORDO_FARMACI
+parameters
+	inputAttributes = [ CostTARIFFA_LORDO_FARMACI ]
+	outputAttributes   = [ TARIFFA_LORDO_FARMACI ]
+end
+
+
+ClFinalSTATINE (ExtendDataModule)
+inputs
+	IADdrug = ASTATINE
+parameters
+  attributes = [ {IsSTATINE : boolean } ]
+end
+FinalSTATINE (ApplyFunction)
+inputs
+	custom = ClFinalSTATINE
+parameters
+	function = NotEqual(MinDateSTATINE, MaxDateSTATINE)
+	result   = IsSTATINE
+	
+	
+end
+
+// INDICATORS FOR GENERAL POPULATION: NUM_PRESC_FARM 
+
+// INDICATORS FOR POPULATION WITH DISEASES: ECG
+FNUM_PRESC_FARM (FilterModule)
+inputs
+	custom = sortedLastYearDRUGS
+parameters
+	conditions = [{DRUG_DISPENSING_DATE>1900-01-01}]
+	
+end
+FECG (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "89.52"} ; {PROC_COD  = "8952"}]
+	boolExpr = OR
+end
+AECG (AggregateModule)
+inputs
+	IADoutpat = FECG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateECG: date };{ MaxDateECG: date };{ NumberECG: int } ]
+end
+ANUM_PRESC_FARM (AggregateModule)
+inputs
+	custom = FNUM_PRESC_FARM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(DRUG_DISPENSING_DATE),SUM(COST) ]
+	results =  [ { NumberNUM_PRESC_FARM: int };{ CostNUM_PRESC_FARM: float } ]
+end
+FinalNUM_PRESC_FARM (RenameAttributesModule)
+inputs
+	custom = ANUM_PRESC_FARM
+parameters
+	inputAttributes = [ NumberNUM_PRESC_FARM ]
+	outputAttributes   = [ NUM_PRESC_FARM ]
+end
+
+
+ClFinalECG (ExtendDataModule)
+inputs
+	IADoutpat = AECG
+parameters
+  attributes = [ {IsECG : boolean } ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: NUM_RIC 
+FinalECG (ApplyFunction)
+inputs
+	custom = ClFinalECG
+parameters
+	function = GreaterThan(NumberECG,0)
+	result   = IsECG
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: GLICEM
+FNUM_RIC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{START_DATE>1900-01-01}]
+	
+end
+FGLICEM (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.28.1"};{PROC_COD  = "90.27.1"}; {PROC_COD  = "90281"};{PROC_COD  = "90271"}]
+	boolExpr = OR
+end
+ANUM_RIC (AggregateModule)
+inputs
+	custom = FNUM_RIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberNUM_RIC: int };{ CostNUM_RIC: float } ]
+end
+AGLICEM (AggregateModule)
+inputs
+	IADoutpat = FGLICEM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateGLICEM: date };{ MaxDateGLICEM: date };{ NumberGLICEM: int } ]
+end
+FinalNUM_RIC (RenameAttributesModule)
+inputs
+	custom = ANUM_RIC
+parameters
+	inputAttributes = [ NumberNUM_RIC ]
+	outputAttributes   = [ NUM_RIC ]
+end
+
+
+
+// INDICATORS FOR GENERAL POPULATION: TARIFFA_LORDO_RIC 
+ClFinalGLICEM (ExtendDataModule)
+inputs
+	IADoutpat = AGLICEM
+parameters
+  attributes = [ {IsGLICEM : boolean } ]
+end
+FinalGLICEM (ApplyFunction)
+inputs
+	custom = ClFinalGLICEM
+parameters
+	function = GreaterThan(NumberGLICEM,0)
+	result   = IsGLICEM
+	
+	
+end
+FTARIFFA_LORDO_RIC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{START_DATE>1900-01-01}]
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ANTIAGGREG
+FANTIAGGREG (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "B01A*"}]
+	
+end
+ATARIFFA_LORDO_RIC (AggregateModule)
+inputs
+	custom = FTARIFFA_LORDO_RIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTARIFFA_LORDO_RIC: int };{ CostTARIFFA_LORDO_RIC: float } ]
+end
+AANTIAGGREG (AggregateModule)
+inputs
+	IADdrug = FANTIAGGREG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateANTIAGGREG: date };{ MaxDateANTIAGGREG: date };{ NumberANTIAGGREG: int } ]
+end
+FinalTARIFFA_LORDO_RIC (RenameAttributesModule)
+inputs
+	custom = ATARIFFA_LORDO_RIC
+parameters
+	inputAttributes = [ CostTARIFFA_LORDO_RIC ]
+	outputAttributes   = [ TARIFFA_LORDO_RIC ]
+end
+
+
+ClFinalANTIAGGREG (ExtendDataModule)
+inputs
+	IADdrug = AANTIAGGREG
+parameters
+  attributes = [ {IsANTIAGGREG : boolean } ]
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPACDRGMED 
+FinalANTIAGGREG (ApplyFunction)
+inputs
+	custom = ClFinalANTIAGGREG
+parameters
+	function = NotEqual(MinDateANTIAGGREG, MaxDateANTIAGGREG)
+	result   = IsANTIAGGREG
+	
+	
+end
+FTAR_OSPACDRGMED (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="MED"} ; {TypeOfFullWard="AC"} ; {REGIME="1"}]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: BETABLOC
+FBETABLOC (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C07*"}]
+	
+end
+ATAR_OSPACDRGMED (AggregateModule)
+inputs
+	custom = FTAR_OSPACDRGMED
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPACDRGMED: int };{ CostTAR_OSPACDRGMED: float } ]
+end
+ABETABLOC (AggregateModule)
+inputs
+	IADdrug = FBETABLOC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateBETABLOC: date };{ MaxDateBETABLOC: date };{ NumberBETABLOC: int } ]
+end
+FinalTAR_OSPACDRGMED (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPACDRGMED
+parameters
+	inputAttributes = [ CostTAR_OSPACDRGMED ]
+	outputAttributes   = [ TAR_OSPACDRGMED ]
+end
+
+
+ClFinalBETABLOC (ExtendDataModule)
+inputs
+	IADdrug = ABETABLOC
+parameters
+  attributes = [ {IsBETABLOC : boolean } ]
+end
+FinalBETABLOC (ApplyFunction)
+inputs
+	custom = ClFinalBETABLOC
+parameters
+	function = NotEqual(MinDateBETABLOC, MaxDateBETABLOC)
+	result   = IsBETABLOC
+	
+	
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPACDRGCHI 
+
+// INDICATORS FOR POPULATION WITH DISEASES: ACEINIB
+FACEINIB (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C09*"}]
+	
+end
+AACEINIB (AggregateModule)
+inputs
+	IADdrug = FACEINIB
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateACEINIB: date };{ MaxDateACEINIB: date };{ NumberACEINIB: int } ]
+end
+FTAR_OSPACDRGCHI (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="CHI"} ; {TypeOfFullWard="AC"} ; {REGIME="1"}]
+	boolExpr = AND
+end
+ClFinalACEINIB (ExtendDataModule)
+inputs
+	IADdrug = AACEINIB
+parameters
+  attributes = [ {IsACEINIB : boolean } ]
+end
+FinalACEINIB (ApplyFunction)
+inputs
+	custom = ClFinalACEINIB
+parameters
+	function = NotEqual(MinDateACEINIB, MaxDateACEINIB)
+	result   = IsACEINIB
+	
+	
+end
+ATAR_OSPACDRGCHI (AggregateModule)
+inputs
+	custom = FTAR_OSPACDRGCHI
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPACDRGCHI: int };{ CostTAR_OSPACDRGCHI: float } ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: NEUROLATIP
+FinalTAR_OSPACDRGCHI (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPACDRGCHI
+parameters
+	inputAttributes = [ CostTAR_OSPACDRGCHI ]
+	outputAttributes   = [ TAR_OSPACDRGCHI ]
+end
+
+
+FNEUROLATIP (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC = "N05AH03"} ; {ATC = "N05AH04"} ; {ATC = "N05AX08"} ]
+	boolExpr = OR
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPNAC 
+ANEUROLATIP (AggregateModule)
+inputs
+	IADdrug = FNEUROLATIP
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateNEUROLATIP: date };{ MaxDateNEUROLATIP: date };{ NumberNEUROLATIP: int } ]
+end
+FTAR_OSPNAC (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfFullWard = "NAC"}; {REGIME="1"}]
+	boolExpr = AND
+end
+ClFinalNEUROLATIP (ExtendDataModule)
+inputs
+	IADdrug = ANEUROLATIP
+parameters
+  attributes = [ {IsNEUROLATIP : boolean } ]
+end
+FinalNEUROLATIP (ApplyFunction)
+inputs
+	custom = ClFinalNEUROLATIP
+parameters
+	function = NotEqual(MinDateNEUROLATIP, MaxDateNEUROLATIP)
+	result   = IsNEUROLATIP
+	
+	
+end
+ATAR_OSPNAC (AggregateModule)
+inputs
+	custom = FTAR_OSPNAC
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPNAC: int };{ CostTAR_OSPNAC: float } ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: NEUROLTIP
+FinalTAR_OSPNAC (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPNAC
+parameters
+	inputAttributes = [ CostTAR_OSPNAC ]
+	outputAttributes   = [ TAR_OSPNAC ]
+end
+
+
+FNEUROLTIP (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC = "N05AD01"} ; {ATC = "N05AA03"}]
+	boolExpr = OR
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHDRGMED 
+ANEUROLTIP (AggregateModule)
+inputs
+	IADdrug = FNEUROLTIP
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateNEUROLTIP: date };{ MaxDateNEUROLTIP: date };{ NumberNEUROLTIP: int } ]
+end
+FTAR_OSPDHDRGMED (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="MED"}  ; {REGIME="2"}]
+	boolExpr = AND
+end
+ATAR_OSPDHDRGMED (AggregateModule)
+inputs
+	custom = FTAR_OSPDHDRGMED
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHDRGMED: int };{ CostTAR_OSPDHDRGMED: float } ]
+end
+ClFinalNEUROLTIP (ExtendDataModule)
+inputs
+	IADdrug = ANEUROLTIP
+parameters
+  attributes = [ {IsNEUROLTIP : boolean } ]
+end
+FinalTAR_OSPDHDRGMED (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHDRGMED
+parameters
+	inputAttributes = [ CostTAR_OSPDHDRGMED ]
+	outputAttributes   = [ TAR_OSPDHDRGMED ]
+end
+
+
+FinalNEUROLTIP (ApplyFunction)
+inputs
+	custom = ClFinalNEUROLTIP
+parameters
+	function = NotEqual(MinDateNEUROLTIP, MaxDateNEUROLTIP)
+	result   = IsNEUROLTIP
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTTOT
+FCOLESTTOT (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.3"} ; {PROC_COD  = "90143"}]
+	boolExpr = OR
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHDRGCHI 
+ACOLESTTOT (AggregateModule)
+inputs
+	IADoutpat = FCOLESTTOT
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTTOT: date };{ MaxDateCOLESTTOT: date };{ NumberCOLESTTOT: int } ]
+end
+FTAR_OSPDHDRGCHI (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfDRG="CHI"} ; {REGIME="2"}]
+	boolExpr = AND
+end
+ClFinalCOLESTTOT (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTTOT
+parameters
+  attributes = [ {IsCOLESTTOT : boolean } ]
+end
+ATAR_OSPDHDRGCHI (AggregateModule)
+inputs
+	custom = FTAR_OSPDHDRGCHI
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHDRGCHI: int };{ CostTAR_OSPDHDRGCHI: float } ]
+end
+FinalCOLESTTOT (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTTOT
+parameters
+	function = GreaterThan(NumberCOLESTTOT,0)
+	result   = IsCOLESTTOT
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTHDL
+FinalTAR_OSPDHDRGCHI (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHDRGCHI
+parameters
+	inputAttributes = [ CostTAR_OSPDHDRGCHI ]
+	outputAttributes   = [ TAR_OSPDHDRGCHI ]
+end
+
+
+FCOLESTHDL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.1"} ; {PROC_COD  = "90141"}]
+	boolExpr = OR
+end
+
+// INDICATORS FOR GENERAL POPULATION: TAR_OSPDHPOSTACUTO 
+ACOLESTHDL (AggregateModule)
+inputs
+	IADoutpat = FCOLESTHDL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTHDL: date };{ MaxDateCOLESTHDL: date };{ NumberCOLESTHDL: int } ]
+end
+FTAR_OSPDHPOSTACUTO (FilterModule)
+inputs
+	custom = sortedLastYearHOSP
+parameters
+	conditions = [{TypeOfFullWard = "NAC"} ; {REGIME="2"}]
+	boolExpr = AND
+end
+ClFinalCOLESTHDL (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTHDL
+parameters
+  attributes = [ {IsCOLESTHDL : boolean } ]
+end
+ATAR_OSPDHPOSTACUTO (AggregateModule)
+inputs
+	custom = FTAR_OSPDHPOSTACUTO
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ COUNT(START_DATE),SUM(VALUE) ]
+	results =  [ { NumberTAR_OSPDHPOSTACUTO: int };{ CostTAR_OSPDHPOSTACUTO: float } ]
+end
+FinalCOLESTHDL (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTHDL
+parameters
+	function = GreaterThan(NumberCOLESTHDL,0)
+	result   = IsCOLESTHDL
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTLDL
+FCOLESTLDL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.2"} ; {PROC_COD  = "90142"}]
+	boolExpr = OR
+end
+FinalTAR_OSPDHPOSTACUTO (RenameAttributesModule)
+inputs
+	custom = ATAR_OSPDHPOSTACUTO
+parameters
+	inputAttributes = [ CostTAR_OSPDHPOSTACUTO ]
+	outputAttributes   = [ TAR_OSPDHPOSTACUTO ]
+end
+
+
+ACOLESTLDL (AggregateModule)
+inputs
+	IADoutpat = FCOLESTLDL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTLDL: date };{ MaxDateCOLESTLDL: date };{ NumberCOLESTLDL: int } ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: CREATININ
+ClFinalCOLESTLDL (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTLDL
+parameters
+  attributes = [ {IsCOLESTLDL : boolean } ]
+end
+FinalCOLESTLDL (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTLDL
+parameters
+	function = GreaterThan(NumberCOLESTLDL,0)
+	result   = IsCOLESTLDL
+	
+	
+end
+FCREATININ (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.16.3"};{PROC_COD  = "90.16.4"};{PROC_COD  = "90163"};{PROC_COD  = "9.164"}]
+	boolExpr = OR
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: TRIGLIC
+ACREATININ (AggregateModule)
+inputs
+	IADoutpat = FCREATININ
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCREATININ: date };{ MaxDateCREATININ: date };{ NumberCREATININ: int } ]
+end
+FTRIGLIC (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.43.2"} ; {PROC_COD  = "90432"}]
+	boolExpr = OR
+end
+ATRIGLIC (AggregateModule)
+inputs
+	IADoutpat = FTRIGLIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateTRIGLIC: date };{ MaxDateTRIGLIC: date };{ NumberTRIGLIC: int } ]
+end
+ClFinalCREATININ (ExtendDataModule)
+inputs
+	IADoutpat = ACREATININ
+parameters
+  attributes = [ {IsCREATININ : boolean } ]
+end
+ClFinalTRIGLIC (ExtendDataModule)
+inputs
+	IADoutpat = ATRIGLIC
+parameters
+  attributes = [ {IsTRIGLIC : boolean } ]
+end
+FinalCREATININ (ApplyFunction)
+inputs
+	custom = ClFinalCREATININ
+parameters
+	function = GreaterThan(NumberCREATININ,0)
+	result   = IsCREATININ
+	
+	
+end
+FinalTRIGLIC (ApplyFunction)
+inputs
+	custom = ClFinalTRIGLIC
+parameters
+	function = GreaterThan(NumberTRIGLIC,0)
+	result   = IsTRIGLIC
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: SOD
+
+// INDICATORS FOR POPULATION WITH DISEASES: MICROALB
+FSOD (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.40.4"} ; {PROC_COD  = "90404"}]
+	boolExpr = OR
+end
+ASOD (AggregateModule)
+inputs
+	IADoutpat = FSOD
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateSOD: date };{ MaxDateSOD: date };{ NumberSOD: int } ]
+end
+FMICROALB (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.33.4"} ; {PROC_COD  = "90334"} ]
+	boolExpr = OR
+end
+ClFinalSOD (ExtendDataModule)
+inputs
+	IADoutpat = ASOD
+parameters
+  attributes = [ {IsSOD : boolean } ]
+end
+AMICROALB (AggregateModule)
+inputs
+	IADoutpat = FMICROALB
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateMICROALB: date };{ MaxDateMICROALB: date };{ NumberMICROALB: int } ]
+end
+FinalSOD (ApplyFunction)
+inputs
+	custom = ClFinalSOD
+parameters
+	function = GreaterThan(NumberSOD,0)
+	result   = IsSOD
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: POTA
+FPOTA (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.37.4"} ; {PROC_COD  = "90374"} ]
+	boolExpr = OR
+end
+ClFinalMICROALB (ExtendDataModule)
+inputs
+	IADoutpat = AMICROALB
+parameters
+  attributes = [ {IsMICROALB : boolean } ]
+end
+APOTA (AggregateModule)
+inputs
+	IADoutpat = FPOTA
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDatePOTA: date };{ MaxDatePOTA: date };{ NumberPOTA: int } ]
+end
+FinalMICROALB (ApplyFunction)
+inputs
+	custom = ClFinalMICROALB
+parameters
+	function = GreaterThan(NumberMICROALB,0)
+	result   = IsMICROALB
+	
+	
+end
+ClFinalPOTA (ExtendDataModule)
+inputs
+	IADoutpat = APOTA
+parameters
+  attributes = [ {IsPOTA : boolean } ]
+end
+FinalPOTA (ApplyFunction)
+inputs
+	custom = ClFinalPOTA
+parameters
+	function = GreaterThan(NumberPOTA,0)
+	result   = IsPOTA
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: TRANSAM
+
+// INDICATORS FOR POPULATION WITH DISEASES: EMOGLIC
+FTRANSAM (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.09.2"} ; {PROC_COD  = "90.04.5"} ; {PROC_COD  = "90092"} ; {PROC_COD  = "90045"}]
+	boolExpr = OR
+end
+FEMOGLIC (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.28.1"} ; {PROC_COD  = "90281"}]
+	boolExpr = OR
+end
+ATRANSAM (AggregateModule)
+inputs
+	IADoutpat = FTRANSAM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateTRANSAM: date };{ MaxDateTRANSAM: date };{ NumberTRANSAM: int } ]
+end
+ClFinalTRANSAM (ExtendDataModule)
+inputs
+	IADoutpat = ATRANSAM
+parameters
+  attributes = [ {IsTRANSAM : boolean } ]
+end
+AEMOGLIC (AggregateModule)
+inputs
+	IADoutpat = FEMOGLIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateEMOGLIC: date };{ MaxDateEMOGLIC: date };{ NumberEMOGLIC: int } ]
+end
+FinalTRANSAM (ApplyFunction)
+inputs
+	custom = ClFinalTRANSAM
+parameters
+	function = GreaterThan(NumberTRANSAM,0)
+	result   = IsTRANSAM
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ELETTROL
+ClFinalEMOGLIC (ExtendDataModule)
+inputs
+	IADoutpat = AEMOGLIC
+parameters
+  attributes = [ {IsEMOGLIC : boolean } ]
+end
+FELETTROL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.13.4"} ; {PROC_COD  = "90.40.4"} ; {PROC_COD  = "90.37.4"} ; {PROC_COD  = "90134"} ; {PROC_COD  = "90404"} ; {PROC_COD  = "90374"}]
+	boolExpr = OR
+end
+AELETTROL (AggregateModule)
+inputs
+	IADoutpat = FELETTROL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateELETTROL: date };{ MaxDateELETTROL: date };{ NumberELETTROL: int } ]
+end
+FinalEMOGLIC (ApplyFunction)
+inputs
+	custom = ClFinalEMOGLIC
+parameters
+	function = GreaterThan(NumberEMOGLIC,1)
+	result   = IsEMOGLIC
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: STATINE
+ClFinalELETTROL (ExtendDataModule)
+inputs
+	IADoutpat = AELETTROL
+parameters
+  attributes = [ {IsELETTROL : boolean } ]
+end
+FinalELETTROL (ApplyFunction)
+inputs
+	custom = ClFinalELETTROL
+parameters
+	function = GreaterThan(NumberELETTROL,0)
+	result   = IsELETTROL
+	
+	
+end
+FSTATINE (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C10*"}]
+	
+end
+ASTATINE (AggregateModule)
+inputs
+	IADdrug = FSTATINE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateSTATINE: date };{ MaxDateSTATINE: date };{ NumberSTATINE: int } ]
+end
+
+// FINAL: join Cohort with sources for diaseases
+sortedCohort (SortModule)
+inputs
+	custom = Cohort
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalSTATINE (ExtendDataModule)
+inputs
+	IADdrug = ASTATINE
+parameters
+  attributes = [ {IsSTATINE : boolean } ]
+end
+sortedFinalFirst_DIAB_HOSP (SortModule)
+inputs
+	custom = FinalFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalSTATINE (ApplyFunction)
+inputs
+	custom = ClFinalSTATINE
+parameters
+	function = NotEqual(MinDateSTATINE, MaxDateSTATINE)
+	result   = IsSTATINE
+	
+	
+end
+Cohort_1 (MergeModule)
+inputs
+	custom = sortedCohort
+	custom = sortedFinalFirst_DIAB_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_2 (MergeModule)
+inputs
+	custom = Cohort_1
+	custom = sortedFinalFirst_DIAB_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ECG
+sortedFinalFirst_DIAB_EXE (SortModule)
+inputs
+	custom = FinalFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FECG (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "89.52"} ; {PROC_COD  = "8952"}]
+	boolExpr = OR
+end
+Cohort_3 (MergeModule)
+inputs
+	custom = Cohort_2
+	custom = sortedFinalFirst_DIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+AECG (AggregateModule)
+inputs
+	IADoutpat = FECG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateECG: date };{ MaxDateECG: date };{ NumberECG: int } ]
+end
+sortedFinalFirst_IHD_HOSP (SortModule)
+inputs
+	custom = FinalFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_4 (MergeModule)
+inputs
+	custom = Cohort_3
+	custom = sortedFinalFirst_IHD_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalECG (ExtendDataModule)
+inputs
+	IADoutpat = AECG
+parameters
+  attributes = [ {IsECG : boolean } ]
+end
+Cohort_5 (MergeModule)
+inputs
+	custom = Cohort_4
+	custom = sortedFinalFirst_IHD_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FinalECG (ApplyFunction)
+inputs
+	custom = ClFinalECG
+parameters
+	function = GreaterThan(NumberECG,0)
+	result   = IsECG
+	
+	
+end
+sortedFinalFirst_IHD_EXE (SortModule)
+inputs
+	custom = FinalFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_6 (MergeModule)
+inputs
+	custom = Cohort_5
+	custom = sortedFinalFirst_IHD_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: GLICEM
+sortedFinalFirst_HF_HOSP (SortModule)
+inputs
+	custom = FinalFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_7 (MergeModule)
+inputs
+	custom = Cohort_6
+	custom = sortedFinalFirst_HF_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_HF_EXE (SortModule)
+inputs
+	custom = FinalFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FGLICEM (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.28.1"};{PROC_COD  = "90.27.1"}; {PROC_COD  = "90281"};{PROC_COD  = "90271"}]
+	boolExpr = OR
+end
+Cohort_8 (MergeModule)
+inputs
+	custom = Cohort_7
+	custom = sortedFinalFirst_HF_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+AGLICEM (AggregateModule)
+inputs
+	IADoutpat = FGLICEM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateGLICEM: date };{ MaxDateGLICEM: date };{ NumberGLICEM: int } ]
+end
+sortedFinalFirst_HYPERTE_EXE (SortModule)
+inputs
+	custom = FinalFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_9 (MergeModule)
+inputs
+	custom = Cohort_8
+	custom = sortedFinalFirst_HYPERTE_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_DEMEN_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DEMEN_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalGLICEM (ExtendDataModule)
+inputs
+	IADoutpat = AGLICEM
+parameters
+  attributes = [ {IsGLICEM : boolean } ]
+end
+Cohort_10 (MergeModule)
+inputs
+	custom = Cohort_9
+	custom = sortedFinalFirst_DEMEN_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_OLDAMI_HOSP (SortModule)
+inputs
+	custom = FinalFirst_OLDAMI_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalGLICEM (ApplyFunction)
+inputs
+	custom = ClFinalGLICEM
+parameters
+	function = GreaterThan(NumberGLICEM,0)
+	result   = IsGLICEM
+	
+	
+end
+Cohort_11 (MergeModule)
+inputs
+	custom = Cohort_10
+	custom = sortedFinalFirst_OLDAMI_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ANTIAGGREG
+sortedFinalCREATININ (SortModule)
+inputs
+	custom = FinalCREATININ
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_12 (MergeModule)
+inputs
+	custom = Cohort_11
+	custom = sortedFinalCREATININ
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FANTIAGGREG (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "B01A*"}]
+	
+end
+sortedFinalMICROALB (SortModule)
+inputs
+	custom = FinalMICROALB
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_13 (MergeModule)
+inputs
+	custom = Cohort_12
+	custom = sortedFinalMICROALB
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+AANTIAGGREG (AggregateModule)
+inputs
+	IADdrug = FANTIAGGREG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateANTIAGGREG: date };{ MaxDateANTIAGGREG: date };{ NumberANTIAGGREG: int } ]
+end
+sortedFinalEMOGLIC (SortModule)
+inputs
+	custom = FinalEMOGLIC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_14 (MergeModule)
+inputs
+	custom = Cohort_13
+	custom = sortedFinalEMOGLIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalSTATINE (SortModule)
+inputs
+	custom = FinalSTATINE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalANTIAGGREG (ExtendDataModule)
+inputs
+	IADdrug = AANTIAGGREG
+parameters
+  attributes = [ {IsANTIAGGREG : boolean } ]
+end
+Cohort_15 (MergeModule)
+inputs
+	custom = Cohort_14
+	custom = sortedFinalSTATINE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FinalANTIAGGREG (ApplyFunction)
+inputs
+	custom = ClFinalANTIAGGREG
+parameters
+	function = NotEqual(MinDateANTIAGGREG, MaxDateANTIAGGREG)
+	result   = IsANTIAGGREG
+	
+	
+end
+sortedFinalECG (SortModule)
+inputs
+	custom = FinalECG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_16 (MergeModule)
+inputs
+	custom = Cohort_15
+	custom = sortedFinalECG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalGLICEM (SortModule)
+inputs
+	custom = FinalGLICEM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: BETABLOC
+Cohort_17 (MergeModule)
+inputs
+	custom = Cohort_16
+	custom = sortedFinalGLICEM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FBETABLOC (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C07*"}]
+	
+end
+sortedFinalANTIAGGREG (SortModule)
+inputs
+	custom = FinalANTIAGGREG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_18 (MergeModule)
+inputs
+	custom = Cohort_17
+	custom = sortedFinalANTIAGGREG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+ABETABLOC (AggregateModule)
+inputs
+	IADdrug = FBETABLOC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateBETABLOC: date };{ MaxDateBETABLOC: date };{ NumberBETABLOC: int } ]
+end
+sortedFinalBETABLOC (SortModule)
+inputs
+	custom = FinalBETABLOC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_19 (MergeModule)
+inputs
+	custom = Cohort_18
+	custom = sortedFinalBETABLOC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalACEINIB (SortModule)
+inputs
+	custom = FinalACEINIB
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_20 (MergeModule)
+inputs
+	custom = Cohort_19
+	custom = sortedFinalACEINIB
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalBETABLOC (ExtendDataModule)
+inputs
+	IADdrug = ABETABLOC
+parameters
+  attributes = [ {IsBETABLOC : boolean } ]
+end
+sortedFinalNEUROLATIP (SortModule)
+inputs
+	custom = FinalNEUROLATIP
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalBETABLOC (ApplyFunction)
+inputs
+	custom = ClFinalBETABLOC
+parameters
+	function = NotEqual(MinDateBETABLOC, MaxDateBETABLOC)
+	result   = IsBETABLOC
+	
+	
+end
+Cohort_21 (MergeModule)
+inputs
+	custom = Cohort_20
+	custom = sortedFinalNEUROLATIP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalNEUROLTIP (SortModule)
+inputs
+	custom = FinalNEUROLTIP
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_22 (MergeModule)
+inputs
+	custom = Cohort_21
+	custom = sortedFinalNEUROLTIP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ACEINIB
+sortedFinalCOLESTTOT (SortModule)
+inputs
+	custom = FinalCOLESTTOT
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FACEINIB (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC matches "C09*"}]
+	
+end
+Cohort_23 (MergeModule)
+inputs
+	custom = Cohort_22
+	custom = sortedFinalCOLESTTOT
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalCOLESTHDL (SortModule)
+inputs
+	custom = FinalCOLESTHDL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+AACEINIB (AggregateModule)
+inputs
+	IADdrug = FACEINIB
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateACEINIB: date };{ MaxDateACEINIB: date };{ NumberACEINIB: int } ]
+end
+Cohort_24 (MergeModule)
+inputs
+	custom = Cohort_23
+	custom = sortedFinalCOLESTHDL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalCOLESTLDL (SortModule)
+inputs
+	custom = FinalCOLESTLDL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_25 (MergeModule)
+inputs
+	custom = Cohort_24
+	custom = sortedFinalCOLESTLDL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalTRIGLIC (SortModule)
+inputs
+	custom = FinalTRIGLIC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_26 (MergeModule)
+inputs
+	custom = Cohort_25
+	custom = sortedFinalTRIGLIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalACEINIB (ExtendDataModule)
+inputs
+	IADdrug = AACEINIB
+parameters
+  attributes = [ {IsACEINIB : boolean } ]
+end
+sortedFinalSOD (SortModule)
+inputs
+	custom = FinalSOD
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalACEINIB (ApplyFunction)
+inputs
+	custom = ClFinalACEINIB
+parameters
+	function = NotEqual(MinDateACEINIB, MaxDateACEINIB)
+	result   = IsACEINIB
+	
+	
+end
+Cohort_27 (MergeModule)
+inputs
+	custom = Cohort_26
+	custom = sortedFinalSOD
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalPOTA (SortModule)
+inputs
+	custom = FinalPOTA
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_28 (MergeModule)
+inputs
+	custom = Cohort_27
+	custom = sortedFinalPOTA
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: NEUROLATIP
+sortedFinalTRANSAM (SortModule)
+inputs
+	custom = FinalTRANSAM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_29 (MergeModule)
+inputs
+	custom = Cohort_28
+	custom = sortedFinalTRANSAM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FNEUROLATIP (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC = "N05AH03"} ; {ATC = "N05AH04"} ; {ATC = "N05AX08"} ]
+	boolExpr = OR
+end
+sortedFinalELETTROL (SortModule)
+inputs
+	custom = FinalELETTROL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+ANEUROLATIP (AggregateModule)
+inputs
+	IADdrug = FNEUROLATIP
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateNEUROLATIP: date };{ MaxDateNEUROLATIP: date };{ NumberNEUROLATIP: int } ]
+end
+Cohort_30 (MergeModule)
+inputs
+	custom = Cohort_29
+	custom = sortedFinalELETTROL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalTARIFFA_LORDO_FARMACI (SortModule)
+inputs
+	custom = FinalTARIFFA_LORDO_FARMACI
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_31 (MergeModule)
+inputs
+	custom = Cohort_30
+	custom = sortedFinalTARIFFA_LORDO_FARMACI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+ClFinalNEUROLATIP (ExtendDataModule)
+inputs
+	IADdrug = ANEUROLATIP
+parameters
+  attributes = [ {IsNEUROLATIP : boolean } ]
+end
+sortedFinalNUM_PRESC_FARM (SortModule)
+inputs
+	custom = FinalNUM_PRESC_FARM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_32 (MergeModule)
+inputs
+	custom = Cohort_31
+	custom = sortedFinalNUM_PRESC_FARM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FinalNEUROLATIP (ApplyFunction)
+inputs
+	custom = ClFinalNEUROLATIP
+parameters
+	function = NotEqual(MinDateNEUROLATIP, MaxDateNEUROLATIP)
+	result   = IsNEUROLATIP
+	
+	
+end
+sortedFinalNUM_RIC (SortModule)
+inputs
+	custom = FinalNUM_RIC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: NEUROLTIP
+Cohort_33 (MergeModule)
+inputs
+	custom = Cohort_32
+	custom = sortedFinalNUM_RIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+FNEUROLTIP (FilterModule)
+inputs
+	IADdrug = sortedLastYearDRUGS
+parameters
+	conditions = [{ATC = "N05AD01"} ; {ATC = "N05AA03"}]
+	boolExpr = OR
+end
+sortedFinalTARIFFA_LORDO_RIC (SortModule)
+inputs
+	custom = FinalTARIFFA_LORDO_RIC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_34 (MergeModule)
+inputs
+	custom = Cohort_33
+	custom = sortedFinalTARIFFA_LORDO_RIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+ANEUROLTIP (AggregateModule)
+inputs
+	IADdrug = FNEUROLTIP
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DRUG_DISPENSING_DATE),MAX(DRUG_DISPENSING_DATE),COUNT(DRUG_DISPENSING_DATE) ]
+	results =  [ { MinDateNEUROLTIP: date };{ MaxDateNEUROLTIP: date };{ NumberNEUROLTIP: int } ]
+end
+sortedFinalTAR_OSPACDRGMED (SortModule)
+inputs
+	custom = FinalTAR_OSPACDRGMED
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_35 (MergeModule)
+inputs
+	custom = Cohort_34
+	custom = sortedFinalTAR_OSPACDRGMED
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPACDRGCHI (SortModule)
+inputs
+	custom = FinalTAR_OSPACDRGCHI
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_36 (MergeModule)
+inputs
+	custom = Cohort_35
+	custom = sortedFinalTAR_OSPACDRGCHI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+ClFinalNEUROLTIP (ExtendDataModule)
+inputs
+	IADdrug = ANEUROLTIP
+parameters
+  attributes = [ {IsNEUROLTIP : boolean } ]
+end
+sortedFinalTAR_OSPNAC (SortModule)
+inputs
+	custom = FinalTAR_OSPNAC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalNEUROLTIP (ApplyFunction)
+inputs
+	custom = ClFinalNEUROLTIP
+parameters
+	function = NotEqual(MinDateNEUROLTIP, MaxDateNEUROLTIP)
+	result   = IsNEUROLTIP
+	
+	
+end
+Cohort_37 (MergeModule)
+inputs
+	custom = Cohort_36
+	custom = sortedFinalTAR_OSPNAC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPDHDRGMED (SortModule)
+inputs
+	custom = FinalTAR_OSPDHDRGMED
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_38 (MergeModule)
+inputs
+	custom = Cohort_37
+	custom = sortedFinalTAR_OSPDHDRGMED
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTTOT
+sortedFinalTAR_OSPDHDRGCHI (SortModule)
+inputs
+	custom = FinalTAR_OSPDHDRGCHI
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_39 (MergeModule)
+inputs
+	custom = Cohort_38
+	custom = sortedFinalTAR_OSPDHDRGCHI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPDHPOSTACUTO (SortModule)
+inputs
+	custom = FinalTAR_OSPDHPOSTACUTO
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FCOLESTTOT (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.3"} ; {PROC_COD  = "90143"}]
+	boolExpr = OR
+end
+FinalJoinPrev (MergeModule)
+inputs
+	custom = Cohort_39
+	custom = sortedFinalTAR_OSPDHPOSTACUTO
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+ACOLESTTOT (AggregateModule)
+inputs
+	IADoutpat = FCOLESTTOT
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTTOT: date };{ MaxDateCOLESTTOT: date };{ NumberCOLESTTOT: int } ]
+end
+
+// FINAL: gen diseases date 
+ClFinalCOLESTTOT (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTTOT
+parameters
+  attributes = [ {IsCOLESTTOT : boolean } ]
+end
+ClFinalDiseasesDate (ExtendDataModule)
+inputs
+	custom = FinalJoinPrev
+parameters
+  attributes = [  {DateDIAB: date }; {DateIHD: date }; {DateHF: date }; {DateHYPERTE: date }; {DateDEMEN: date }; {DateOLDAMI: date } ]
+end
+FinalCOLESTTOT (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTTOT
+parameters
+	function = GreaterThan(NumberCOLESTTOT,0)
+	result   = IsCOLESTTOT
+	
+	
+end
+FinalDiseasesDate_1 (ApplyFunction)
+inputs
+	custom = ClFinalDiseasesDate
+parameters
+	function =  MIN( First_DIAB_HOSP, First_DIAB_DRUGS, First_DIAB_EXE ) 
+	result   = DateDIAB
+	
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTHDL
+FinalDiseasesDate_2 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_1
+parameters
+	function =  MIN( First_IHD_HOSP, First_IHD_DRUGS, First_IHD_EXE ) 
+	result   = DateIHD
+	
+	
+end
+FinalDiseasesDate_3 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_2
+parameters
+	function =  MIN( First_HF_HOSP, First_HF_EXE ) 
+	result   = DateHF
+	
+	
+end
+FCOLESTHDL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.1"} ; {PROC_COD  = "90141"}]
+	boolExpr = OR
+end
+FinalDiseasesDate_4 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_3
+parameters
+	function =  MIN( First_HYPERTE_EXE ) 
+	result   = DateHYPERTE
+	
+	
+end
+FinalDiseasesDate_5 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_4
+parameters
+	function =  MIN( First_DEMEN_DRUGS ) 
+	result   = DateDEMEN
+	
+	
+end
+ACOLESTHDL (AggregateModule)
+inputs
+	IADoutpat = FCOLESTHDL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTHDL: date };{ MaxDateCOLESTHDL: date };{ NumberCOLESTHDL: int } ]
+end
+FinalDiseasesDate (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_5
+parameters
+	function =  MIN( First_OLDAMI_HOSP ) 
+	result   = DateOLDAMI
+	
+	
+end
+
+// FINAL: generate prevalent for diseases at 2012-01-01 
+ClDiseasesPrev (ExtendDataModule)
+inputs
+	custom = FinalDiseasesDate
+parameters
+  attributes = [  { DIABPrev : string}; { IHDPrev : string}; { HFPrev : string}; { HYPERTEPrev : string}; { DEMENPrev : string}; { OLDAMIPrev : string} ]
+end
+DiseasesPrev_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrev
+parameters
+	function = Id("1")
+	result   = DIABPrev
+	conditions = [ { DateDIAB < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+ClFinalCOLESTHDL (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTHDL
+parameters
+  attributes = [ {IsCOLESTHDL : boolean } ]
+end
+DiseasesPrev_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_1
+parameters
+	function = Id("1")
+	result   = IHDPrev
+	conditions = [ { DateIHD < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_2
+parameters
+	function = Id("1")
+	result   = HFPrev
+	conditions = [ { DateHF < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+FinalCOLESTHDL (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTHDL
+parameters
+	function = GreaterThan(NumberCOLESTHDL,0)
+	result   = IsCOLESTHDL
+	
+	
+end
+DiseasesPrev_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_3
+parameters
+	function = Id("1")
+	result   = HYPERTEPrev
+	conditions = [ { DateHYPERTE < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_4
+parameters
+	function = Id("1")
+	result   = DEMENPrev
+	conditions = [ { DateDEMEN < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: COLESTLDL
+DiseasesPrev (ApplyFunction)
+inputs
+	custom = DiseasesPrev_5
+parameters
+	function = Id("1")
+	result   = OLDAMIPrev
+	conditions = [ { DateOLDAMI < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+
+// FINAL: gen Sources for diseases at 2012-01-01
+FCOLESTLDL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.14.2"} ; {PROC_COD  = "90142"}]
+	boolExpr = OR
+end
+ClDiseasesPrevSources (ExtendDataModule)
+inputs
+	custom = DiseasesPrev
+parameters
+  attributes = [  {FONTI_DIAB: string } ;{FONTI_IHD: string } ;{FONTI_HF: string } ;{FONTI_HYPERTE: string } ;{FONTI_DEMEN: string } ]
+end
+
+// FINAL: fill in Sources for diseases at 2012-01-01 
+ACOLESTLDL (AggregateModule)
+inputs
+	IADoutpat = FCOLESTLDL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateCOLESTLDL: date };{ MaxDateCOLESTLDL: date };{ NumberCOLESTLDL: int } ]
+end
+DiseasesPrevSource_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrevSources
+parameters
+	function = Concat(FONTI_DIAB,"HOSP ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_1
+parameters
+	function = Concat(FONTI_DIAB,"DRUGS ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_2
+parameters
+	function = Concat(FONTI_DIAB,"EXE ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+ClFinalCOLESTLDL (ExtendDataModule)
+inputs
+	IADoutpat = ACOLESTLDL
+parameters
+  attributes = [ {IsCOLESTLDL : boolean } ]
+end
+DiseasesPrevSource_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_3
+parameters
+	function = Concat(FONTI_IHD,"HOSP ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+FinalCOLESTLDL (ApplyFunction)
+inputs
+	custom = ClFinalCOLESTLDL
+parameters
+	function = GreaterThan(NumberCOLESTLDL,0)
+	result   = IsCOLESTLDL
+	
+	
+end
+DiseasesPrevSource_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_4
+parameters
+	function = Concat(FONTI_IHD,"DRUGS ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_6 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_5
+parameters
+	function = Concat(FONTI_IHD,"EXE ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_7 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_6
+parameters
+	function = Concat(FONTI_HF,"HOSP ")
+	result   = FONTI_HF
+	conditions = [ {First_HF_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: TRIGLIC
+DiseasesPrevSource_8 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_7
+parameters
+	function = Concat(FONTI_HF,"EXE ")
+	result   = FONTI_HF
+	conditions = [ {First_HF_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_9 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_8
+parameters
+	function = Concat(FONTI_HYPERTE,"EXE ")
+	result   = FONTI_HYPERTE
+	conditions = [ {First_HYPERTE_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+FTRIGLIC (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.43.2"} ; {PROC_COD  = "90432"}]
+	boolExpr = OR
+end
+DiseasesPrevSource (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_9
+parameters
+	function = Concat(FONTI_DEMEN,"DRUGS ")
+	result   = FONTI_DEMEN
+	conditions = [ {First_DEMEN_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+
+// FINAL: generate prevalent for diseases at 2012-12-31 
+ATRIGLIC (AggregateModule)
+inputs
+	IADoutpat = FTRIGLIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateTRIGLIC: date };{ MaxDateTRIGLIC: date };{ NumberTRIGLIC: int } ]
+end
+ClDiseasesPrevFinal (ExtendDataModule)
+inputs
+	custom = DiseasesPrevSource
+parameters
+  attributes = [  { DIABPrevENDFUP : string }; { IHDPrevENDFUP : string }; { HFPrevENDFUP : string }; { HYPERTEPrevENDFUP : string }; { DEMENPrevENDFUP : string }; { OLDAMIPrevENDFUP : string } ]
+end
+DiseasesPrevFinal_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrevFinal
+parameters
+	function = Id("1")
+	result   = DIABPrevENDFUP
+	conditions = [ { DateDIAB < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+ClFinalTRIGLIC (ExtendDataModule)
+inputs
+	IADoutpat = ATRIGLIC
+parameters
+  attributes = [ {IsTRIGLIC : boolean } ]
+end
+DiseasesPrevFinal_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_1
+parameters
+	function = Id("1")
+	result   = IHDPrevENDFUP
+	conditions = [ { DateIHD < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_2
+parameters
+	function = Id("1")
+	result   = HFPrevENDFUP
+	conditions = [ { DateHF < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+FinalTRIGLIC (ApplyFunction)
+inputs
+	custom = ClFinalTRIGLIC
+parameters
+	function = GreaterThan(NumberTRIGLIC,0)
+	result   = IsTRIGLIC
+	
+	
+end
+DiseasesPrevFinal_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_3
+parameters
+	function = Id("1")
+	result   = HYPERTEPrevENDFUP
+	conditions = [ { DateHYPERTE < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_4
+parameters
+	function = Id("1")
+	result   = DEMENPrevENDFUP
+	conditions = [ { DateDEMEN < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: SOD
+DiseasesPrevFinal (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_5
+parameters
+	function = Id("1")
+	result   = OLDAMIPrevENDFUP
+	conditions = [ { DateOLDAMI < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+
+// FINAL: gen STAGE of diseases at 2012-01-01
+FSOD (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.40.4"} ; {PROC_COD  = "90404"}]
+	boolExpr = OR
+end
+ClDiseasesStages (ExtendDataModule)
+inputs
+	custom = DiseasesPrevFinal
+parameters
+  attributes = [  {STAGE_DIAB: string } ;{STAGE_IHD: string } ;{STAGE_HF: string } ;{STAGE_HYPERTE: string } ;{STAGE_DEMEN: string } ]
+end
+
+// FINAL: fill in STAGE of diseases at 2012-01-01 
+ASOD (AggregateModule)
+inputs
+	IADoutpat = FSOD
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateSOD: date };{ MaxDateSOD: date };{ NumberSOD: int } ]
+end
+DiseasesStage_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesStages
+parameters
+	function = Id("DIAB1a")
+	result   = STAGE_DIAB
+	conditions = [{DIABPrev = "1"}]
+	
+end
+DiseasesStage_2 (ApplyFunction)
+inputs
+	custom = DiseasesStage_1
+parameters
+	function = Id("DIAB1b")
+	result   = STAGE_DIAB
+	conditions = [{DIABPrev = "1"};{First_DIAB_DRUGS < 2012-01-01}]
+	boolExpr = AND 
+end
+DiseasesStage_3 (ApplyFunction)
+inputs
+	custom = DiseasesStage_2
+parameters
+	function = Id("IHD1a")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"}]
+	
+end
+DiseasesStage_4 (ApplyFunction)
+inputs
+	custom = DiseasesStage_3
+parameters
+	function = Id("IHD1b")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"};{ OLDAMIPrev = "1"}]
+	boolExpr = AND 
+end
+ClFinalSOD (ExtendDataModule)
+inputs
+	IADoutpat = ASOD
+parameters
+  attributes = [ {IsSOD : boolean } ]
+end
+DiseasesStage_5 (ApplyFunction)
+inputs
+	custom = DiseasesStage_4
+parameters
+	function = Id("IHD3")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"};{ HFPrev = "1"}]
+	boolExpr = AND 
+end
+FinalSOD (ApplyFunction)
+inputs
+	custom = ClFinalSOD
+parameters
+	function = GreaterThan(NumberSOD,0)
+	result   = IsSOD
+	
+	
+end
+DiseasesStage_6 (ApplyFunction)
+inputs
+	custom = DiseasesStage_5
+parameters
+	function = Id("HF1")
+	result   = STAGE_HF
+	conditions = [{HFPrev = "1"}]
+	
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: POTA
+DiseasesStage_7 (ApplyFunction)
+inputs
+	custom = DiseasesStage_6
+parameters
+	function = Id("HYPERTE1")
+	result   = STAGE_HYPERTE
+	conditions = [{HYPERTEPrev = "1"}]
+	
+end
+DiseasesStage_8 (ApplyFunction)
+inputs
+	custom = DiseasesStage_7
+parameters
+	function = Id("HYPERTE2b")
+	result   = STAGE_HYPERTE
+	conditions = [{HYPERTEPrev = "1"};{ HFPrev = "1"}]
+	boolExpr = AND 
+end
+FPOTA (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.37.4"} ; {PROC_COD  = "90374"} ]
+	boolExpr = OR
+end
+DiseasesStage (ApplyFunction)
+inputs
+	custom = DiseasesStage_8
+parameters
+	function = Id("ANTICOLIN")
+	result   = STAGE_DEMEN
+	conditions = [{DEMENPrev = "1"}]
+	
+end
+
+// FINAL: rename variables
+APOTA (AggregateModule)
+inputs
+	IADoutpat = FPOTA
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDatePOTA: date };{ MaxDatePOTA: date };{ NumberPOTA: int } ]
+end
+RenamedFile (RenameAttributesModule)
+inputs
+	custom = DiseasesStage
+parameters
+	inputAttributes = [ PERSON_ID,DATE_OF_BIRTH, DATE_OF_DEATH,GENDER_CONCEPT_ID,STARTDATE, ENDDATE, CENSUS_LOCATION_CONCEPT_ID, LOCATION_CONCEPT_ID, LHU_LOCATION_CONCEPT_ID, GP_ID, STARTDATE_GP, IsPrev12M,IsPrevDATEENDFUP,DateDIAB,STAGE_DIAB,DIABPrevENDFUP,DateIHD,STAGE_IHD,IHDPrevENDFUP,DateHF,STAGE_HF,HFPrevENDFUP,DateHYPERTE,STAGE_HYPERTE,HYPERTEPrevENDFUP,DateDEMEN,STAGE_DEMEN,DEMENPrevENDFUP,TAR_OSPACDRGMED,TAR_OSPACDRGCHI,TAR_OSPNAC,TAR_OSPDHDRGMED,TAR_OSPDHDRGCHI,TAR_OSPDHPOSTACUTO ]
+	outputAttributes   = [ ID_SOGGETTO,DATA_NASCITA,DATA_MORTE,SESSO,DATA_INGRESSO, DATA_USCITA,SEZIONE,COMUNE,DISTRETTO_RESIDENZA,MMG, DATA_MMG,IN_CARICO12M,IN_CARICO,DATA_DIAGN_DIAB,STADIO_DIAB_12M,STADIO_DIAB,DATA_DIAGN_IHD,STADIO_IHD_12M,STADIO_IHD,DATA_DIAGN_HF,STADIO_HF_12M,STADIO_HF,DATA_DIAGN_HYPERTE,STADIO_HYPERTE_12M,STADIO_HYPERTE,DATA_DIAGN_DEMEN,STADIO_DEMEN_12M,STADIO_DEMEN,TARIFFA_LORDO_OSPACDRGMED,TARIFFA_LORDO_OSPACDRGCHIR,TARIFFA_LORDO_OSPNAC,TARIFFA_LORDO_OSPDHDRGMED,TARIFFA_LORDO_OSPDHDRGCHIR,TARIFFA_LORDO_OSPDHPOSTACUTO ]
+end
+
+
+
+// FINAL: gen complex disease-specific indicators
+ClFinalPOTA (ExtendDataModule)
+inputs
+	IADoutpat = APOTA
+parameters
+  attributes = [ {IsPOTA : boolean } ]
+end
+ClIndicComplex (ExtendDataModule)
+inputs
+	custom = RenamedFile
+parameters
+  attributes = [   { IsPROFLIP : boolean }  ; { IsCREATNAK : boolean }  ; { IsEMATOCHIM : boolean }  ]
+end
+FinalPOTA (ApplyFunction)
+inputs
+	custom = ClFinalPOTA
+parameters
+	function = GreaterThan(NumberPOTA,0)
+	result   = IsPOTA
+	
+	
+end
+IndicComplex_1 (ApplyFunction)
+inputs
+	custom = ClIndicComplex
+parameters
+	function = Id(true)
+	result   = IsPROFLIP
+	conditions = [ {IsCOLESTTOT = true};{IsCOLESTHDL = true};{IsTRIGLIC = true}]
+	boolExpr = AND
+end
+IndicComplex_2 (ApplyFunction)
+inputs
+	custom = IndicComplex_1
+parameters
+	function = Id(true)
+	result   = IsCREATNAK
+	conditions = [ {IsSOD = true};{IsPOTA = true};{IsCREATININ = true}]
+	boolExpr = AND
+end
+IndicComplex (ApplyFunction)
+inputs
+	custom = IndicComplex_2
+parameters
+	function = Id(true)
+	result   = IsEMATOCHIM
+	conditions = [ {IsTRANSAM = true};{IsELETTROL = true};{IsGLICEM = true};{IsCREATININ = true}]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: TRANSAM
+
+// FINAL: gen num/denom of disease-specific indicators (DEN is specific per stage)
+FTRANSAM (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.09.2"} ; {PROC_COD  = "90.04.5"} ; {PROC_COD  = "90092"} ; {PROC_COD  = "90045"}]
+	boolExpr = OR
+end
+ClIndicFinal (ExtendDataModule)
+inputs
+	custom = IndicComplex
+parameters
+  attributes = [   { DEN_CREATININ_DIAB : int } ; { NUM_CREATININ_DIAB : int = 0 }  ; { DEN_CREATININ_HYPERTE : int } ; { NUM_CREATININ_HYPERTE : int = 0 }  ; { DEN_MICROALB_DIAB : int } ; { NUM_MICROALB_DIAB : int = 0 }  ; { DEN_MICROALB_HYPERTE : int } ; { NUM_MICROALB_HYPERTE : int = 0 }  ; { DEN_EMOGLIC_DIAB : int } ; { NUM_EMOGLIC_DIAB : int = 0 }  ; { DEN_STATINE_DIAB : int } ; { NUM_STATINE_DIAB : int = 0 }  ; { DEN_STATINE_IHD : int } ; { NUM_STATINE_IHD : int = 0 }  ; { DEN_ECG_IHD : int } ; { NUM_ECG_IHD : int = 0 }  ; { DEN_ECG_HYPERTE : int } ; { NUM_ECG_HYPERTE : int = 0 }  ; { DEN_ECG_HF : int } ; { NUM_ECG_HF : int = 0 }  ; { DEN_ECG_DEMEN : int } ; { NUM_ECG_DEMEN : int = 0 }  ; { DEN_GLICEM_IHD : int } ; { NUM_GLICEM_IHD : int = 0 }  ; { DEN_GLICEM_HYPERTE : int } ; { NUM_GLICEM_HYPERTE : int = 0 }  ; { DEN_ANTIAGGREG_IHD : int } ; { NUM_ANTIAGGREG_IHD : int = 0 }  ; { DEN_BETABLOC_IHD : int } ; { NUM_BETABLOC_IHD : int = 0 }  ; { DEN_BETABLOC_HF : int } ; { NUM_BETABLOC_HF : int = 0 }  ; { DEN_ACEINIB_IHD : int } ; { NUM_ACEINIB_IHD : int = 0 }  ; { DEN_ACEINIB_HF : int } ; { NUM_ACEINIB_HF : int = 0 }  ; { DEN_NEUROLATIP_DEMEN : int } ; { NUM_NEUROLATIP_DEMEN : int = 0 }  ; { DEN_NEUROLTIP_DEMEN : int } ; { NUM_NEUROLTIP_DEMEN : int = 0 }  ; { DEN_PROFLIP_DIAB : int } ; { NUM_PROFLIP_DIAB : int = 0 }  ; { DEN_PROFLIP_IHD : int } ; { NUM_PROFLIP_IHD : int = 0 }  ; { DEN_PROFLIP_HYPERTE : int } ; { NUM_PROFLIP_HYPERTE : int = 0 }  ; { DEN_CREATNAK_HF : int } ; { NUM_CREATNAK_HF : int = 0 }  ; { DEN_EMATOCHIM_DEMEN : int } ; { NUM_EMATOCHIM_DEMEN : int = 0 }  ]
+end
+ATRANSAM (AggregateModule)
+inputs
+	IADoutpat = FTRANSAM
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateTRANSAM: date };{ MaxDateTRANSAM: date };{ NumberTRANSAM: int } ]
+end
+IndicFinal_1 (ApplyFunction)
+inputs
+	custom = ClIndicFinal
+parameters
+	function = Id(1)
+	result   = DEN_CREATININ_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+ClFinalTRANSAM (ExtendDataModule)
+inputs
+	IADoutpat = ATRANSAM
+parameters
+  attributes = [ {IsTRANSAM : boolean } ]
+end
+IndicFinal_2 (ApplyFunction)
+inputs
+	custom = IndicFinal_1
+parameters
+	function = Id(1)
+	result   = NUM_CREATININ_DIAB
+	conditions = [ { DEN_CREATININ_DIAB = 1 } ; { IsCREATININ = true }]
+	boolExpr = AND
+end
+FinalTRANSAM (ApplyFunction)
+inputs
+	custom = ClFinalTRANSAM
+parameters
+	function = GreaterThan(NumberTRANSAM,0)
+	result   = IsTRANSAM
+	
+	
+end
+IndicFinal_3 (ApplyFunction)
+inputs
+	custom = IndicFinal_2
+parameters
+	function = Id(1)
+	result   = DEN_CREATININ_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_4 (ApplyFunction)
+inputs
+	custom = IndicFinal_3
+parameters
+	function = Id(1)
+	result   = NUM_CREATININ_HYPERTE
+	conditions = [ { DEN_CREATININ_HYPERTE = 1 } ; { IsCREATININ = true }]
+	boolExpr = AND
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: ELETTROL
+IndicFinal_5 (ApplyFunction)
+inputs
+	custom = IndicFinal_4
+parameters
+	function = Id(1)
+	result   = DEN_MICROALB_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_6 (ApplyFunction)
+inputs
+	custom = IndicFinal_5
+parameters
+	function = Id(1)
+	result   = NUM_MICROALB_DIAB
+	conditions = [ { DEN_MICROALB_DIAB = 1 } ; { IsMICROALB = true }]
+	boolExpr = AND
+end
+FELETTROL (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+	conditions = [{PROC_COD  = "90.13.4"} ; {PROC_COD  = "90.40.4"} ; {PROC_COD  = "90.37.4"} ; {PROC_COD  = "90134"} ; {PROC_COD  = "90404"} ; {PROC_COD  = "90374"}]
+	boolExpr = OR
+end
+IndicFinal_7 (ApplyFunction)
+inputs
+	custom = IndicFinal_6
+parameters
+	function = Id(1)
+	result   = DEN_MICROALB_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_8 (ApplyFunction)
+inputs
+	custom = IndicFinal_7
+parameters
+	function = Id(1)
+	result   = NUM_MICROALB_HYPERTE
+	conditions = [ { DEN_MICROALB_HYPERTE = 1 } ; { IsMICROALB = true }]
+	boolExpr = AND
+end
+AELETTROL (AggregateModule)
+inputs
+	IADoutpat = FELETTROL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateELETTROL: date };{ MaxDateELETTROL: date };{ NumberELETTROL: int } ]
+end
+IndicFinal_9 (ApplyFunction)
+inputs
+	custom = IndicFinal_8
+parameters
+	function = Id(1)
+	result   = DEN_EMOGLIC_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+ClFinalELETTROL (ExtendDataModule)
+inputs
+	IADoutpat = AELETTROL
+parameters
+  attributes = [ {IsELETTROL : boolean } ]
+end
+IndicFinal_10 (ApplyFunction)
+inputs
+	custom = IndicFinal_9
+parameters
+	function = Id(1)
+	result   = NUM_EMOGLIC_DIAB
+	conditions = [ { DEN_EMOGLIC_DIAB = 1 } ; { IsEMOGLIC = true }]
+	boolExpr = AND
+end
+IndicFinal_11 (ApplyFunction)
+inputs
+	custom = IndicFinal_10
+parameters
+	function = Id(1)
+	result   = DEN_STATINE_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+FinalELETTROL (ApplyFunction)
+inputs
+	custom = ClFinalELETTROL
+parameters
+	function = GreaterThan(NumberELETTROL,0)
+	result   = IsELETTROL
+	
+	
+end
+IndicFinal_12 (ApplyFunction)
+inputs
+	custom = IndicFinal_11
+parameters
+	function = Id(1)
+	result   = NUM_STATINE_DIAB
+	conditions = [ { DEN_STATINE_DIAB = 1 } ; { IsSTATINE = true }]
+	boolExpr = AND
+end
+IndicFinal_13 (ApplyFunction)
+inputs
+	custom = IndicFinal_12
+parameters
+	function = Id(1)
+	result   = DEN_STATINE_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+
+// FINAL: join Cohort with sources for diaseases
+IndicFinal_14 (ApplyFunction)
+inputs
+	custom = IndicFinal_13
+parameters
+	function = Id(1)
+	result   = NUM_STATINE_IHD
+	conditions = [ { DEN_STATINE_IHD = 1 } ; { IsSTATINE = true }]
+	boolExpr = AND
+end
+IndicFinal_15 (ApplyFunction)
+inputs
+	custom = IndicFinal_14
+parameters
+	function = Id(1)
+	result   = DEN_ECG_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+sortedCohort (SortModule)
+inputs
+	custom = Cohort
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_16 (ApplyFunction)
+inputs
+	custom = IndicFinal_15
+parameters
+	function = Id(1)
+	result   = NUM_ECG_IHD
+	conditions = [ { DEN_ECG_IHD = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_DIAB_HOSP (SortModule)
+inputs
+	custom = FinalFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_17 (ApplyFunction)
+inputs
+	custom = IndicFinal_16
+parameters
+	function = Id(1)
+	result   = DEN_ECG_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+Cohort_1 (MergeModule)
+inputs
+	custom = sortedCohort
+	custom = sortedFinalFirst_DIAB_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_18 (ApplyFunction)
+inputs
+	custom = IndicFinal_17
+parameters
+	function = Id(1)
+	result   = NUM_ECG_HYPERTE
+	conditions = [ { DEN_ECG_HYPERTE = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_19 (ApplyFunction)
+inputs
+	custom = IndicFinal_18
+parameters
+	function = Id(1)
+	result   = DEN_ECG_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_20 (ApplyFunction)
+inputs
+	custom = IndicFinal_19
+parameters
+	function = Id(1)
+	result   = NUM_ECG_HF
+	conditions = [ { DEN_ECG_HF = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+Cohort_2 (MergeModule)
+inputs
+	custom = Cohort_1
+	custom = sortedFinalFirst_DIAB_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_21 (ApplyFunction)
+inputs
+	custom = IndicFinal_20
+parameters
+	function = Id(1)
+	result   = DEN_ECG_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal_22 (ApplyFunction)
+inputs
+	custom = IndicFinal_21
+parameters
+	function = Id(1)
+	result   = NUM_ECG_DEMEN
+	conditions = [ { DEN_ECG_DEMEN = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_DIAB_EXE (SortModule)
+inputs
+	custom = FinalFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_23 (ApplyFunction)
+inputs
+	custom = IndicFinal_22
+parameters
+	function = Id(1)
+	result   = DEN_GLICEM_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+Cohort_3 (MergeModule)
+inputs
+	custom = Cohort_2
+	custom = sortedFinalFirst_DIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_24 (ApplyFunction)
+inputs
+	custom = IndicFinal_23
+parameters
+	function = Id(1)
+	result   = NUM_GLICEM_IHD
+	conditions = [ { DEN_GLICEM_IHD = 1 } ; { IsGLICEM = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_IHD_HOSP (SortModule)
+inputs
+	custom = FinalFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_25 (ApplyFunction)
+inputs
+	custom = IndicFinal_24
+parameters
+	function = Id(1)
+	result   = DEN_GLICEM_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_26 (ApplyFunction)
+inputs
+	custom = IndicFinal_25
+parameters
+	function = Id(1)
+	result   = NUM_GLICEM_HYPERTE
+	conditions = [ { DEN_GLICEM_HYPERTE = 1 } ; { IsGLICEM = true }]
+	boolExpr = AND
+end
+Cohort_4 (MergeModule)
+inputs
+	custom = Cohort_3
+	custom = sortedFinalFirst_IHD_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_27 (ApplyFunction)
+inputs
+	custom = IndicFinal_26
+parameters
+	function = Id(1)
+	result   = DEN_ANTIAGGREG_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+sortedFinalFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_28 (ApplyFunction)
+inputs
+	custom = IndicFinal_27
+parameters
+	function = Id(1)
+	result   = NUM_ANTIAGGREG_IHD
+	conditions = [ { DEN_ANTIAGGREG_IHD = 1 } ; { IsANTIAGGREG = true }]
+	boolExpr = AND
+end
+IndicFinal_29 (ApplyFunction)
+inputs
+	custom = IndicFinal_28
+parameters
+	function = Id(1)
+	result   = DEN_BETABLOC_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+Cohort_5 (MergeModule)
+inputs
+	custom = Cohort_4
+	custom = sortedFinalFirst_IHD_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_30 (ApplyFunction)
+inputs
+	custom = IndicFinal_29
+parameters
+	function = Id(1)
+	result   = NUM_BETABLOC_IHD
+	conditions = [ { DEN_BETABLOC_IHD = 1 } ; { IsBETABLOC = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_IHD_EXE (SortModule)
+inputs
+	custom = FinalFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_31 (ApplyFunction)
+inputs
+	custom = IndicFinal_30
+parameters
+	function = Id(1)
+	result   = DEN_BETABLOC_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_32 (ApplyFunction)
+inputs
+	custom = IndicFinal_31
+parameters
+	function = Id(1)
+	result   = NUM_BETABLOC_HF
+	conditions = [ { DEN_BETABLOC_HF = 1 } ; { IsBETABLOC = true }]
+	boolExpr = AND
+end
+Cohort_6 (MergeModule)
+inputs
+	custom = Cohort_5
+	custom = sortedFinalFirst_IHD_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_33 (ApplyFunction)
+inputs
+	custom = IndicFinal_32
+parameters
+	function = Id(1)
+	result   = DEN_ACEINIB_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_34 (ApplyFunction)
+inputs
+	custom = IndicFinal_33
+parameters
+	function = Id(1)
+	result   = NUM_ACEINIB_IHD
+	conditions = [ { DEN_ACEINIB_IHD = 1 } ; { IsACEINIB = true }]
+	boolExpr = AND
+end
+sortedFinalFirst_HF_HOSP (SortModule)
+inputs
+	custom = FinalFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_35 (ApplyFunction)
+inputs
+	custom = IndicFinal_34
+parameters
+	function = Id(1)
+	result   = DEN_ACEINIB_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+Cohort_7 (MergeModule)
+inputs
+	custom = Cohort_6
+	custom = sortedFinalFirst_HF_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_36 (ApplyFunction)
+inputs
+	custom = IndicFinal_35
+parameters
+	function = Id(1)
+	result   = NUM_ACEINIB_HF
+	conditions = [ { DEN_ACEINIB_HF = 1 } ; { IsACEINIB = true }]
+	boolExpr = AND
+end
+IndicFinal_37 (ApplyFunction)
+inputs
+	custom = IndicFinal_36
+parameters
+	function = Id(1)
+	result   = DEN_NEUROLATIP_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+sortedFinalFirst_HF_EXE (SortModule)
+inputs
+	custom = FinalFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_38 (ApplyFunction)
+inputs
+	custom = IndicFinal_37
+parameters
+	function = Id(1)
+	result   = NUM_NEUROLATIP_DEMEN
+	conditions = [ { DEN_NEUROLATIP_DEMEN = 1 } ; { IsNEUROLATIP = true }]
+	boolExpr = AND
+end
+IndicFinal_39 (ApplyFunction)
+inputs
+	custom = IndicFinal_38
+parameters
+	function = Id(1)
+	result   = DEN_NEUROLTIP_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal_40 (ApplyFunction)
+inputs
+	custom = IndicFinal_39
+parameters
+	function = Id(1)
+	result   = NUM_NEUROLTIP_DEMEN
+	conditions = [ { DEN_NEUROLTIP_DEMEN = 1 } ; { IsNEUROLTIP = true }]
+	boolExpr = AND
+end
+Cohort_8 (MergeModule)
+inputs
+	custom = Cohort_7
+	custom = sortedFinalFirst_HF_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_41 (ApplyFunction)
+inputs
+	custom = IndicFinal_40
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+sortedFinalFirst_HYPERTE_EXE (SortModule)
+inputs
+	custom = FinalFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_42 (ApplyFunction)
+inputs
+	custom = IndicFinal_41
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_DIAB
+	conditions = [ { DEN_PROFLIP_DIAB = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+IndicFinal_43 (ApplyFunction)
+inputs
+	custom = IndicFinal_42
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_44 (ApplyFunction)
+inputs
+	custom = IndicFinal_43
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_IHD
+	conditions = [ { DEN_PROFLIP_IHD = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+Cohort_9 (MergeModule)
+inputs
+	custom = Cohort_8
+	custom = sortedFinalFirst_HYPERTE_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_45 (ApplyFunction)
+inputs
+	custom = IndicFinal_44
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+sortedFinalFirst_DEMEN_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DEMEN_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_46 (ApplyFunction)
+inputs
+	custom = IndicFinal_45
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_HYPERTE
+	conditions = [ { DEN_PROFLIP_HYPERTE = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+Cohort_10 (MergeModule)
+inputs
+	custom = Cohort_9
+	custom = sortedFinalFirst_DEMEN_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal_47 (ApplyFunction)
+inputs
+	custom = IndicFinal_46
+parameters
+	function = Id(1)
+	result   = DEN_CREATNAK_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+sortedFinalFirst_OLDAMI_HOSP (SortModule)
+inputs
+	custom = FinalFirst_OLDAMI_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_48 (ApplyFunction)
+inputs
+	custom = IndicFinal_47
+parameters
+	function = Id(1)
+	result   = NUM_CREATNAK_HF
+	conditions = [ { DEN_CREATNAK_HF = 1 } ; { IsCREATNAK = true }]
+	boolExpr = AND
+end
+Cohort_11 (MergeModule)
+inputs
+	custom = Cohort_10
+	custom = sortedFinalFirst_OLDAMI_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+IndicFinal_49 (ApplyFunction)
+inputs
+	custom = IndicFinal_48
+parameters
+	function = Id(1)
+	result   = DEN_EMATOCHIM_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+sortedFinalCREATININ (SortModule)
+inputs
+	custom = FinalCREATININ
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+IndicFinal (ApplyFunction)
+inputs
+	custom = IndicFinal_49
+parameters
+	function = Id(1)
+	result   = NUM_EMATOCHIM_DEMEN
+	conditions = [ { DEN_EMATOCHIM_DEMEN = 1 } ; { IsEMATOCHIM = true }]
+	boolExpr = AND
+end
+
+// FINAL: rename final variables
+FinalRenamedFile (RenameAttributesModule)
+inputs
+	custom = IndicFinal
+parameters
+	inputAttributes = [ First_DEMEN_DRUGS, STADIO_DEMEN_12M ]
+	outputAttributes   = [ DATA_PRIMA_PRESCR_ANTICOLIN, ANTICOLIN_12M ]
+end
+
+
+
+// FINAL: gen empty variables (temporary)
+Cohort_12 (MergeModule)
+inputs
+	custom = Cohort_11
+	custom = sortedFinalCREATININ
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FullVariables (ExtendDataModule)
+inputs
+	custom = FinalRenamedFile
+parameters
+  attributes = [ {PROVA: string} ;{CITTADINANZA: string } ;{DISTRETTO_MMG: string } ;{DENSITA_COMUNE: string } ;{INDIRIZZO: string } ;{INDICE_DEPRIVAZ: string } ;{MMG_12M: string } ;{NOME_FORMAASSOCIATIVA: string } ;{TIPO_FORMAASSOCIATIVA: string } ]
+end
+sortedFinalMICROALB (SortModule)
+inputs
+	custom = FinalMICROALB
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+// FINAL: gen constant variables (dates)
+Cohort_13 (MergeModule)
+inputs
+	custom = Cohort_12
+	custom = sortedFinalMICROALB
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+WithConstantDates (ExtendDataModule)
+inputs
+	custom = FullVariables
+parameters
+  attributes = [ {DATA: date = 2012-12-31};{DATA_AGG: date =2012-12-31} ]
+end
+sortedFinalEMOGLIC (SortModule)
+inputs
+	custom = FinalEMOGLIC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_14 (MergeModule)
+inputs
+	custom = Cohort_13
+	custom = sortedFinalEMOGLIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalSTATINE (SortModule)
+inputs
+	custom = FinalSTATINE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_15 (MergeModule)
+inputs
+	custom = Cohort_14
+	custom = sortedFinalSTATINE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalECG (SortModule)
+inputs
+	custom = FinalECG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_16 (MergeModule)
+inputs
+	custom = Cohort_15
+	custom = sortedFinalECG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalGLICEM (SortModule)
+inputs
+	custom = FinalGLICEM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_17 (MergeModule)
+inputs
+	custom = Cohort_16
+	custom = sortedFinalGLICEM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalANTIAGGREG (SortModule)
+inputs
+	custom = FinalANTIAGGREG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_18 (MergeModule)
+inputs
+	custom = Cohort_17
+	custom = sortedFinalANTIAGGREG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalBETABLOC (SortModule)
+inputs
+	custom = FinalBETABLOC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_19 (MergeModule)
+inputs
+	custom = Cohort_18
+	custom = sortedFinalBETABLOC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalACEINIB (SortModule)
+inputs
+	custom = FinalACEINIB
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_20 (MergeModule)
+inputs
+	custom = Cohort_19
+	custom = sortedFinalACEINIB
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalNEUROLATIP (SortModule)
+inputs
+	custom = FinalNEUROLATIP
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_21 (MergeModule)
+inputs
+	custom = Cohort_20
+	custom = sortedFinalNEUROLATIP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalNEUROLTIP (SortModule)
+inputs
+	custom = FinalNEUROLTIP
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_22 (MergeModule)
+inputs
+	custom = Cohort_21
+	custom = sortedFinalNEUROLTIP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalCOLESTTOT (SortModule)
+inputs
+	custom = FinalCOLESTTOT
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_23 (MergeModule)
+inputs
+	custom = Cohort_22
+	custom = sortedFinalCOLESTTOT
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalCOLESTHDL (SortModule)
+inputs
+	custom = FinalCOLESTHDL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_24 (MergeModule)
+inputs
+	custom = Cohort_23
+	custom = sortedFinalCOLESTHDL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalCOLESTLDL (SortModule)
+inputs
+	custom = FinalCOLESTLDL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_25 (MergeModule)
+inputs
+	custom = Cohort_24
+	custom = sortedFinalCOLESTLDL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalTRIGLIC (SortModule)
+inputs
+	custom = FinalTRIGLIC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_26 (MergeModule)
+inputs
+	custom = Cohort_25
+	custom = sortedFinalTRIGLIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalSOD (SortModule)
+inputs
+	custom = FinalSOD
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_27 (MergeModule)
+inputs
+	custom = Cohort_26
+	custom = sortedFinalSOD
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalPOTA (SortModule)
+inputs
+	custom = FinalPOTA
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_28 (MergeModule)
+inputs
+	custom = Cohort_27
+	custom = sortedFinalPOTA
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalTRANSAM (SortModule)
+inputs
+	custom = FinalTRANSAM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_29 (MergeModule)
+inputs
+	custom = Cohort_28
+	custom = sortedFinalTRANSAM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalELETTROL (SortModule)
+inputs
+	custom = FinalELETTROL
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_30 (MergeModule)
+inputs
+	custom = Cohort_29
+	custom = sortedFinalELETTROL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalTARIFFA_LORDO_FARMACI (SortModule)
+inputs
+	custom = FinalTARIFFA_LORDO_FARMACI
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_31 (MergeModule)
+inputs
+	custom = Cohort_30
+	custom = sortedFinalTARIFFA_LORDO_FARMACI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalNUM_PRESC_FARM (SortModule)
+inputs
+	custom = FinalNUM_PRESC_FARM
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_32 (MergeModule)
+inputs
+	custom = Cohort_31
+	custom = sortedFinalNUM_PRESC_FARM
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalNUM_RIC (SortModule)
+inputs
+	custom = FinalNUM_RIC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_33 (MergeModule)
+inputs
+	custom = Cohort_32
+	custom = sortedFinalNUM_RIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTARIFFA_LORDO_RIC (SortModule)
+inputs
+	custom = FinalTARIFFA_LORDO_RIC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_34 (MergeModule)
+inputs
+	custom = Cohort_33
+	custom = sortedFinalTARIFFA_LORDO_RIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPACDRGMED (SortModule)
+inputs
+	custom = FinalTAR_OSPACDRGMED
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_35 (MergeModule)
+inputs
+	custom = Cohort_34
+	custom = sortedFinalTAR_OSPACDRGMED
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPACDRGCHI (SortModule)
+inputs
+	custom = FinalTAR_OSPACDRGCHI
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_36 (MergeModule)
+inputs
+	custom = Cohort_35
+	custom = sortedFinalTAR_OSPACDRGCHI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPNAC (SortModule)
+inputs
+	custom = FinalTAR_OSPNAC
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_37 (MergeModule)
+inputs
+	custom = Cohort_36
+	custom = sortedFinalTAR_OSPNAC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPDHDRGMED (SortModule)
+inputs
+	custom = FinalTAR_OSPDHDRGMED
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_38 (MergeModule)
+inputs
+	custom = Cohort_37
+	custom = sortedFinalTAR_OSPDHDRGMED
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPDHDRGCHI (SortModule)
+inputs
+	custom = FinalTAR_OSPDHDRGCHI
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_39 (MergeModule)
+inputs
+	custom = Cohort_38
+	custom = sortedFinalTAR_OSPDHDRGCHI
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalTAR_OSPDHPOSTACUTO (SortModule)
+inputs
+	custom = FinalTAR_OSPDHPOSTACUTO
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalJoinPrev (MergeModule)
+inputs
+	custom = Cohort_39
+	custom = sortedFinalTAR_OSPDHPOSTACUTO
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+
+// FINAL: gen diseases date 
+ClFinalDiseasesDate (ExtendDataModule)
+inputs
+	custom = FinalJoinPrev
+parameters
+  attributes = [  {DateDIAB: date }; {DateIHD: date }; {DateHF: date }; {DateHYPERTE: date }; {DateDEMEN: date }; {DateOLDAMI: date } ]
+end
+FinalDiseasesDate_1 (ApplyFunction)
+inputs
+	custom = ClFinalDiseasesDate
+parameters
+	function =  MIN( First_DIAB_HOSP, First_DIAB_DRUGS, First_DIAB_EXE ) 
+	result   = DateDIAB
+	
+	
+end
+FinalDiseasesDate_2 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_1
+parameters
+	function =  MIN( First_IHD_HOSP, First_IHD_DRUGS, First_IHD_EXE ) 
+	result   = DateIHD
+	
+	
+end
+FinalDiseasesDate_3 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_2
+parameters
+	function =  MIN( First_HF_HOSP, First_HF_EXE ) 
+	result   = DateHF
+	
+	
+end
+FinalDiseasesDate_4 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_3
+parameters
+	function =  MIN( First_HYPERTE_EXE ) 
+	result   = DateHYPERTE
+	
+	
+end
+FinalDiseasesDate_5 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_4
+parameters
+	function =  MIN( First_DEMEN_DRUGS ) 
+	result   = DateDEMEN
+	
+	
+end
+FinalDiseasesDate (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_5
+parameters
+	function =  MIN( First_OLDAMI_HOSP ) 
+	result   = DateOLDAMI
+	
+	
+end
+
+// FINAL: generate prevalent for diseases at 2012-01-01 
+ClDiseasesPrev (ExtendDataModule)
+inputs
+	custom = FinalDiseasesDate
+parameters
+  attributes = [  { DIABPrev : string}; { IHDPrev : string}; { HFPrev : string}; { HYPERTEPrev : string}; { DEMENPrev : string}; { OLDAMIPrev : string} ]
+end
+DiseasesPrev_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrev
+parameters
+	function = Id("1")
+	result   = DIABPrev
+	conditions = [ { DateDIAB < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_1
+parameters
+	function = Id("1")
+	result   = IHDPrev
+	conditions = [ { DateIHD < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_2
+parameters
+	function = Id("1")
+	result   = HFPrev
+	conditions = [ { DateHF < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_3
+parameters
+	function = Id("1")
+	result   = HYPERTEPrev
+	conditions = [ { DateHYPERTE < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_4
+parameters
+	function = Id("1")
+	result   = DEMENPrev
+	conditions = [ { DateDEMEN < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+DiseasesPrev (ApplyFunction)
+inputs
+	custom = DiseasesPrev_5
+parameters
+	function = Id("1")
+	result   = OLDAMIPrev
+	conditions = [ { DateOLDAMI < 2012-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+
+// FINAL: gen Sources for diseases at 2012-01-01
+ClDiseasesPrevSources (ExtendDataModule)
+inputs
+	custom = DiseasesPrev
+parameters
+  attributes = [  {FONTI_DIAB: string } ;{FONTI_IHD: string } ;{FONTI_HF: string } ;{FONTI_HYPERTE: string } ;{FONTI_DEMEN: string } ]
+end
+
+// FINAL: fill in Sources for diseases at 2012-01-01 
+DiseasesPrevSource_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrevSources
+parameters
+	function = Concat(FONTI_DIAB,"HOSP ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_1
+parameters
+	function = Concat(FONTI_DIAB,"DRUGS ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_2
+parameters
+	function = Concat(FONTI_DIAB,"EXE ")
+	result   = FONTI_DIAB
+	conditions = [ {First_DIAB_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_3
+parameters
+	function = Concat(FONTI_IHD,"HOSP ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_4
+parameters
+	function = Concat(FONTI_IHD,"DRUGS ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_6 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_5
+parameters
+	function = Concat(FONTI_IHD,"EXE ")
+	result   = FONTI_IHD
+	conditions = [ {First_IHD_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_7 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_6
+parameters
+	function = Concat(FONTI_HF,"HOSP ")
+	result   = FONTI_HF
+	conditions = [ {First_HF_HOSP < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_8 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_7
+parameters
+	function = Concat(FONTI_HF,"EXE ")
+	result   = FONTI_HF
+	conditions = [ {First_HF_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource_9 (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_8
+parameters
+	function = Concat(FONTI_HYPERTE,"EXE ")
+	result   = FONTI_HYPERTE
+	conditions = [ {First_HYPERTE_EXE < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+DiseasesPrevSource (ApplyFunction)
+inputs
+	custom = DiseasesPrevSource_9
+parameters
+	function = Concat(FONTI_DEMEN,"DRUGS ")
+	result   = FONTI_DEMEN
+	conditions = [ {First_DEMEN_DRUGS < 2012-01-01}; {IsPrev12M= true}]
+	boolExpr = AND
+end
+
+// FINAL: generate prevalent for diseases at 2012-12-31 
+ClDiseasesPrevFinal (ExtendDataModule)
+inputs
+	custom = DiseasesPrevSource
+parameters
+  attributes = [  { DIABPrevENDFUP : string }; { IHDPrevENDFUP : string }; { HFPrevENDFUP : string }; { HYPERTEPrevENDFUP : string }; { DEMENPrevENDFUP : string }; { OLDAMIPrevENDFUP : string } ]
+end
+DiseasesPrevFinal_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrevFinal
+parameters
+	function = Id("1")
+	result   = DIABPrevENDFUP
+	conditions = [ { DateDIAB < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_1
+parameters
+	function = Id("1")
+	result   = IHDPrevENDFUP
+	conditions = [ { DateIHD < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_2
+parameters
+	function = Id("1")
+	result   = HFPrevENDFUP
+	conditions = [ { DateHF < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_4 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_3
+parameters
+	function = Id("1")
+	result   = HYPERTEPrevENDFUP
+	conditions = [ { DateHYPERTE < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal_5 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_4
+parameters
+	function = Id("1")
+	result   = DEMENPrevENDFUP
+	conditions = [ { DateDEMEN < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+DiseasesPrevFinal (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_5
+parameters
+	function = Id("1")
+	result   = OLDAMIPrevENDFUP
+	conditions = [ { DateOLDAMI < 2012-12-31 }; {IsPrevDATEENDFUP= true} ]
+	boolExpr = AND
+end
+
+// FINAL: gen STAGE of diseases at 2012-01-01
+ClDiseasesStages (ExtendDataModule)
+inputs
+	custom = DiseasesPrevFinal
+parameters
+  attributes = [  {STAGE_DIAB: string } ;{STAGE_IHD: string } ;{STAGE_HF: string } ;{STAGE_HYPERTE: string } ;{STAGE_DEMEN: string } ]
+end
+
+// FINAL: fill in STAGE of diseases at 2012-01-01 
+DiseasesStage_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesStages
+parameters
+	function = Id("DIAB1a")
+	result   = STAGE_DIAB
+	conditions = [{DIABPrev = "1"}]
+	
+end
+DiseasesStage_2 (ApplyFunction)
+inputs
+	custom = DiseasesStage_1
+parameters
+	function = Id("DIAB1b")
+	result   = STAGE_DIAB
+	conditions = [{DIABPrev = "1"};{First_DIAB_DRUGS < 2012-01-01}]
+	boolExpr = AND 
+end
+DiseasesStage_3 (ApplyFunction)
+inputs
+	custom = DiseasesStage_2
+parameters
+	function = Id("IHD1a")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"}]
+	
+end
+DiseasesStage_4 (ApplyFunction)
+inputs
+	custom = DiseasesStage_3
+parameters
+	function = Id("IHD1b")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"};{ OLDAMIPrev = "1"}]
+	boolExpr = AND 
+end
+DiseasesStage_5 (ApplyFunction)
+inputs
+	custom = DiseasesStage_4
+parameters
+	function = Id("IHD3")
+	result   = STAGE_IHD
+	conditions = [{IHDPrev = "1"};{ HFPrev = "1"}]
+	boolExpr = AND 
+end
+DiseasesStage_6 (ApplyFunction)
+inputs
+	custom = DiseasesStage_5
+parameters
+	function = Id("HF1")
+	result   = STAGE_HF
+	conditions = [{HFPrev = "1"}]
+	
+end
+DiseasesStage_7 (ApplyFunction)
+inputs
+	custom = DiseasesStage_6
+parameters
+	function = Id("HYPERTE1")
+	result   = STAGE_HYPERTE
+	conditions = [{HYPERTEPrev = "1"}]
+	
+end
+DiseasesStage_8 (ApplyFunction)
+inputs
+	custom = DiseasesStage_7
+parameters
+	function = Id("HYPERTE2b")
+	result   = STAGE_HYPERTE
+	conditions = [{HYPERTEPrev = "1"};{ HFPrev = "1"}]
+	boolExpr = AND 
+end
+DiseasesStage (ApplyFunction)
+inputs
+	custom = DiseasesStage_8
+parameters
+	function = Id("ANTICOLIN")
+	result   = STAGE_DEMEN
+	conditions = [{DEMENPrev = "1"}]
+	
+end
+
+// FINAL: rename variables
+RenamedFile (RenameAttributesModule)
+inputs
+	custom = DiseasesStage
+parameters
+	inputAttributes = [ PERSON_ID,DATE_OF_BIRTH, DATE_OF_DEATH,GENDER_CONCEPT_ID,STARTDATE, ENDDATE, CENSUS_LOCATION_CONCEPT_ID, LOCATION_CONCEPT_ID, LHU_LOCATION_CONCEPT_ID, GP_ID, STARTDATE_GP, IsPrev12M,IsPrevDATEENDFUP,DateDIAB,STAGE_DIAB,DIABPrevENDFUP,DateIHD,STAGE_IHD,IHDPrevENDFUP,DateHF,STAGE_HF,HFPrevENDFUP,DateHYPERTE,STAGE_HYPERTE,HYPERTEPrevENDFUP,DateDEMEN,STAGE_DEMEN,DEMENPrevENDFUP,TAR_OSPACDRGMED,TAR_OSPACDRGCHI,TAR_OSPNAC,TAR_OSPDHDRGMED,TAR_OSPDHDRGCHI,TAR_OSPDHPOSTACUTO ]
+	outputAttributes   = [ ID_SOGGETTO,DATA_NASCITA,DATA_MORTE,SESSO,DATA_INGRESSO, DATA_USCITA,SEZIONE,COMUNE,DISTRETTO_RESIDENZA,MMG, DATA_MMG,IN_CARICO12M,IN_CARICO,DATA_DIAGN_DIAB,STADIO_DIAB_12M,STADIO_DIAB,DATA_DIAGN_IHD,STADIO_IHD_12M,STADIO_IHD,DATA_DIAGN_HF,STADIO_HF_12M,STADIO_HF,DATA_DIAGN_HYPERTE,STADIO_HYPERTE_12M,STADIO_HYPERTE,DATA_DIAGN_DEMEN,STADIO_DEMEN_12M,STADIO_DEMEN,TARIFFA_LORDO_OSPACDRGMED,TARIFFA_LORDO_OSPACDRGCHIR,TARIFFA_LORDO_OSPNAC,TARIFFA_LORDO_OSPDHDRGMED,TARIFFA_LORDO_OSPDHDRGCHIR,TARIFFA_LORDO_OSPDHPOSTACUTO ]
+end
+
+
+
+// FINAL: gen complex disease-specific indicators
+ClIndicComplex (ExtendDataModule)
+inputs
+	custom = RenamedFile
+parameters
+  attributes = [   { IsPROFLIP : boolean }  ; { IsCREATNAK : boolean }  ; { IsEMATOCHIM : boolean }  ]
+end
+IndicComplex_1 (ApplyFunction)
+inputs
+	custom = ClIndicComplex
+parameters
+	function = Id(true)
+	result   = IsPROFLIP
+	conditions = [ {IsCOLESTTOT = true};{IsCOLESTHDL = true};{IsTRIGLIC = true}]
+	boolExpr = AND
+end
+IndicComplex_2 (ApplyFunction)
+inputs
+	custom = IndicComplex_1
+parameters
+	function = Id(true)
+	result   = IsCREATNAK
+	conditions = [ {IsSOD = true};{IsPOTA = true};{IsCREATININ = true}]
+	boolExpr = AND
+end
+IndicComplex (ApplyFunction)
+inputs
+	custom = IndicComplex_2
+parameters
+	function = Id(true)
+	result   = IsEMATOCHIM
+	conditions = [ {IsTRANSAM = true};{IsELETTROL = true};{IsGLICEM = true};{IsCREATININ = true}]
+	boolExpr = AND
+end
+
+// FINAL: gen num/denom of disease-specific indicators (DEN is specific per stage)
+ClIndicFinal (ExtendDataModule)
+inputs
+	custom = IndicComplex
+parameters
+  attributes = [   { DEN_CREATININ_DIAB : int } ; { NUM_CREATININ_DIAB : int = 0 }  ; { DEN_CREATININ_HYPERTE : int } ; { NUM_CREATININ_HYPERTE : int = 0 }  ; { DEN_MICROALB_DIAB : int } ; { NUM_MICROALB_DIAB : int = 0 }  ; { DEN_MICROALB_HYPERTE : int } ; { NUM_MICROALB_HYPERTE : int = 0 }  ; { DEN_EMOGLIC_DIAB : int } ; { NUM_EMOGLIC_DIAB : int = 0 }  ; { DEN_STATINE_DIAB : int } ; { NUM_STATINE_DIAB : int = 0 }  ; { DEN_STATINE_IHD : int } ; { NUM_STATINE_IHD : int = 0 }  ; { DEN_ECG_IHD : int } ; { NUM_ECG_IHD : int = 0 }  ; { DEN_ECG_HYPERTE : int } ; { NUM_ECG_HYPERTE : int = 0 }  ; { DEN_ECG_HF : int } ; { NUM_ECG_HF : int = 0 }  ; { DEN_ECG_DEMEN : int } ; { NUM_ECG_DEMEN : int = 0 }  ; { DEN_GLICEM_IHD : int } ; { NUM_GLICEM_IHD : int = 0 }  ; { DEN_GLICEM_HYPERTE : int } ; { NUM_GLICEM_HYPERTE : int = 0 }  ; { DEN_ANTIAGGREG_IHD : int } ; { NUM_ANTIAGGREG_IHD : int = 0 }  ; { DEN_BETABLOC_IHD : int } ; { NUM_BETABLOC_IHD : int = 0 }  ; { DEN_BETABLOC_HF : int } ; { NUM_BETABLOC_HF : int = 0 }  ; { DEN_ACEINIB_IHD : int } ; { NUM_ACEINIB_IHD : int = 0 }  ; { DEN_ACEINIB_HF : int } ; { NUM_ACEINIB_HF : int = 0 }  ; { DEN_NEUROLATIP_DEMEN : int } ; { NUM_NEUROLATIP_DEMEN : int = 0 }  ; { DEN_NEUROLTIP_DEMEN : int } ; { NUM_NEUROLTIP_DEMEN : int = 0 }  ; { DEN_PROFLIP_DIAB : int } ; { NUM_PROFLIP_DIAB : int = 0 }  ; { DEN_PROFLIP_IHD : int } ; { NUM_PROFLIP_IHD : int = 0 }  ; { DEN_PROFLIP_HYPERTE : int } ; { NUM_PROFLIP_HYPERTE : int = 0 }  ; { DEN_CREATNAK_HF : int } ; { NUM_CREATNAK_HF : int = 0 }  ; { DEN_EMATOCHIM_DEMEN : int } ; { NUM_EMATOCHIM_DEMEN : int = 0 }  ]
+end
+IndicFinal_1 (ApplyFunction)
+inputs
+	custom = ClIndicFinal
+parameters
+	function = Id(1)
+	result   = DEN_CREATININ_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_2 (ApplyFunction)
+inputs
+	custom = IndicFinal_1
+parameters
+	function = Id(1)
+	result   = NUM_CREATININ_DIAB
+	conditions = [ { DEN_CREATININ_DIAB = 1 } ; { IsCREATININ = true }]
+	boolExpr = AND
+end
+IndicFinal_3 (ApplyFunction)
+inputs
+	custom = IndicFinal_2
+parameters
+	function = Id(1)
+	result   = DEN_CREATININ_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_4 (ApplyFunction)
+inputs
+	custom = IndicFinal_3
+parameters
+	function = Id(1)
+	result   = NUM_CREATININ_HYPERTE
+	conditions = [ { DEN_CREATININ_HYPERTE = 1 } ; { IsCREATININ = true }]
+	boolExpr = AND
+end
+IndicFinal_5 (ApplyFunction)
+inputs
+	custom = IndicFinal_4
+parameters
+	function = Id(1)
+	result   = DEN_MICROALB_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_6 (ApplyFunction)
+inputs
+	custom = IndicFinal_5
+parameters
+	function = Id(1)
+	result   = NUM_MICROALB_DIAB
+	conditions = [ { DEN_MICROALB_DIAB = 1 } ; { IsMICROALB = true }]
+	boolExpr = AND
+end
+IndicFinal_7 (ApplyFunction)
+inputs
+	custom = IndicFinal_6
+parameters
+	function = Id(1)
+	result   = DEN_MICROALB_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_8 (ApplyFunction)
+inputs
+	custom = IndicFinal_7
+parameters
+	function = Id(1)
+	result   = NUM_MICROALB_HYPERTE
+	conditions = [ { DEN_MICROALB_HYPERTE = 1 } ; { IsMICROALB = true }]
+	boolExpr = AND
+end
+IndicFinal_9 (ApplyFunction)
+inputs
+	custom = IndicFinal_8
+parameters
+	function = Id(1)
+	result   = DEN_EMOGLIC_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_10 (ApplyFunction)
+inputs
+	custom = IndicFinal_9
+parameters
+	function = Id(1)
+	result   = NUM_EMOGLIC_DIAB
+	conditions = [ { DEN_EMOGLIC_DIAB = 1 } ; { IsEMOGLIC = true }]
+	boolExpr = AND
+end
+IndicFinal_11 (ApplyFunction)
+inputs
+	custom = IndicFinal_10
+parameters
+	function = Id(1)
+	result   = DEN_STATINE_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_12 (ApplyFunction)
+inputs
+	custom = IndicFinal_11
+parameters
+	function = Id(1)
+	result   = NUM_STATINE_DIAB
+	conditions = [ { DEN_STATINE_DIAB = 1 } ; { IsSTATINE = true }]
+	boolExpr = AND
+end
+IndicFinal_13 (ApplyFunction)
+inputs
+	custom = IndicFinal_12
+parameters
+	function = Id(1)
+	result   = DEN_STATINE_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+IndicFinal_14 (ApplyFunction)
+inputs
+	custom = IndicFinal_13
+parameters
+	function = Id(1)
+	result   = NUM_STATINE_IHD
+	conditions = [ { DEN_STATINE_IHD = 1 } ; { IsSTATINE = true }]
+	boolExpr = AND
+end
+IndicFinal_15 (ApplyFunction)
+inputs
+	custom = IndicFinal_14
+parameters
+	function = Id(1)
+	result   = DEN_ECG_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_16 (ApplyFunction)
+inputs
+	custom = IndicFinal_15
+parameters
+	function = Id(1)
+	result   = NUM_ECG_IHD
+	conditions = [ { DEN_ECG_IHD = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+IndicFinal_17 (ApplyFunction)
+inputs
+	custom = IndicFinal_16
+parameters
+	function = Id(1)
+	result   = DEN_ECG_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_18 (ApplyFunction)
+inputs
+	custom = IndicFinal_17
+parameters
+	function = Id(1)
+	result   = NUM_ECG_HYPERTE
+	conditions = [ { DEN_ECG_HYPERTE = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+IndicFinal_19 (ApplyFunction)
+inputs
+	custom = IndicFinal_18
+parameters
+	function = Id(1)
+	result   = DEN_ECG_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_20 (ApplyFunction)
+inputs
+	custom = IndicFinal_19
+parameters
+	function = Id(1)
+	result   = NUM_ECG_HF
+	conditions = [ { DEN_ECG_HF = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+IndicFinal_21 (ApplyFunction)
+inputs
+	custom = IndicFinal_20
+parameters
+	function = Id(1)
+	result   = DEN_ECG_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal_22 (ApplyFunction)
+inputs
+	custom = IndicFinal_21
+parameters
+	function = Id(1)
+	result   = NUM_ECG_DEMEN
+	conditions = [ { DEN_ECG_DEMEN = 1 } ; { IsECG = true }]
+	boolExpr = AND
+end
+IndicFinal_23 (ApplyFunction)
+inputs
+	custom = IndicFinal_22
+parameters
+	function = Id(1)
+	result   = DEN_GLICEM_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_24 (ApplyFunction)
+inputs
+	custom = IndicFinal_23
+parameters
+	function = Id(1)
+	result   = NUM_GLICEM_IHD
+	conditions = [ { DEN_GLICEM_IHD = 1 } ; { IsGLICEM = true }]
+	boolExpr = AND
+end
+IndicFinal_25 (ApplyFunction)
+inputs
+	custom = IndicFinal_24
+parameters
+	function = Id(1)
+	result   = DEN_GLICEM_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_26 (ApplyFunction)
+inputs
+	custom = IndicFinal_25
+parameters
+	function = Id(1)
+	result   = NUM_GLICEM_HYPERTE
+	conditions = [ { DEN_GLICEM_HYPERTE = 1 } ; { IsGLICEM = true }]
+	boolExpr = AND
+end
+IndicFinal_27 (ApplyFunction)
+inputs
+	custom = IndicFinal_26
+parameters
+	function = Id(1)
+	result   = DEN_ANTIAGGREG_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+IndicFinal_28 (ApplyFunction)
+inputs
+	custom = IndicFinal_27
+parameters
+	function = Id(1)
+	result   = NUM_ANTIAGGREG_IHD
+	conditions = [ { DEN_ANTIAGGREG_IHD = 1 } ; { IsANTIAGGREG = true }]
+	boolExpr = AND
+end
+IndicFinal_29 (ApplyFunction)
+inputs
+	custom = IndicFinal_28
+parameters
+	function = Id(1)
+	result   = DEN_BETABLOC_IHD
+	conditions = [  {STADIO_IHD_12M = "IHD2a"} ; {STADIO_IHD_12M = "IHD2b"} ; {STADIO_IHD_12M = "IHD3"}  ]
+	boolExpr = OR
+end
+IndicFinal_30 (ApplyFunction)
+inputs
+	custom = IndicFinal_29
+parameters
+	function = Id(1)
+	result   = NUM_BETABLOC_IHD
+	conditions = [ { DEN_BETABLOC_IHD = 1 } ; { IsBETABLOC = true }]
+	boolExpr = AND
+end
+IndicFinal_31 (ApplyFunction)
+inputs
+	custom = IndicFinal_30
+parameters
+	function = Id(1)
+	result   = DEN_BETABLOC_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_32 (ApplyFunction)
+inputs
+	custom = IndicFinal_31
+parameters
+	function = Id(1)
+	result   = NUM_BETABLOC_HF
+	conditions = [ { DEN_BETABLOC_HF = 1 } ; { IsBETABLOC = true }]
+	boolExpr = AND
+end
+IndicFinal_33 (ApplyFunction)
+inputs
+	custom = IndicFinal_32
+parameters
+	function = Id(1)
+	result   = DEN_ACEINIB_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_34 (ApplyFunction)
+inputs
+	custom = IndicFinal_33
+parameters
+	function = Id(1)
+	result   = NUM_ACEINIB_IHD
+	conditions = [ { DEN_ACEINIB_IHD = 1 } ; { IsACEINIB = true }]
+	boolExpr = AND
+end
+IndicFinal_35 (ApplyFunction)
+inputs
+	custom = IndicFinal_34
+parameters
+	function = Id(1)
+	result   = DEN_ACEINIB_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_36 (ApplyFunction)
+inputs
+	custom = IndicFinal_35
+parameters
+	function = Id(1)
+	result   = NUM_ACEINIB_HF
+	conditions = [ { DEN_ACEINIB_HF = 1 } ; { IsACEINIB = true }]
+	boolExpr = AND
+end
+IndicFinal_37 (ApplyFunction)
+inputs
+	custom = IndicFinal_36
+parameters
+	function = Id(1)
+	result   = DEN_NEUROLATIP_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal_38 (ApplyFunction)
+inputs
+	custom = IndicFinal_37
+parameters
+	function = Id(1)
+	result   = NUM_NEUROLATIP_DEMEN
+	conditions = [ { DEN_NEUROLATIP_DEMEN = 1 } ; { IsNEUROLATIP = true }]
+	boolExpr = AND
+end
+IndicFinal_39 (ApplyFunction)
+inputs
+	custom = IndicFinal_38
+parameters
+	function = Id(1)
+	result   = DEN_NEUROLTIP_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal_40 (ApplyFunction)
+inputs
+	custom = IndicFinal_39
+parameters
+	function = Id(1)
+	result   = NUM_NEUROLTIP_DEMEN
+	conditions = [ { DEN_NEUROLTIP_DEMEN = 1 } ; { IsNEUROLTIP = true }]
+	boolExpr = AND
+end
+IndicFinal_41 (ApplyFunction)
+inputs
+	custom = IndicFinal_40
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_DIAB
+	conditions = [ { STADIO_DIAB_12M != MISSING } ]
+	
+end
+IndicFinal_42 (ApplyFunction)
+inputs
+	custom = IndicFinal_41
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_DIAB
+	conditions = [ { DEN_PROFLIP_DIAB = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+IndicFinal_43 (ApplyFunction)
+inputs
+	custom = IndicFinal_42
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_IHD
+	conditions = [ { STADIO_IHD_12M != MISSING } ]
+	
+end
+IndicFinal_44 (ApplyFunction)
+inputs
+	custom = IndicFinal_43
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_IHD
+	conditions = [ { DEN_PROFLIP_IHD = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+IndicFinal_45 (ApplyFunction)
+inputs
+	custom = IndicFinal_44
+parameters
+	function = Id(1)
+	result   = DEN_PROFLIP_HYPERTE
+	conditions = [ { STADIO_HYPERTE_12M != MISSING } ]
+	
+end
+IndicFinal_46 (ApplyFunction)
+inputs
+	custom = IndicFinal_45
+parameters
+	function = Id(1)
+	result   = NUM_PROFLIP_HYPERTE
+	conditions = [ { DEN_PROFLIP_HYPERTE = 1 } ; { IsPROFLIP = true }]
+	boolExpr = AND
+end
+IndicFinal_47 (ApplyFunction)
+inputs
+	custom = IndicFinal_46
+parameters
+	function = Id(1)
+	result   = DEN_CREATNAK_HF
+	conditions = [ { STADIO_HF_12M != MISSING } ]
+	
+end
+IndicFinal_48 (ApplyFunction)
+inputs
+	custom = IndicFinal_47
+parameters
+	function = Id(1)
+	result   = NUM_CREATNAK_HF
+	conditions = [ { DEN_CREATNAK_HF = 1 } ; { IsCREATNAK = true }]
+	boolExpr = AND
+end
+IndicFinal_49 (ApplyFunction)
+inputs
+	custom = IndicFinal_48
+parameters
+	function = Id(1)
+	result   = DEN_EMATOCHIM_DEMEN
+	conditions = [ { STADIO_DEMEN_12M != MISSING } ]
+	
+end
+IndicFinal (ApplyFunction)
+inputs
+	custom = IndicFinal_49
+parameters
+	function = Id(1)
+	result   = NUM_EMATOCHIM_DEMEN
+	conditions = [ { DEN_EMATOCHIM_DEMEN = 1 } ; { IsEMATOCHIM = true }]
+	boolExpr = AND
+end
+
+// FINAL: rename final variables
+FinalRenamedFile (RenameAttributesModule)
+inputs
+	custom = IndicFinal
+parameters
+	inputAttributes = [ First_DEMEN_DRUGS, STADIO_DEMEN_12M ]
+	outputAttributes   = [ DATA_PRIMA_PRESCR_ANTICOLIN, ANTICOLIN_12M ]
+end
+
+
+
+// FINAL: gen empty variables (temporary)
+FullVariables (ExtendDataModule)
+inputs
+	custom = FinalRenamedFile
+parameters
+  attributes = [ {PROVA: string} ;{CITTADINANZA: string } ;{DISTRETTO_MMG: string } ;{DENSITA_COMUNE: string } ;{INDIRIZZO: string } ;{INDICE_DEPRIVAZ: string } ;{MMG_12M: string } ;{NOME_FORMAASSOCIATIVA: string } ;{TIPO_FORMAASSOCIATIVA: string } ]
+end
+
+// FINAL: gen constant variables (dates)
+WithConstantDates (ExtendDataModule)
+inputs
+	custom = FullVariables
+parameters
+  attributes = [ {DATA: date = 2012-12-31};{DATA_AGG: date =2012-12-31} ]
+end

@@ -1,0 +1,12 @@
+PERSONFile (FileInputModule)
+parameters
+  inputFileName = PERSON.csv
+  inputSchema = IADperson
+end
+
+PERSON_Sorted (SortModule)
+inputs
+  IADperson = PERSONFile
+parameters
+  fieldNames = [PERSON_ID]
+end

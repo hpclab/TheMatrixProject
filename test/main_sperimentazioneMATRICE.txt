@@ -1,0 +1,57 @@
+
+// fa il merge
+Join_Diabetes (MergeModule)
+inputs
+IADperson = Inhabitants
+custom = Diabetes
+parameters
+primaryKey = [PERSON_ID]
+fieldNames= [PERSON_ID]
+end
+
+// fa il merge
+Join_CI (MergeModule)
+inputs
+custom = Join_Diabetes
+custom = CI
+parameters
+primaryKey = [PERSON_ID]
+fieldNames= [PERSON_ID]
+end
+
+
+// pulisce prevalenti
+Prevalent (FilterModule)
+inputs
+custom = Join_CI
+parameters
+conditions = [ { Prevalent = true }]
+end
+
+
+
+//attacca l’indicatore
+Join_emo_glic (MergeModule)
+inputs
+custom = Prevalent
+custom = Emo_glic
+parameters
+primaryKey = [PERSON_ID]
+fieldNames= [PERSON_ID]
+end
+
+
+//pulisce indicatori
+Final (ApplyFunction)
+inputs
+custom = Join_emo_glic
+parameters
+
+function = Id(false)
+
+result   = Emo_glic
+
+conditions =  [{ PrevDiabetes = false }]
+end
+
+

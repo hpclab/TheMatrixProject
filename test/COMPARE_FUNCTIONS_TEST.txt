@@ -1,0 +1,65 @@
+AGGREGATE_TEST_FILE (FileInputModule)
+parameters
+	  inputFileName = AGGREGATE_TEST.csv
+      inputSchema   = AggregateTestSchema
+end
+
+TFILE (ExtendDataModule)
+inputs
+	AggregateTestSchema = AGGREGATE_TEST_FILE
+parameters
+  	attributes = [ {GT : boolean };{LT : boolean };{EQ : boolean };{NE : boolean } ]
+end
+
+
+TESTGREATERTHAN (ApplyFunction)
+inputs
+	custom = TFILE
+parameters
+    function = GreaterThan(ID,INT) // my bad practice of using keywords as field names
+    result   = GT
+end
+
+TESTLESSTHAN (ApplyFunction)
+inputs
+	custom = TESTGREATERTHAN
+parameters
+    function = LessThan(ID,INT) // my bad practice of using keywords as field names
+    result   = LT
+end
+
+TESTNOTEQUAL (ApplyFunction)
+inputs
+	custom = TESTLESSTHAN
+parameters
+    function = NotEqual(ID,INT) // my bad practice of using keywords as field names
+    result   = NE
+end
+
+
+TESTEQUALSTO (ApplyFunction)
+inputs
+	custom = TESTNOTEQUAL
+parameters
+    function = EqualsTo(ID,INT) // my bad practice of using keywords as field names
+    result   = EQ
+end
+
+/*
+FILEY (FileInputModule)
+parameters
+      inputFileName = MERGEY_1K2F.csv
+      inputSchema   = TestSchemaY
+end
+
+
+// FINAL: join the list of persons with sources for diabetes
+MERGEOUTPUT (MergeModule)
+inputs
+	TestSchemaX = FILEX
+	TestSchemaY = FILEY
+parameters
+	primaryKey = [ KEY ]
+	fieldNames = [ EXTKEY ]
+end
+*/

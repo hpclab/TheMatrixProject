@@ -1,0 +1,23 @@
+
+EXEA (FileInputModule)
+parameters
+	inputFileName = EXE.csv
+	inputSchema   = IADexe
+end
+
+
+EXEcustom (ExtendDataModule)
+inputs
+	IADexe = EXEA
+parameters
+  attributes = [ {Aux: string} ]
+end
+
+
+EXEFile (FileOutputModule)
+inputs
+	custom = EXEcustom
+parameters
+	checksum = none
+	compression = none
+end

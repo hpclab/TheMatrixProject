@@ -1,0 +1,526 @@
+
+declareSchema groupGP = [  { GP_ID : string };  { Group : string }]
+
+// Load data  from GPgroup
+
+GPgroup (FileInputModule)
+parameters
+  inputFileName = GPgroup.csv
+          inputSchema   = groupGP
+end
+
+
+
+// Load data  from HOSP
+
+HOSP (ScriptInputModule)
+parameters
+	scriptFilename = LoadHOSP.txt
+	inputName = HOSP
+	expectedSchema = IADhosp
+end
+
+// Load data  from EXE
+
+EXE (ScriptInputModule)
+parameters
+	scriptFilename = LoadEXE.txt
+	inputName = EXE
+	expectedSchema = IADexe
+end
+
+// Load data  from PERSON
+
+PERSON (ScriptInputModule)
+parameters
+	scriptFilename = LoadPERSON.txt
+	inputName = PERSON
+	expectedSchema = IADperson
+end
+
+// Load data  from DRUGS
+
+DRUGS (ScriptInputModule)
+parameters
+	scriptFilename = LoadDRUGS.txt
+	inputName = DRUGS
+	expectedSchema = IADdrug
+end
+
+// Load data  from OUTPAT
+
+OUTPAT (ScriptInputModule)
+parameters
+	scriptFilename = LoadOUTPAT.txt
+	inputName = OUTPAT
+	expectedSchema = IADoutpat
+end
+
+// Load data  from DDRUG
+
+DDRUG (ScriptInputModule)
+parameters
+	scriptFilename = LoadDDRUG.txt
+	inputName = DDRUG
+	expectedSchema = IADdrug
+end
+
+
+
+// PREVALENT: mark prevalent at date 2011-01-01 
+
+ClFinalPrev12M (ExtendDataModule)
+inputs
+	IADperson = PERSON
+parameters
+  attributes = [ {IsPrev12M : boolean } ]
+end
+
+FinalPrev12M (ApplyFunction)
+inputs
+	custom = ClFinalPrev12M
+parameters
+	function = Id(true)
+	result   = IsPrev12M
+	conditions = [ {ENDDATE > 2011-01-01};{STARTDATE <= 2011-01-01} ]
+	boolExpr = AND
+end
+
+// PREVALENT: filter prevalent at date 2011-01-01
+
+Cohort (FilterModule)
+inputs
+	custom = FinalPrev12M
+parameters
+	conditions = [{IsPrev12M = true}]
+	
+end
+
+// DIAB: select from source HOSP 
+
+FFirst_DIAB_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  matches "250*"};{SECONDARY_DIAGNOSIS_1 matches "250*"};{SECONDARY_DIAGNOSIS_2 matches "250*"};{SECONDARY_DIAGNOSIS_3 matches "250*"};{SECONDARY_DIAGNOSIS_4 matches "250*"};{SECONDARY_DIAGNOSIS_5 matches "250*"}]
+	boolExpr = OR 
+end
+
+sortedFirst_DIAB_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+
+FinalFirst_DIAB_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_DIAB_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_DIAB_HOSP : date } ]
+end
+
+// DIAB: select from source DRUGS 
+
+FFirst_DIAB_DRUGSDRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+
+FFirst_DIAB_DRUGSDDRUG (FilterModule)
+inputs
+	IADdrug = DDRUG
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+
+FFirst_DIAB_DRUGSTot (UnionModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSDDRUG
+	IADdrug = FFirst_DIAB_DRUGSDRUGS
+end
+
+
+ClYearFirst_DIAB_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGSTot
+parameters
+  attributes = [ { YearFirst_DIAB_DRUGS: int } ]
+end
+
+YearFirst_DIAB_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DIAB_DRUGS
+	
+	
+end
+
+sortedYearFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+end
+
+NumberFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DIAB_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DIAB_DRUGS : int };{ DateFirstFirst_DIAB_DRUGS : date } ]
+end
+
+FilterTwoFirst_DIAB_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DRUGS
+parameters
+	conditions = [{NumberFirst_DIAB_DRUGS>1}]
+	
+end
+
+FinalFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DRUGS) ]
+	results =  [ {First_DIAB_DRUGS : date} ]
+end
+
+// DIAB: select from source EXE 
+
+FFirst_DIAB_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*250"}]
+	
+end
+
+sortedFirst_DIAB_EXE (SortModule)
+inputs
+	IADexe = FFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+FinalFirst_DIAB_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_DIAB_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_DIAB_EXE : date } ]
+end
+
+// INDICATORS FOR POPULATION WITH DISEASES: CREATININ
+
+// INDICATORS - PREPARE SOURCES - prepare OUTPAT
+
+LastYearOUTPAT (FilterModule)
+inputs
+	IADoutpat = OUTPAT
+parameters
+	conditions = [{PROC_START_DATE >= 2011-01-01};{PROC_START_DATE <= 2011-12-31}]
+	boolExpr = AND
+end
+
+sortedLastYearOUTPAT (SortModule)
+inputs
+	IADoutpat = LastYearOUTPAT
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+
+// INDICATORS FOR POPULATION WITH DISEASES: EMOGLIC
+
+FEMOGLIC (FilterModule)
+inputs
+	IADoutpat = sortedLastYearOUTPAT
+parameters
+//	conditions = [{PERSON_ID  != MISSING } ]
+	conditions = [{PROC_COD  = "90.28.1"} ; {PROC_COD  = "90281"} ]
+	boolExpr = OR
+end
+
+AEMOGLIC (AggregateModule)
+inputs
+	IADoutpat = FEMOGLIC
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(PROC_START_DATE),MAX(PROC_START_DATE),COUNT(PROC_START_DATE) ]
+	results =  [ { MinDateEMOGLIC: date };{ MaxDateEMOGLIC: date };{ NumberEMOGLIC: int } ]
+end
+
+ClFinalEMOGLIC (ExtendDataModule)
+inputs
+	custom = AEMOGLIC
+parameters
+  attributes = [ {IsEMOGLIC : boolean } ]
+end
+
+FinalEMOGLIC (ApplyFunction)
+inputs
+	custom = ClFinalEMOGLIC
+parameters
+	function = GreaterThan(NumberEMOGLIC,1)
+	result   = IsEMOGLIC	
+end
+
+
+
+
+// FINAL: join Cohort with sources for diaseases
+
+sortedCohort (SortModule)
+inputs
+	custom = Cohort
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+sortedFinalFirst_DIAB_HOSP (SortModule)
+inputs
+	custom = FinalFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+
+Cohort_1 (MergeModule)
+inputs
+	custom = sortedCohort
+	custom = sortedFinalFirst_DIAB_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+
+sortedFinalFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+Cohort_2 (MergeModule)
+inputs
+	custom = Cohort_1
+	custom = sortedFinalFirst_DIAB_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+sortedFinalFirst_DIAB_EXE (SortModule)
+inputs
+	custom = FinalFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+Cohort_3 (MergeModule)
+inputs
+	custom = Cohort_2
+	custom = sortedFinalFirst_DIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+sortedFinalEMOGLIC (SortModule)
+inputs
+	custom = FinalEMOGLIC
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+FinalJoinPrev (MergeModule)
+inputs
+	custom = Cohort_3
+	custom = sortedFinalEMOGLIC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// FINAL: gen diseases date 
+
+ClFinalDiseasesDate (ExtendDataModule)
+inputs
+	custom = FinalJoinPrev
+parameters
+  attributes = [  {DateDIAB: date } ]
+end
+
+FinalDiseasesDate (ApplyFunction)
+inputs
+	custom = ClFinalDiseasesDate
+parameters
+	function =  MIN( First_DIAB_HOSP, First_DIAB_DRUGS, First_DIAB_EXE ) 
+	result   = DateDIAB
+end
+
+// FINAL: generate prevalent for diseases at 2011-01-01 
+
+ClDiseasesPrev (ExtendDataModule)
+inputs
+	custom = FinalDiseasesDate
+parameters
+  attributes = [  { DIABPrev : string} ]
+end
+
+DiseasesPrev (ApplyFunction)
+inputs
+	custom = ClDiseasesPrev
+parameters
+	function = Id("1")
+	result   = DIABPrev
+	conditions = [ { DateDIAB < 2011-01-01 }; {IsPrev12M = true} ]
+	boolExpr = AND
+end
+
+// FINAL: gen num/denom of disease-specific indicators 
+
+ClIndicFinal (ExtendDataModule)
+inputs
+	custom = DiseasesPrev
+parameters
+  attributes = [   { DEN_EMOGLIC_DIAB : int } ; { NUM_EMOGLIC_DIAB : int = 0 } ]
+end
+
+IndicFinal_1 (ApplyFunction)
+inputs
+	custom = ClIndicFinal
+parameters
+	function = Id(1)
+	result   = DEN_EMOGLIC_DIAB
+	conditions = [ { DIABPrev  = "1" } ]
+end
+
+
+IndicFinal (ApplyFunction)
+inputs
+	custom = IndicFinal_1 
+parameters
+	function = Id(1)
+	result   = NUM_EMOGLIC_DIAB
+	conditions = [ { DEN_EMOGLIC_DIAB = 1 } ; { IsEMOGLIC = true }]
+	boolExpr = AND
+end
+
+sortedIndicFinal  (SortModule)
+inputs
+	custom = IndicFinal 
+parameters
+	fieldNames = [ GP_ID,NUM_EMOGLIC_DIAB, PERSON_ID,DIABPrev, DEN_EMOGLIC_DIAB]
+end
+
+CleanOutput (AggregateModule)
+inputs
+	custom = sortedIndicFinal
+parameters
+	isInputSorted = false
+	groupBy =  [ GP_ID,NUM_EMOGLIC_DIAB, PERSON_ID,DIABPrev, DEN_EMOGLIC_DIAB ]
+	functions = [ COUNT(PERSON_ID) ]
+	results =  [ { Num : int } ]
+end
+
+OnlyDiab (FilterModule)
+inputs
+	custom = CleanOutput
+parameters
+	conditions = [{DIABPrev = "1"}]	
+end
+
+AggregateGP (AggregateModule)
+inputs
+		custom = OnlyDiab
+parameters
+	isInputSorted = false
+	groupBy =  [ GP_ID,NUM_EMOGLIC_DIAB]
+	functions = [ SUM(DEN_EMOGLIC_DIAB) ]
+	results =  [ { Patients : int } ]
+end
+
+MergeGP  (MergeModule)
+inputs
+	groupGP = GPgroup
+	custom = AggregateGP
+parameters
+	primaryKey = [ GP_ID ]
+	fieldNames = [ GP_ID ]
+end
+
+sortedMergeGP (SortModule)
+inputs
+	custom = MergeGP
+parameters
+	fieldNames = [ Group,NUM_EMOGLIC_DIAB ]
+end
+
+
+AggregateGroup (AggregateModule)
+inputs
+		custom = sortedMergeGP
+parameters
+	isInputSorted = false
+	groupBy =  [ Group,NUM_EMOGLIC_DIAB]
+	functions = [ SUM(Patients) ]
+	results =  [ { Patients : int } ]
+end
+
+/*
+
+ExercisePopulation (FileOutputModule)
+inputs
+	custom = CleanOutput
+parameters
+	checksum = none
+	compression = none
+end
+
+
+ExerciseDiabOnly (FileOutputModule)
+inputs
+	custom = OnlyDiab
+parameters
+	checksum = none
+	compression = none
+end
+
+
+ExerciseAggregateGP (FileOutputModule)
+inputs
+	custom = AggregateGP
+parameters
+	checksum = none
+	compression = none
+end
+
+*/ 
+
+ExerciseFinal (FileOutputModule)
+inputs
+	custom = AggregateGroup
+parameters
+	checksum = none
+	compression = none
+end
+
+

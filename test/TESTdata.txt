@@ -1,0 +1,46 @@
+declareSchema testDATA = [{PERSON_ID : string} ;  {NUM1 : int };  {NUM2 : int } ;  {NUM3 : int }]
+
+
+Input (FileInputModule)
+parameters
+	inputFileName = TESTData.csv
+	inputSchema   = testDATA
+end
+
+Extend (ExtendDataModule)
+inputs
+	testDATA = Input
+parameters
+  attributes = [ { SqNUM1: int };{ SqNUM2: int };{ SqNUM3: int } ]
+end
+
+Apply1 (ApplyFunction)
+inputs
+	custom = Extend
+parameters
+	function = Prod(NUM1,NUM1)
+	result   = SqNUM1
+	
+	
+end
+
+Apply2 (ApplyFunction)
+inputs
+	custom = Apply1
+parameters
+	function = Prod(NUM2,NUM2)
+	result   = SqNUM2
+	
+	
+end
+
+Apply3 (ApplyFunction)
+inputs
+	custom = Apply2
+parameters
+	function = Prod(NUM3,NUM3)
+	result   = SqNUM3
+	
+	
+end
+

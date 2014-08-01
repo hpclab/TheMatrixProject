@@ -1,0 +1,83 @@
+/* test of EXTENDDATAMODULE with function identity of different types: should always complete
+ *
+ *  THIS TEST IS INCOMPLETE! checks dates, string, ints, but does NOT check 
+ * actual assignment of floats an booleans
+ */
+
+FILEP (FileInputModule)
+parameters
+      inputFileName = EXE.csv
+      inputSchema   = IADexe
+end
+
+
+// FINAL: gen diseases date 
+ExtendTest (ExtendDataModule)
+inputs
+	IADexe = FILEP
+parameters
+  attributes = [  {DateDIAB1: date }; {DateZibibbo2 : date}; {DateIHD3: date }; {DateHF4: date }; {DateHYPERTE5: date }; {DateMarroni6 : date}; {UnaStringa: string}; {AltraStringa: string}; {UnIntero: int}; {UnFloat: float}; {UnBooleano: boolean} ]
+end
+
+/*
+	OLD BUG we had in ExtendDataModule
+ Houston, why the new columns are added in reverse sorted order.... ????
+*/
+
+
+// date
+APPLY1 (ApplyFunction)
+inputs
+	custom = ExtendTest
+parameters
+	function = Id(EXE_START_DATE)
+	result   = EXE_END_DATE
+end
+
+// we no longer assign other date fields, it is now redundant
+
+// string
+APPLY2 (ApplyFunction)
+inputs
+	custom = APPLY1
+parameters
+	function = Id(PERSON_ID)
+	result   = UnaStringa
+end
+
+// string
+APPLY3 (ApplyFunction)
+inputs
+	custom = APPLY2
+parameters
+	function = Id(UnaStringa)
+	result   = AltraStringa
+end
+
+// boolean
+APPLY4 (ApplyFunction)
+inputs
+	custom = APPLY3
+parameters
+// unlikely to produce useful results, of course
+	function = ElapsedTimeInRange(EXE_START_DATE,EXE_END_DATE,0,1)
+	result   = UnBooleano
+end
+
+// float  (may be tricky, same field...)
+APPLY5 (ApplyFunction)
+inputs
+	custom = APPLY4
+parameters
+	function = Duration("0001063080") // we use a fixed atc
+	result   = UnFloat
+end
+
+// int
+APPLY6 (ApplyFunction)
+inputs
+	custom = APPLY5
+parameters
+	function = Year(EXE_START_DATE)
+	result = UnIntero
+end

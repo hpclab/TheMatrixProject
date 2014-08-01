@@ -1,0 +1,1116 @@
+
+You are invisible.
+Go visible
+Available (video enabled)	Aleš Černivec
+Available	Alessandro Lulli
+Available (video enabled)	Andrea Esposito
+Available	Claudio Lucchese
+Available (video enabled)	Diego Ceccarelli
+	https://www.youtube.com/watch?v=g0vPW71gA5Q
+Available	francesca rinaldi
+Available (video enabled)	Franco Maria Nardini
+Available	Gabriele Capannini
+Available	Giorgio Zoppi
+	Available - I use http://digsby.com/gtalk
+Available	Giovanni Accetta
+Available	Marco Picone
+Available	Matteo Mordacchini
+Available	Mattia Carlini
+Available	Patrizio Dazzi
+Available	Roberta Paris
+Busy	Marco Distefano
+Idle	Alberto Lluch Lafuente
+Idle	Aliaksandr Lazouski
+Idle	Anna Della Costa
+Idle	Carmela Semprevivo
+Idle	Daniele Broccolo
+Idle	Fabrizio Silvestri
+Idle	Francesco Battaglia
+Idle	Gaetano Mancini
+Idle (video enabled)	Iacopo Peri
+	...
+Idle	Luca Colombini
+Idle	Luca Ferrucci
+Idle	Raffaele Perego
+Idle	Sebnem Erturk
+Idle	Stefania Lombardi
+Idle	Susanna Martinelli
+Offline	Barbara Guidi
+Offline	Carla Albanese
+Offline	Emanuela Zucchelli
+Offline	Gabriele Tolomei
+Offline	Giacomo Righetti
+Offline	Hanna Kavalionak
+Offline	Koteswararao Kondepu
+Offline	laura ricci
+Offline	Paola Spataro
+Offline	Patrick Johnson
+Offline	pepito987@gmail.com
+Offline	Rossano Venturini
+Offline	Shun-Yun Hu
+Offline	Valeria Galanti
+1 of 3
+ 
+TheMatrix Release 1.51
+Inbox
+	x
+ISTI
+	x
+Matrice
+	x
+Massimo Coppola	
+Ciao Rosa, in allegato il jar della nuova release 1.51; sul sito sftp trovi l...
+	6:48 PM (20 hours ago)
+Rosa Gini	
+cioa ragazzi, purtroppo c'e' una null pointer exception, vi ho messo tutto ne...
+	8:07 AM (6 hours ago)
+Massimo Coppola	
+Ciao Emanuele, sembra un bug nel costruttore della Count (uno di quelli che v...
+	9:53 AM (4 hours ago)
+Emanuele Carlini	
+Ciao, stamani non ci riesco (sono a casa e ho internet dal cellulare = lentis...
+	10:41 AM (4 hours ago)
+Massimo Coppola	
+Ok, per favore potresti rispondere tu a Rosa che ci sentiamo nel pomeriggio? ...
+	11:06 AM (3 hours ago)
+Emanuele Carlini	
+Ciao Rosa, do un'occhiata alla cosa nel primo pomeriggio. Ti faccio sapere, E...
+	11:35 AM (3 hours ago)
+Emanuele Carlini	
+Ops, dimenticato il cc
+	11:36 AM (3 hours ago)
+Rosa Gini	
+ottimo, bisognerebbe fare girare lo script domani sui dati di patrizio perche...
+	11:36 AM (3 hours ago)
+Emanuele Carlini	
+Ciao Rosa, non riesco a riprodurre l'errore, mi manca postprocessMATRICE_1_se...
+	2:34 PM (15 minutes ago)
+Rosa Gini
+	
+2:36 PM (15 minutes ago)
+		
+to Emanuele, Massimo
+allegato, lo devi far girare sull'installazione di patrizio, senno' ti mando i risultati, rosa
+
+Il 25/03/14 14.34, Emanuele Carlini ha scritto:
+
+    Ciao Rosa,
+
+    non riesco a riprodurre l'errore, mi manca
+
+    postprocessMATRICE_1_select.txt
+
+    per eseguire i vari ScriptInputModule.
+
+    E.
+
+
+
+    2014-03-25 11:36 GMT+01:00 Rosa Gini <rosa.gini@ars.toscana.it
+    <mailto:rosa.gini@ars.toscana.it>>:
+
+
+
+        ottimo, bisognerebbe fare girare lo script domani sui dati di
+        patrizio perche' devo aver qualcosa da far vedere giovedi'... :(
+
+                         rosa
+
+        Il 25/03/14 11.35, Emanuele Carlini ha scritto:
+
+            Ciao Rosa,
+            do un'occhiata alla cosa nel primo pomeriggio.
+            Ti faccio sapere,
+
+            E.
+
+
+            2014-03-25 8:07 GMT+01:00 Rosa Gini <rosa.gini@ars.toscana.it
+            <mailto:rosa.gini@ars.toscana.it>
+            <mailto:rosa.gini@ars.toscana.__it
+            <mailto:emanuele.carlini@isti.__cnr.it
+
+            <mailto:emanuele.carlini@isti.cnr.it>>
+
+            via G. Moruzzi 1 - 56124 Pisa, Italy Room C26, Phone:
+            +390503152936 <tel:%2B390503152936>
+            http://hpc.isti.cnr.it/~__carlini/
+
+[Text]
+Emanuele Carlini emanuele.carlini@isti.cnr.it
+	
+2:39 PM (11 minutes ago)
+		
+to Rosa, Massimo
+Si se è poca roba, meglio i dati.
+Fammi sapere,
+
+
+E.
+
+
+2014-03-25 14:36 GMT+01:00 Rosa Gini <rosa.gini@ars.toscana.it>:
+Rosa Gini
+	
+2:40 PM (11 minutes ago)
+		
+to Emanuele, Massimo
+guarda questa e' la cosa migliore ema: in allegato hai i dati di validazione 'falsi', cioe' quelli che uso io per sviluppare lo script di validazione- lancia su questi postprocess1 e poi il 2, quello che da' l'errore
+
+                rosa
+
+Il 25/03/14 14.36, Rosa Gini ha scritto:
+14 Attachments
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+[XML]
+[Comma Separated Data]
+	
+Click here to Reply, Reply to all, or Forward
+3.93 GB (26%) of 15 GB used
+Manage
+©2014 Google - Terms & Privacy
+Last account activity: 3 hours ago
+Details
+	
+	
+People (2)
+	Rosa Gini
+Show details
+You have one new message.
+declareSchema IADvalidPERSON = [{PERSON_ID : string} ;  {N_GP : int } ; {MUNICIPALITY_GP : string } ; {GENDER_CONCEPT_ID : string } ; {YearIn : int } ; {YearOut : int } ; {AgeBand2009 : int } ; {AgeBand2012 : int }; {RowPERSON  : int}  ; {LHU_GP  : string}]
+
+declareSchema IADvalidHOSP = [ { AUTOPTIC : string } ; { BIRTH_WEIGTH : float } ; { BOOKING_DATE : date } ; { CITIZENSHIP : string } ; { DATE_MAIN_PROC : string } ; { DH_CAUSE : string } ; { DRG : string } ; { END_DATE : date } ; { EXTERNAL_CAUSE : string } ; { LENGTH_DH : int } ; { MAIN_DIAGNOSIS : string } ; { MAIN_PROC : string } ; { MARITAL_STATUS : string } ; { ORIGIN : string } ; { PERSON_ID : string } ; { PRIORITY : string } ; { REGIME : string } ; { SECONDARY_DIAGNOSIS_1 : string } ; { SECONDARY_DIAGNOSIS_2 : string } ; { SECONDARY_DIAGNOSIS_3 : string } ; { SECONDARY_DIAGNOSIS_4 : string } ; { SECONDARY_DIAGNOSIS_5 : string } ; { SECONDARY_PROC_1 : string } ; { SECONDARY_PROC_2 : string } ; { SECONDARY_PROC_3 : string } ; { SECONDARY_PROC_4 : string } ; { SECONDARY_PROC_5 : string } ; { START_DATE : date } ; { TRAUMA : string } ; { TYPE : string } ; { TYPE_DISCHARGE : string } ; { VALUE : float } ; { WARD_DISCHARGE : string } ; {RowPERSON  : int}  ]
+
+declareSchema IADvalidOUTPAT = [ { DIAGNOSIS : string } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FIRST_ACCESS : boolean } ; { GROUP_CODE : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { MAX_WAITING_TIME : boolean } ; { NUMBER_OF_PROC : int } ; { PERSON_ID : string } ; { PROC_BOOKING_DATE : date } ; { PROC_COD : string } ; { PROC_DATE : date } ; { PROC_END_DATE : date } ; { PROC_PRESCRIPTION : date } ; { PROC_START_DATE : date } ; { QUANTITY : int } ; { REG_PROVIDER_ID : string } ; { TYPE_PROC : string } ; { VALUE : float } ; { WARD_CODE : string } ; {RowPERSON  : int}  ; {Aux : string} ]
+
+declareSchema IADvalidEXE = [ { EXEMPTION_CODE : string } ; { EXE_END_DATE : date } ; { EXE_START_DATE : date } ; { PERSON_ID : string } ; {RowPERSON  : int}  ; {Aux : string} ]
+
+declareSchema IADvalidDRUGS = [ { ATC : string } ; { COST : float } ; { DRUG_DISPENSING_DATE : date } ; { DRUG_PRESCRIPTION : date } ; { DURATION : float } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FOREIGN_COUNTRY : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { NUMBER_OF_BOXES : float } ; { PERSON_ID : string } ; { PRODUCT_CODE : string } ; { REG_PROVIDER_ID : string } ; {RowPERSON  : int}  ; {duration_of_box : float} ]
+
+declareSchema IADvalidDDRUG = [ { ATC : string } ; { COST : float } ; { DRUG_DISPENSING_DATE : date } ; { DRUG_PRESCRIPTION : date } ; { DURATION : float } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FOREIGN_COUNTRY : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { NUMBER_OF_BOXES : float } ; { PERSON_ID : string } ; { PRODUCT_CODE : string } ; { REG_PROVIDER_ID : string } ; {RowPERSON  : int}  ; {duration_of_box : float} ]
+
+
+PERSONrow (FileInputModule)
+parameters
+inputFileName = Valid_PERSON.csv
+inputSchema   = IADvalidPERSON
+end
+
+PERSON (DropModule)
+inputs
+IADvalidPERSON = PERSONrow
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+HOSProw (FileInputModule)
+parameters
+inputFileName = Valid_HOSP.csv
+inputSchema   = IADvalidHOSP
+end
+
+HOSP (DropModule)
+inputs
+IADvalidHOSP = HOSProw
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+OUTPATrow (FileInputModule)
+parameters
+inputFileName = Valid_OUTPAT.csv
+inputSchema   = IADvalidOUTPAT
+end
+
+OUTPAT (DropModule)
+inputs
+IADvalidOUTPAT = OUTPATrow
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+EXErow (FileInputModule)
+parameters
+inputFileName = Valid_EXE.csv
+inputSchema   = IADvalidEXE
+end
+
+EXE (DropModule)
+inputs
+IADvalidEXE = EXErow
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+DRUGSrow (FileInputModule)
+parameters
+inputFileName = Valid_DRUGS.csv
+inputSchema   = IADvalidDRUGS
+end
+
+DRUGS (DropModule)
+inputs
+IADvalidDRUGS = DRUGSrow
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+DDRUGrow (FileInputModule)
+parameters
+inputFileName = Valid_DDRUG.csv
+inputSchema   = IADvalidDDRUG
+end
+
+DDRUG (DropModule)
+inputs
+IADvalidDDRUG = DDRUGrow
+parameters
+params = [ RowPERSON ]
+end
+
+
+
+// Generate VISIT from OUTPAT (start with fix for bug)
+
+OUTPATfix (FilterModule)
+inputs
+custom = OUTPAT
+parameters
+conditions = [{PERSON_ID!=MISSING}]
+
+end
+
+// Generate VISIT from OUTPAT
+
+ClVISITUnfiltered (ExtendDataModule)
+inputs
+custom = OUTPATfix
+parameters
+  attributes = [ { IsGeneralVisit: boolean = false} ]
+end
+
+VISITUnfiltered (ApplyFunction)
+inputs
+custom = ClVISITUnfiltered
+parameters
+function = Id(true)
+result   = IsGeneralVisit
+conditions = [{PROC_COD  = "89.7"} ; {PROC_COD  = "89.01"} ; {PROC_COD  = "89.07"} ; {PROC_COD  = "89.03"}; {PROC_COD  = "897"} ; {PROC_COD  = "8901"} ; {PROC_COD  = "8907"} ; {PROC_COD  = "8903"}]
+boolExpr = OR
+end
+
+VISIT (FilterModule)
+inputs
+custom = VISITUnfiltered
+parameters
+conditions = [{IsGeneralVisit = true}]
+
+end
+
+// create result of selection rule DIAB_DRUGS_INSULIN from DDRUG
+
+RESULTDIAB_DRUGS_INSULINDDRUGtoClean (FilterModule)
+inputs
+custom = DDRUG
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10A*" } ; { ATC matches "A10A*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_INSULINDDRUGtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULINDDRUGtoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_INSULINDDRUG (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULINDDRUGtoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_INSULIN from DRUGS
+
+RESULTDIAB_DRUGS_INSULINDRUGStoClean (FilterModule)
+inputs
+custom = DRUGS
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10A*" } ; { ATC matches "A10A*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_INSULINDRUGStoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULINDRUGStoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_INSULINDRUGS (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULINDRUGStoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_INSULIN from all sources `"DDRUG"' `"DRUGS"'
+
+RESULTDIAB_DRUGS_INSULIN (UnionModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULINDDRUG
+custom = RESULTDIAB_DRUGS_INSULINDRUGS
+end
+
+
+// Output RESULTDIAB_DRUGS_INSULIN
+
+PostproMATRICE_DIAB_DRUGS_INSULIN (FileOutputModule)
+inputs
+custom = RESULTDIAB_DRUGS_INSULIN
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_DRUGS_ORAL from DDRUG
+
+RESULTDIAB_DRUGS_ORALDDRUGtoClean (FilterModule)
+inputs
+custom = DDRUG
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10B*" } ; { ATC matches "A10B*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_ORALDDRUGtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORALDDRUGtoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_ORALDDRUG (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORALDDRUGtoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_ORAL from DRUGS
+
+RESULTDIAB_DRUGS_ORALDRUGStoClean (FilterModule)
+inputs
+custom = DRUGS
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10B*" } ; { ATC matches "A10B*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_ORALDRUGStoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORALDRUGStoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_ORALDRUGS (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORALDRUGStoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_ORAL from all sources `"DDRUG"' `"DRUGS"'
+
+RESULTDIAB_DRUGS_ORAL (UnionModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORALDDRUG
+custom = RESULTDIAB_DRUGS_ORALDRUGS
+end
+
+
+// Output RESULTDIAB_DRUGS_ORAL
+
+PostproMATRICE_DIAB_DRUGS_ORAL (FileOutputModule)
+inputs
+custom = RESULTDIAB_DRUGS_ORAL
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_DRUGS_OTHER from DDRUG
+
+RESULTDIAB_DRUGS_OTHERDDRUGtoClean (FilterModule)
+inputs
+custom = DDRUG
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10X*" } ; { ATC matches "A10X*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_OTHERDDRUGtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHERDDRUGtoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_OTHERDDRUG (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHERDDRUGtoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_OTHER from DRUGS
+
+RESULTDIAB_DRUGS_OTHERDRUGStoClean (FilterModule)
+inputs
+custom = DRUGS
+parameters
+conditions = [{PERSON_ID = MISSING} ; { ATC matches "A10X*" } ; { ATC matches "A10X*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_DRUGS_OTHERDRUGStoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHERDRUGStoClean
+parameters
+inputAttributes = [ DRUG_DISPENSING_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_DRUGS_OTHERDRUGS (DropModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHERDRUGStoDrop
+parameters
+params = [   ATC , COST , DRUG_DISPENSING_DATE , DRUG_PRESCRIPTION , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FOREIGN_COUNTRY , LHU_PROVIDER_CONCEPT_ID , NUMBER_OF_BOXES , PRODUCT_CODE , REG_PROVIDER_ID , duration_of_box , Aux ]
+end
+
+
+
+// create result of selection rule DIAB_DRUGS_OTHER from all sources `"DDRUG"' `"DRUGS"'
+
+RESULTDIAB_DRUGS_OTHER (UnionModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHERDDRUG
+custom = RESULTDIAB_DRUGS_OTHERDRUGS
+end
+
+
+// Output RESULTDIAB_DRUGS_OTHER
+
+PostproMATRICE_DIAB_DRUGS_OTHER (FileOutputModule)
+inputs
+custom = RESULTDIAB_DRUGS_OTHER
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_EXE from EXE
+
+RESULTDIAB_EXEtoClean (FilterModule)
+inputs
+custom = EXE
+parameters
+conditions = [{PERSON_ID = MISSING} ; { EXEMPTION_CODE matches "*250" } ; { EXEMPTION_CODE matches "*250" }]
+boolExpr= OR
+end
+
+RESULTDIAB_EXEtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_EXEtoClean
+parameters
+inputAttributes = [ EXE_START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_EXEtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_EXEtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_EXE (DropModule)
+inputs
+custom = RESULTDIAB_EXEtoRefine
+parameters
+params = [   EXEMPTION_CODE , EXE_END_DATE , EXE_START_DATE ]
+end
+
+
+
+// Output RESULTDIAB_EXE
+
+PostproMATRICE_DIAB_EXE (FileOutputModule)
+inputs
+custom = RESULTDIAB_EXE
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_DRG from HOSP
+
+RESULTDIAB_HOSP_DRGtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { DRG = "294" } ; { DRG = "294" } ; { DRG = "295" } ; { DRG = "295" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_DRGtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_DRGtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_DRGtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_DRGtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_DRG (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_DRGtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_DRG
+
+PostproMATRICE_DIAB_HOSP_DRG (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_DRG
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_MAIN_COMPL from HOSP
+
+RESULTDIAB_HOSP_MAIN_COMPLtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { MAIN_DIAGNOSIS = "250.4" } ; { MAIN_DIAGNOSIS = "2504" } ; { MAIN_DIAGNOSIS = "250.42" } ; { MAIN_DIAGNOSIS = "25042" } ; { MAIN_DIAGNOSIS = "250.5" } ; { MAIN_DIAGNOSIS = "2505" } ; { MAIN_DIAGNOSIS = "250.52" } ; { MAIN_DIAGNOSIS = "25052" } ; { MAIN_DIAGNOSIS = "250.6" } ; { MAIN_DIAGNOSIS = "2506" } ; { MAIN_DIAGNOSIS = "250.62" } ; { MAIN_DIAGNOSIS = "25062" } ; { MAIN_DIAGNOSIS = "250.7" } ; { MAIN_DIAGNOSIS = "2507" } ; { MAIN_DIAGNOSIS = "250.72" } ; { MAIN_DIAGNOSIS = "25072" } ; { MAIN_DIAGNOSIS = "250.8" } ; { MAIN_DIAGNOSIS = "2508" } ; { MAIN_DIAGNOSIS = "250.82" } ; { MAIN_DIAGNOSIS = "25082" } ; { MAIN_DIAGNOSIS = "250.9" } ; { MAIN_DIAGNOSIS = "2509" } ; { MAIN_DIAGNOSIS = "250.90" } ; { MAIN_DIAGNOSIS = "25090" } ; { MAIN_DIAGNOSIS = "250.92" } ; { MAIN_DIAGNOSIS = "25092" } ; { MAIN_DIAGNOSIS = "357.2" } ; { MAIN_DIAGNOSIS = "3572" } ; { MAIN_DIAGNOSIS = "362.0" } ; { MAIN_DIAGNOSIS = "3620" } ; { MAIN_DIAGNOSIS = "362.01" } ; { MAIN_DIAGNOSIS = "36201" } ; { MAIN_DIAGNOSIS = "362.02" } ; { MAIN_DIAGNOSIS = "36202" } ; { MAIN_DIAGNOSIS = "366.41" } ; { MAIN_DIAGNOSIS = "36641" } ; { MAIN_DIAGNOSIS = "369.9" } ; { MAIN_DIAGNOSIS = "3699" } ; { MAIN_DIAGNOSIS = "785.4" } ; { MAIN_DIAGNOSIS = "7854" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_MAIN_COMPLtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_COMPLtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_MAIN_COMPLtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_COMPLtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_MAIN_COMPL (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_COMPLtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_MAIN_COMPL
+
+PostproMATRICE_DIAB_HOSP_MAIN_COMPL (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_COMPL
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_MAIN_INSDEV from HOSP
+
+RESULTDIAB_HOSP_MAIN_INSDEVtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { MAIN_DIAGNOSIS = "V45.85" } ; { MAIN_DIAGNOSIS = "V4585" } ; { MAIN_DIAGNOSIS = "V53.91" } ; { MAIN_DIAGNOSIS = "V5391" } ; { MAIN_DIAGNOSIS = "V58.67" } ; { MAIN_DIAGNOSIS = "V5867" } ; { MAIN_DIAGNOSIS = "V65.46" } ; { MAIN_DIAGNOSIS = "V6546" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_MAIN_INSDEVtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_INSDEVtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_MAIN_INSDEVtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_INSDEVtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_MAIN_INSDEV (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_INSDEVtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_MAIN_INSDEV
+
+PostproMATRICE_DIAB_HOSP_MAIN_INSDEV (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_INSDEV
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_MAIN_T2 from HOSP
+
+RESULTDIAB_HOSP_MAIN_T2toClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { MAIN_DIAGNOSIS = "250.00" } ; { MAIN_DIAGNOSIS = "25000" } ; { MAIN_DIAGNOSIS = "250.02" } ; { MAIN_DIAGNOSIS = "25002" } ; { MAIN_DIAGNOSIS = "250.10" } ; { MAIN_DIAGNOSIS = "25010" } ; { MAIN_DIAGNOSIS = "250.12" } ; { MAIN_DIAGNOSIS = "25012" } ; { MAIN_DIAGNOSIS = "250.20" } ; { MAIN_DIAGNOSIS = "25020" } ; { MAIN_DIAGNOSIS = "250.22" } ; { MAIN_DIAGNOSIS = "25022" } ; { MAIN_DIAGNOSIS = "250.30" } ; { MAIN_DIAGNOSIS = "25030" } ; { MAIN_DIAGNOSIS = "250.32" } ; { MAIN_DIAGNOSIS = "25032" } ; { MAIN_DIAGNOSIS = "250.40" } ; { MAIN_DIAGNOSIS = "25040" } ; { MAIN_DIAGNOSIS = "250.42" } ; { MAIN_DIAGNOSIS = "25042" } ; { MAIN_DIAGNOSIS = "250.50" } ; { MAIN_DIAGNOSIS = "25050" } ; { MAIN_DIAGNOSIS = "250.52" } ; { MAIN_DIAGNOSIS = "25052" } ; { MAIN_DIAGNOSIS = "250.60" } ; { MAIN_DIAGNOSIS = "25060" } ; { MAIN_DIAGNOSIS = "250.62" } ; { MAIN_DIAGNOSIS = "25062" } ; { MAIN_DIAGNOSIS = "250.70" } ; { MAIN_DIAGNOSIS = "25070" } ; { MAIN_DIAGNOSIS = "250.72" } ; { MAIN_DIAGNOSIS = "25072" } ; { MAIN_DIAGNOSIS = "250.80" } ; { MAIN_DIAGNOSIS = "25080" } ; { MAIN_DIAGNOSIS = "250.82" } ; { MAIN_DIAGNOSIS = "25082" } ; { MAIN_DIAGNOSIS = "250.90" } ; { MAIN_DIAGNOSIS = "25090" } ; { MAIN_DIAGNOSIS = "250.92" } ; { MAIN_DIAGNOSIS = "25092" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_MAIN_T2toDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_T2toClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_MAIN_T2toRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_T2toDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_MAIN_T2 (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_T2toRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_MAIN_T2
+
+PostproMATRICE_DIAB_HOSP_MAIN_T2 (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_T2
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_MAIN_UNSPEC from HOSP
+
+RESULTDIAB_HOSP_MAIN_UNSPECtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { MAIN_DIAGNOSIS matches "250*" } ; { MAIN_DIAGNOSIS matches "250*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_MAIN_UNSPECtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_UNSPECtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_MAIN_UNSPECtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_UNSPECtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_MAIN_UNSPEC (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_UNSPECtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_MAIN_UNSPEC
+
+PostproMATRICE_DIAB_HOSP_MAIN_UNSPEC (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_MAIN_UNSPEC
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_SEC_COMPL from HOSP
+
+RESULTDIAB_HOSP_SEC_COMPLtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { SECONDARY_DIAGNOSIS_1 = "250.4" } ; { SECONDARY_DIAGNOSIS_1 = "2504" } ; { SECONDARY_DIAGNOSIS_1 = "250.42" } ; { SECONDARY_DIAGNOSIS_1 = "25042" } ; { SECONDARY_DIAGNOSIS_1 = "250.5" } ; { SECONDARY_DIAGNOSIS_1 = "2505" } ; { SECONDARY_DIAGNOSIS_1 = "250.52" } ; { SECONDARY_DIAGNOSIS_1 = "25052" } ; { SECONDARY_DIAGNOSIS_1 = "250.6" } ; { SECONDARY_DIAGNOSIS_1 = "2506" } ; { SECONDARY_DIAGNOSIS_1 = "250.62" } ; { SECONDARY_DIAGNOSIS_1 = "25062" } ; { SECONDARY_DIAGNOSIS_1 = "250.7" } ; { SECONDARY_DIAGNOSIS_1 = "2507" } ; { SECONDARY_DIAGNOSIS_1 = "250.72" } ; { SECONDARY_DIAGNOSIS_1 = "25072" } ; { SECONDARY_DIAGNOSIS_1 = "250.8" } ; { SECONDARY_DIAGNOSIS_1 = "2508" } ; { SECONDARY_DIAGNOSIS_1 = "250.82" } ; { SECONDARY_DIAGNOSIS_1 = "25082" } ; { SECONDARY_DIAGNOSIS_1 = "250.9" } ; { SECONDARY_DIAGNOSIS_1 = "2509" } ; { SECONDARY_DIAGNOSIS_1 = "250.90" } ; { SECONDARY_DIAGNOSIS_1 = "25090" } ; { SECONDARY_DIAGNOSIS_1 = "250.92" } ; { SECONDARY_DIAGNOSIS_1 = "25092" } ; { SECONDARY_DIAGNOSIS_1 = "357.2" } ; { SECONDARY_DIAGNOSIS_1 = "3572" } ; { SECONDARY_DIAGNOSIS_1 = "362.0" } ; { SECONDARY_DIAGNOSIS_1 = "3620" } ; { SECONDARY_DIAGNOSIS_1 = "362.01" } ; { SECONDARY_DIAGNOSIS_1 = "36201" } ; { SECONDARY_DIAGNOSIS_1 = "362.02" } ; { SECONDARY_DIAGNOSIS_1 = "36202" } ; { SECONDARY_DIAGNOSIS_1 = "366.41" } ; { SECONDARY_DIAGNOSIS_1 = "36641" } ; { SECONDARY_DIAGNOSIS_1 = "369.9" } ; { SECONDARY_DIAGNOSIS_1 = "3699" } ; { SECONDARY_DIAGNOSIS_1 = "785.4" } ; { SECONDARY_DIAGNOSIS_1 = "7854" } ; { SECONDARY_DIAGNOSIS_2 = "250.4" } ; { SECONDARY_DIAGNOSIS_2 = "2504" } ; { SECONDARY_DIAGNOSIS_2 = "250.42" } ; { SECONDARY_DIAGNOSIS_2 = "25042" } ; { SECONDARY_DIAGNOSIS_2 = "250.5" } ; { SECONDARY_DIAGNOSIS_2 = "2505" } ; { SECONDARY_DIAGNOSIS_2 = "250.52" } ; { SECONDARY_DIAGNOSIS_2 = "25052" } ; { SECONDARY_DIAGNOSIS_2 = "250.6" } ; { SECONDARY_DIAGNOSIS_2 = "2506" } ; { SECONDARY_DIAGNOSIS_2 = "250.62" } ; { SECONDARY_DIAGNOSIS_2 = "25062" } ; { SECONDARY_DIAGNOSIS_2 = "250.7" } ; { SECONDARY_DIAGNOSIS_2 = "2507" } ; { SECONDARY_DIAGNOSIS_2 = "250.72" } ; { SECONDARY_DIAGNOSIS_2 = "25072" } ; { SECONDARY_DIAGNOSIS_2 = "250.8" } ; { SECONDARY_DIAGNOSIS_2 = "2508" } ; { SECONDARY_DIAGNOSIS_2 = "250.82" } ; { SECONDARY_DIAGNOSIS_2 = "25082" } ; { SECONDARY_DIAGNOSIS_2 = "250.9" } ; { SECONDARY_DIAGNOSIS_2 = "2509" } ; { SECONDARY_DIAGNOSIS_2 = "250.90" } ; { SECONDARY_DIAGNOSIS_2 = "25090" } ; { SECONDARY_DIAGNOSIS_2 = "250.92" } ; { SECONDARY_DIAGNOSIS_2 = "25092" } ; { SECONDARY_DIAGNOSIS_2 = "357.2" } ; { SECONDARY_DIAGNOSIS_2 = "3572" } ; { SECONDARY_DIAGNOSIS_2 = "362.0" } ; { SECONDARY_DIAGNOSIS_2 = "3620" } ; { SECONDARY_DIAGNOSIS_2 = "362.01" } ; { SECONDARY_DIAGNOSIS_2 = "36201" } ; { SECONDARY_DIAGNOSIS_2 = "362.02" } ; { SECONDARY_DIAGNOSIS_2 = "36202" } ; { SECONDARY_DIAGNOSIS_2 = "366.41" } ; { SECONDARY_DIAGNOSIS_2 = "36641" } ; { SECONDARY_DIAGNOSIS_2 = "369.9" } ; { SECONDARY_DIAGNOSIS_2 = "3699" } ; { SECONDARY_DIAGNOSIS_2 = "785.4" } ; { SECONDARY_DIAGNOSIS_2 = "7854" } ; { SECONDARY_DIAGNOSIS_3 = "250.4" } ; { SECONDARY_DIAGNOSIS_3 = "2504" } ; { SECONDARY_DIAGNOSIS_3 = "250.42" } ; { SECONDARY_DIAGNOSIS_3 = "25042" } ; { SECONDARY_DIAGNOSIS_3 = "250.5" } ; { SECONDARY_DIAGNOSIS_3 = "2505" } ; { SECONDARY_DIAGNOSIS_3 = "250.52" } ; { SECONDARY_DIAGNOSIS_3 = "25052" } ; { SECONDARY_DIAGNOSIS_3 = "250.6" } ; { SECONDARY_DIAGNOSIS_3 = "2506" } ; { SECONDARY_DIAGNOSIS_3 = "250.62" } ; { SECONDARY_DIAGNOSIS_3 = "25062" } ; { SECONDARY_DIAGNOSIS_3 = "250.7" } ; { SECONDARY_DIAGNOSIS_3 = "2507" } ; { SECONDARY_DIAGNOSIS_3 = "250.72" } ; { SECONDARY_DIAGNOSIS_3 = "25072" } ; { SECONDARY_DIAGNOSIS_3 = "250.8" } ; { SECONDARY_DIAGNOSIS_3 = "2508" } ; { SECONDARY_DIAGNOSIS_3 = "250.82" } ; { SECONDARY_DIAGNOSIS_3 = "25082" } ; { SECONDARY_DIAGNOSIS_3 = "250.9" } ; { SECONDARY_DIAGNOSIS_3 = "2509" } ; { SECONDARY_DIAGNOSIS_3 = "250.90" } ; { SECONDARY_DIAGNOSIS_3 = "25090" } ; { SECONDARY_DIAGNOSIS_3 = "250.92" } ; { SECONDARY_DIAGNOSIS_3 = "25092" } ; { SECONDARY_DIAGNOSIS_3 = "357.2" } ; { SECONDARY_DIAGNOSIS_3 = "3572" } ; { SECONDARY_DIAGNOSIS_3 = "362.0" } ; { SECONDARY_DIAGNOSIS_3 = "3620" } ; { SECONDARY_DIAGNOSIS_3 = "362.01" } ; { SECONDARY_DIAGNOSIS_3 = "36201" } ; { SECONDARY_DIAGNOSIS_3 = "362.02" } ; { SECONDARY_DIAGNOSIS_3 = "36202" } ; { SECONDARY_DIAGNOSIS_3 = "366.41" } ; { SECONDARY_DIAGNOSIS_3 = "36641" } ; { SECONDARY_DIAGNOSIS_3 = "369.9" } ; { SECONDARY_DIAGNOSIS_3 = "3699" } ; { SECONDARY_DIAGNOSIS_3 = "785.4" } ; { SECONDARY_DIAGNOSIS_3 = "7854" } ; { SECONDARY_DIAGNOSIS_4 = "250.4" } ; { SECONDARY_DIAGNOSIS_4 = "2504" } ; { SECONDARY_DIAGNOSIS_4 = "250.42" } ; { SECONDARY_DIAGNOSIS_4 = "25042" } ; { SECONDARY_DIAGNOSIS_4 = "250.5" } ; { SECONDARY_DIAGNOSIS_4 = "2505" } ; { SECONDARY_DIAGNOSIS_4 = "250.52" } ; { SECONDARY_DIAGNOSIS_4 = "25052" } ; { SECONDARY_DIAGNOSIS_4 = "250.6" } ; { SECONDARY_DIAGNOSIS_4 = "2506" } ; { SECONDARY_DIAGNOSIS_4 = "250.62" } ; { SECONDARY_DIAGNOSIS_4 = "25062" } ; { SECONDARY_DIAGNOSIS_4 = "250.7" } ; { SECONDARY_DIAGNOSIS_4 = "2507" } ; { SECONDARY_DIAGNOSIS_4 = "250.72" } ; { SECONDARY_DIAGNOSIS_4 = "25072" } ; { SECONDARY_DIAGNOSIS_4 = "250.8" } ; { SECONDARY_DIAGNOSIS_4 = "2508" } ; { SECONDARY_DIAGNOSIS_4 = "250.82" } ; { SECONDARY_DIAGNOSIS_4 = "25082" } ; { SECONDARY_DIAGNOSIS_4 = "250.9" } ; { SECONDARY_DIAGNOSIS_4 = "2509" } ; { SECONDARY_DIAGNOSIS_4 = "250.90" } ; { SECONDARY_DIAGNOSIS_4 = "25090" } ; { SECONDARY_DIAGNOSIS_4 = "250.92" } ; { SECONDARY_DIAGNOSIS_4 = "25092" } ; { SECONDARY_DIAGNOSIS_4 = "357.2" } ; { SECONDARY_DIAGNOSIS_4 = "3572" } ; { SECONDARY_DIAGNOSIS_4 = "362.0" } ; { SECONDARY_DIAGNOSIS_4 = "3620" } ; { SECONDARY_DIAGNOSIS_4 = "362.01" } ; { SECONDARY_DIAGNOSIS_4 = "36201" } ; { SECONDARY_DIAGNOSIS_4 = "362.02" } ; { SECONDARY_DIAGNOSIS_4 = "36202" } ; { SECONDARY_DIAGNOSIS_4 = "366.41" } ; { SECONDARY_DIAGNOSIS_4 = "36641" } ; { SECONDARY_DIAGNOSIS_4 = "369.9" } ; { SECONDARY_DIAGNOSIS_4 = "3699" } ; { SECONDARY_DIAGNOSIS_4 = "785.4" } ; { SECONDARY_DIAGNOSIS_4 = "7854" } ; { SECONDARY_DIAGNOSIS_5 = "250.4" } ; { SECONDARY_DIAGNOSIS_5 = "2504" } ; { SECONDARY_DIAGNOSIS_5 = "250.42" } ; { SECONDARY_DIAGNOSIS_5 = "25042" } ; { SECONDARY_DIAGNOSIS_5 = "250.5" } ; { SECONDARY_DIAGNOSIS_5 = "2505" } ; { SECONDARY_DIAGNOSIS_5 = "250.52" } ; { SECONDARY_DIAGNOSIS_5 = "25052" } ; { SECONDARY_DIAGNOSIS_5 = "250.6" } ; { SECONDARY_DIAGNOSIS_5 = "2506" } ; { SECONDARY_DIAGNOSIS_5 = "250.62" } ; { SECONDARY_DIAGNOSIS_5 = "25062" } ; { SECONDARY_DIAGNOSIS_5 = "250.7" } ; { SECONDARY_DIAGNOSIS_5 = "2507" } ; { SECONDARY_DIAGNOSIS_5 = "250.72" } ; { SECONDARY_DIAGNOSIS_5 = "25072" } ; { SECONDARY_DIAGNOSIS_5 = "250.8" } ; { SECONDARY_DIAGNOSIS_5 = "2508" } ; { SECONDARY_DIAGNOSIS_5 = "250.82" } ; { SECONDARY_DIAGNOSIS_5 = "25082" } ; { SECONDARY_DIAGNOSIS_5 = "250.9" } ; { SECONDARY_DIAGNOSIS_5 = "2509" } ; { SECONDARY_DIAGNOSIS_5 = "250.90" } ; { SECONDARY_DIAGNOSIS_5 = "25090" } ; { SECONDARY_DIAGNOSIS_5 = "250.92" } ; { SECONDARY_DIAGNOSIS_5 = "25092" } ; { SECONDARY_DIAGNOSIS_5 = "357.2" } ; { SECONDARY_DIAGNOSIS_5 = "3572" } ; { SECONDARY_DIAGNOSIS_5 = "362.0" } ; { SECONDARY_DIAGNOSIS_5 = "3620" } ; { SECONDARY_DIAGNOSIS_5 = "362.01" } ; { SECONDARY_DIAGNOSIS_5 = "36201" } ; { SECONDARY_DIAGNOSIS_5 = "362.02" } ; { SECONDARY_DIAGNOSIS_5 = "36202" } ; { SECONDARY_DIAGNOSIS_5 = "366.41" } ; { SECONDARY_DIAGNOSIS_5 = "36641" } ; { SECONDARY_DIAGNOSIS_5 = "369.9" } ; { SECONDARY_DIAGNOSIS_5 = "3699" } ; { SECONDARY_DIAGNOSIS_5 = "785.4" } ; { SECONDARY_DIAGNOSIS_5 = "7854" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_SEC_COMPLtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_COMPLtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_SEC_COMPLtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_COMPLtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_SEC_COMPL (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_COMPLtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_SEC_COMPL
+
+PostproMATRICE_DIAB_HOSP_SEC_COMPL (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_COMPL
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_SEC_INSDEV from HOSP
+
+RESULTDIAB_HOSP_SEC_INSDEVtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { SECONDARY_DIAGNOSIS_1 = "V45.85" } ; { SECONDARY_DIAGNOSIS_1 = "V4585" } ; { SECONDARY_DIAGNOSIS_1 = "V53.91" } ; { SECONDARY_DIAGNOSIS_1 = "V5391" } ; { SECONDARY_DIAGNOSIS_1 = "V58.67" } ; { SECONDARY_DIAGNOSIS_1 = "V5867" } ; { SECONDARY_DIAGNOSIS_1 = "V65.46" } ; { SECONDARY_DIAGNOSIS_1 = "V6546" } ; { SECONDARY_DIAGNOSIS_2 = "V45.85" } ; { SECONDARY_DIAGNOSIS_2 = "V4585" } ; { SECONDARY_DIAGNOSIS_2 = "V53.91" } ; { SECONDARY_DIAGNOSIS_2 = "V5391" } ; { SECONDARY_DIAGNOSIS_2 = "V58.67" } ; { SECONDARY_DIAGNOSIS_2 = "V5867" } ; { SECONDARY_DIAGNOSIS_2 = "V65.46" } ; { SECONDARY_DIAGNOSIS_2 = "V6546" } ; { SECONDARY_DIAGNOSIS_3 = "V45.85" } ; { SECONDARY_DIAGNOSIS_3 = "V4585" } ; { SECONDARY_DIAGNOSIS_3 = "V53.91" } ; { SECONDARY_DIAGNOSIS_3 = "V5391" } ; { SECONDARY_DIAGNOSIS_3 = "V58.67" } ; { SECONDARY_DIAGNOSIS_3 = "V5867" } ; { SECONDARY_DIAGNOSIS_3 = "V65.46" } ; { SECONDARY_DIAGNOSIS_3 = "V6546" } ; { SECONDARY_DIAGNOSIS_4 = "V45.85" } ; { SECONDARY_DIAGNOSIS_4 = "V4585" } ; { SECONDARY_DIAGNOSIS_4 = "V53.91" } ; { SECONDARY_DIAGNOSIS_4 = "V5391" } ; { SECONDARY_DIAGNOSIS_4 = "V58.67" } ; { SECONDARY_DIAGNOSIS_4 = "V5867" } ; { SECONDARY_DIAGNOSIS_4 = "V65.46" } ; { SECONDARY_DIAGNOSIS_4 = "V6546" } ; { SECONDARY_DIAGNOSIS_5 = "V45.85" } ; { SECONDARY_DIAGNOSIS_5 = "V4585" } ; { SECONDARY_DIAGNOSIS_5 = "V53.91" } ; { SECONDARY_DIAGNOSIS_5 = "V5391" } ; { SECONDARY_DIAGNOSIS_5 = "V58.67" } ; { SECONDARY_DIAGNOSIS_5 = "V5867" } ; { SECONDARY_DIAGNOSIS_5 = "V65.46" } ; { SECONDARY_DIAGNOSIS_5 = "V6546" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_SEC_INSDEVtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_INSDEVtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_SEC_INSDEVtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_INSDEVtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_SEC_INSDEV (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_INSDEVtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_SEC_INSDEV
+
+PostproMATRICE_DIAB_HOSP_SEC_INSDEV (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_INSDEV
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_SEC_T2 from HOSP
+
+RESULTDIAB_HOSP_SEC_T2toClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { SECONDARY_DIAGNOSIS_1 = "250.00" } ; { SECONDARY_DIAGNOSIS_1 = "25000" } ; { SECONDARY_DIAGNOSIS_1 = "250.02" } ; { SECONDARY_DIAGNOSIS_1 = "25002" } ; { SECONDARY_DIAGNOSIS_1 = "250.10" } ; { SECONDARY_DIAGNOSIS_1 = "25010" } ; { SECONDARY_DIAGNOSIS_1 = "250.12" } ; { SECONDARY_DIAGNOSIS_1 = "25012" } ; { SECONDARY_DIAGNOSIS_1 = "250.20" } ; { SECONDARY_DIAGNOSIS_1 = "25020" } ; { SECONDARY_DIAGNOSIS_1 = "250.22" } ; { SECONDARY_DIAGNOSIS_1 = "25022" } ; { SECONDARY_DIAGNOSIS_1 = "250.30" } ; { SECONDARY_DIAGNOSIS_1 = "25030" } ; { SECONDARY_DIAGNOSIS_1 = "250.32" } ; { SECONDARY_DIAGNOSIS_1 = "25032" } ; { SECONDARY_DIAGNOSIS_1 = "250.40" } ; { SECONDARY_DIAGNOSIS_1 = "25040" } ; { SECONDARY_DIAGNOSIS_1 = "250.42" } ; { SECONDARY_DIAGNOSIS_1 = "25042" } ; { SECONDARY_DIAGNOSIS_1 = "250.50" } ; { SECONDARY_DIAGNOSIS_1 = "25050" } ; { SECONDARY_DIAGNOSIS_1 = "250.52" } ; { SECONDARY_DIAGNOSIS_1 = "25052" } ; { SECONDARY_DIAGNOSIS_1 = "250.60" } ; { SECONDARY_DIAGNOSIS_1 = "25060" } ; { SECONDARY_DIAGNOSIS_1 = "250.62" } ; { SECONDARY_DIAGNOSIS_1 = "25062" } ; { SECONDARY_DIAGNOSIS_1 = "250.70" } ; { SECONDARY_DIAGNOSIS_1 = "25070" } ; { SECONDARY_DIAGNOSIS_1 = "250.72" } ; { SECONDARY_DIAGNOSIS_1 = "25072" } ; { SECONDARY_DIAGNOSIS_1 = "250.80" } ; { SECONDARY_DIAGNOSIS_1 = "25080" } ; { SECONDARY_DIAGNOSIS_1 = "250.82" } ; { SECONDARY_DIAGNOSIS_1 = "25082" } ; { SECONDARY_DIAGNOSIS_1 = "250.90" } ; { SECONDARY_DIAGNOSIS_1 = "25090" } ; { SECONDARY_DIAGNOSIS_1 = "250.92" } ; { SECONDARY_DIAGNOSIS_1 = "25092" } ; { SECONDARY_DIAGNOSIS_2 = "250.00" } ; { SECONDARY_DIAGNOSIS_2 = "25000" } ; { SECONDARY_DIAGNOSIS_2 = "250.02" } ; { SECONDARY_DIAGNOSIS_2 = "25002" } ; { SECONDARY_DIAGNOSIS_2 = "250.10" } ; { SECONDARY_DIAGNOSIS_2 = "25010" } ; { SECONDARY_DIAGNOSIS_2 = "250.12" } ; { SECONDARY_DIAGNOSIS_2 = "25012" } ; { SECONDARY_DIAGNOSIS_2 = "250.20" } ; { SECONDARY_DIAGNOSIS_2 = "25020" } ; { SECONDARY_DIAGNOSIS_2 = "250.22" } ; { SECONDARY_DIAGNOSIS_2 = "25022" } ; { SECONDARY_DIAGNOSIS_2 = "250.30" } ; { SECONDARY_DIAGNOSIS_2 = "25030" } ; { SECONDARY_DIAGNOSIS_2 = "250.32" } ; { SECONDARY_DIAGNOSIS_2 = "25032" } ; { SECONDARY_DIAGNOSIS_2 = "250.40" } ; { SECONDARY_DIAGNOSIS_2 = "25040" } ; { SECONDARY_DIAGNOSIS_2 = "250.42" } ; { SECONDARY_DIAGNOSIS_2 = "25042" } ; { SECONDARY_DIAGNOSIS_2 = "250.50" } ; { SECONDARY_DIAGNOSIS_2 = "25050" } ; { SECONDARY_DIAGNOSIS_2 = "250.52" } ; { SECONDARY_DIAGNOSIS_2 = "25052" } ; { SECONDARY_DIAGNOSIS_2 = "250.60" } ; { SECONDARY_DIAGNOSIS_2 = "25060" } ; { SECONDARY_DIAGNOSIS_2 = "250.62" } ; { SECONDARY_DIAGNOSIS_2 = "25062" } ; { SECONDARY_DIAGNOSIS_2 = "250.70" } ; { SECONDARY_DIAGNOSIS_2 = "25070" } ; { SECONDARY_DIAGNOSIS_2 = "250.72" } ; { SECONDARY_DIAGNOSIS_2 = "25072" } ; { SECONDARY_DIAGNOSIS_2 = "250.80" } ; { SECONDARY_DIAGNOSIS_2 = "25080" } ; { SECONDARY_DIAGNOSIS_2 = "250.82" } ; { SECONDARY_DIAGNOSIS_2 = "25082" } ; { SECONDARY_DIAGNOSIS_2 = "250.90" } ; { SECONDARY_DIAGNOSIS_2 = "25090" } ; { SECONDARY_DIAGNOSIS_2 = "250.92" } ; { SECONDARY_DIAGNOSIS_2 = "25092" } ; { SECONDARY_DIAGNOSIS_3 = "250.00" } ; { SECONDARY_DIAGNOSIS_3 = "25000" } ; { SECONDARY_DIAGNOSIS_3 = "250.02" } ; { SECONDARY_DIAGNOSIS_3 = "25002" } ; { SECONDARY_DIAGNOSIS_3 = "250.10" } ; { SECONDARY_DIAGNOSIS_3 = "25010" } ; { SECONDARY_DIAGNOSIS_3 = "250.12" } ; { SECONDARY_DIAGNOSIS_3 = "25012" } ; { SECONDARY_DIAGNOSIS_3 = "250.20" } ; { SECONDARY_DIAGNOSIS_3 = "25020" } ; { SECONDARY_DIAGNOSIS_3 = "250.22" } ; { SECONDARY_DIAGNOSIS_3 = "25022" } ; { SECONDARY_DIAGNOSIS_3 = "250.30" } ; { SECONDARY_DIAGNOSIS_3 = "25030" } ; { SECONDARY_DIAGNOSIS_3 = "250.32" } ; { SECONDARY_DIAGNOSIS_3 = "25032" } ; { SECONDARY_DIAGNOSIS_3 = "250.40" } ; { SECONDARY_DIAGNOSIS_3 = "25040" } ; { SECONDARY_DIAGNOSIS_3 = "250.42" } ; { SECONDARY_DIAGNOSIS_3 = "25042" } ; { SECONDARY_DIAGNOSIS_3 = "250.50" } ; { SECONDARY_DIAGNOSIS_3 = "25050" } ; { SECONDARY_DIAGNOSIS_3 = "250.52" } ; { SECONDARY_DIAGNOSIS_3 = "25052" } ; { SECONDARY_DIAGNOSIS_3 = "250.60" } ; { SECONDARY_DIAGNOSIS_3 = "25060" } ; { SECONDARY_DIAGNOSIS_3 = "250.62" } ; { SECONDARY_DIAGNOSIS_3 = "25062" } ; { SECONDARY_DIAGNOSIS_3 = "250.70" } ; { SECONDARY_DIAGNOSIS_3 = "25070" } ; { SECONDARY_DIAGNOSIS_3 = "250.72" } ; { SECONDARY_DIAGNOSIS_3 = "25072" } ; { SECONDARY_DIAGNOSIS_3 = "250.80" } ; { SECONDARY_DIAGNOSIS_3 = "25080" } ; { SECONDARY_DIAGNOSIS_3 = "250.82" } ; { SECONDARY_DIAGNOSIS_3 = "25082" } ; { SECONDARY_DIAGNOSIS_3 = "250.90" } ; { SECONDARY_DIAGNOSIS_3 = "25090" } ; { SECONDARY_DIAGNOSIS_3 = "250.92" } ; { SECONDARY_DIAGNOSIS_3 = "25092" } ; { SECONDARY_DIAGNOSIS_4 = "250.00" } ; { SECONDARY_DIAGNOSIS_4 = "25000" } ; { SECONDARY_DIAGNOSIS_4 = "250.02" } ; { SECONDARY_DIAGNOSIS_4 = "25002" } ; { SECONDARY_DIAGNOSIS_4 = "250.10" } ; { SECONDARY_DIAGNOSIS_4 = "25010" } ; { SECONDARY_DIAGNOSIS_4 = "250.12" } ; { SECONDARY_DIAGNOSIS_4 = "25012" } ; { SECONDARY_DIAGNOSIS_4 = "250.20" } ; { SECONDARY_DIAGNOSIS_4 = "25020" } ; { SECONDARY_DIAGNOSIS_4 = "250.22" } ; { SECONDARY_DIAGNOSIS_4 = "25022" } ; { SECONDARY_DIAGNOSIS_4 = "250.30" } ; { SECONDARY_DIAGNOSIS_4 = "25030" } ; { SECONDARY_DIAGNOSIS_4 = "250.32" } ; { SECONDARY_DIAGNOSIS_4 = "25032" } ; { SECONDARY_DIAGNOSIS_4 = "250.40" } ; { SECONDARY_DIAGNOSIS_4 = "25040" } ; { SECONDARY_DIAGNOSIS_4 = "250.42" } ; { SECONDARY_DIAGNOSIS_4 = "25042" } ; { SECONDARY_DIAGNOSIS_4 = "250.50" } ; { SECONDARY_DIAGNOSIS_4 = "25050" } ; { SECONDARY_DIAGNOSIS_4 = "250.52" } ; { SECONDARY_DIAGNOSIS_4 = "25052" } ; { SECONDARY_DIAGNOSIS_4 = "250.60" } ; { SECONDARY_DIAGNOSIS_4 = "25060" } ; { SECONDARY_DIAGNOSIS_4 = "250.62" } ; { SECONDARY_DIAGNOSIS_4 = "25062" } ; { SECONDARY_DIAGNOSIS_4 = "250.70" } ; { SECONDARY_DIAGNOSIS_4 = "25070" } ; { SECONDARY_DIAGNOSIS_4 = "250.72" } ; { SECONDARY_DIAGNOSIS_4 = "25072" } ; { SECONDARY_DIAGNOSIS_4 = "250.80" } ; { SECONDARY_DIAGNOSIS_4 = "25080" } ; { SECONDARY_DIAGNOSIS_4 = "250.82" } ; { SECONDARY_DIAGNOSIS_4 = "25082" } ; { SECONDARY_DIAGNOSIS_4 = "250.90" } ; { SECONDARY_DIAGNOSIS_4 = "25090" } ; { SECONDARY_DIAGNOSIS_4 = "250.92" } ; { SECONDARY_DIAGNOSIS_4 = "25092" } ; { SECONDARY_DIAGNOSIS_5 = "250.00" } ; { SECONDARY_DIAGNOSIS_5 = "25000" } ; { SECONDARY_DIAGNOSIS_5 = "250.02" } ; { SECONDARY_DIAGNOSIS_5 = "25002" } ; { SECONDARY_DIAGNOSIS_5 = "250.10" } ; { SECONDARY_DIAGNOSIS_5 = "25010" } ; { SECONDARY_DIAGNOSIS_5 = "250.12" } ; { SECONDARY_DIAGNOSIS_5 = "25012" } ; { SECONDARY_DIAGNOSIS_5 = "250.20" } ; { SECONDARY_DIAGNOSIS_5 = "25020" } ; { SECONDARY_DIAGNOSIS_5 = "250.22" } ; { SECONDARY_DIAGNOSIS_5 = "25022" } ; { SECONDARY_DIAGNOSIS_5 = "250.30" } ; { SECONDARY_DIAGNOSIS_5 = "25030" } ; { SECONDARY_DIAGNOSIS_5 = "250.32" } ; { SECONDARY_DIAGNOSIS_5 = "25032" } ; { SECONDARY_DIAGNOSIS_5 = "250.40" } ; { SECONDARY_DIAGNOSIS_5 = "25040" } ; { SECONDARY_DIAGNOSIS_5 = "250.42" } ; { SECONDARY_DIAGNOSIS_5 = "25042" } ; { SECONDARY_DIAGNOSIS_5 = "250.50" } ; { SECONDARY_DIAGNOSIS_5 = "25050" } ; { SECONDARY_DIAGNOSIS_5 = "250.52" } ; { SECONDARY_DIAGNOSIS_5 = "25052" } ; { SECONDARY_DIAGNOSIS_5 = "250.60" } ; { SECONDARY_DIAGNOSIS_5 = "25060" } ; { SECONDARY_DIAGNOSIS_5 = "250.62" } ; { SECONDARY_DIAGNOSIS_5 = "25062" } ; { SECONDARY_DIAGNOSIS_5 = "250.70" } ; { SECONDARY_DIAGNOSIS_5 = "25070" } ; { SECONDARY_DIAGNOSIS_5 = "250.72" } ; { SECONDARY_DIAGNOSIS_5 = "25072" } ; { SECONDARY_DIAGNOSIS_5 = "250.80" } ; { SECONDARY_DIAGNOSIS_5 = "25080" } ; { SECONDARY_DIAGNOSIS_5 = "250.82" } ; { SECONDARY_DIAGNOSIS_5 = "25082" } ; { SECONDARY_DIAGNOSIS_5 = "250.90" } ; { SECONDARY_DIAGNOSIS_5 = "25090" } ; { SECONDARY_DIAGNOSIS_5 = "250.92" } ; { SECONDARY_DIAGNOSIS_5 = "25092" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_SEC_T2toDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_T2toClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_SEC_T2toRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_T2toDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_SEC_T2 (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_T2toRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_SEC_T2
+
+PostproMATRICE_DIAB_HOSP_SEC_T2 (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_T2
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_HOSP_SEC_UNSPEC from HOSP
+
+RESULTDIAB_HOSP_SEC_UNSPECtoClean (FilterModule)
+inputs
+custom = HOSP
+parameters
+conditions = [{PERSON_ID = MISSING} ; { SECONDARY_DIAGNOSIS_1 matches "250*" } ; { SECONDARY_DIAGNOSIS_1 matches "250*" } ; { SECONDARY_DIAGNOSIS_2 matches "250*" } ; { SECONDARY_DIAGNOSIS_2 matches "250*" } ; { SECONDARY_DIAGNOSIS_3 matches "250*" } ; { SECONDARY_DIAGNOSIS_3 matches "250*" } ; { SECONDARY_DIAGNOSIS_4 matches "250*" } ; { SECONDARY_DIAGNOSIS_4 matches "250*" } ; { SECONDARY_DIAGNOSIS_5 matches "250*" } ; { SECONDARY_DIAGNOSIS_5 matches "250*" }]
+boolExpr= OR
+end
+
+RESULTDIAB_HOSP_SEC_UNSPECtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_UNSPECtoClean
+parameters
+inputAttributes = [ START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_HOSP_SEC_UNSPECtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_UNSPECtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_HOSP_SEC_UNSPEC (DropModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_UNSPECtoRefine
+parameters
+params = [   AUTOPTIC , BIRTH_WEIGTH , BOOKING_DATE , CITIZENSHIP , DATE_MAIN_PROC , DH_CAUSE , DRG , END_DATE , EXTERNAL_CAUSE , LENGTH_DH , MAIN_DIAGNOSIS , MAIN_PROC , MARITAL_STATUS , ORIGIN , PRIORITY , REGIME , SECONDARY_DIAGNOSIS_1 , SECONDARY_DIAGNOSIS_2 , SECONDARY_DIAGNOSIS_3 , SECONDARY_DIAGNOSIS_4 , SECONDARY_DIAGNOSIS_5 , SECONDARY_PROC_1 , SECONDARY_PROC_2 , SECONDARY_PROC_3 , SECONDARY_PROC_4 , SECONDARY_PROC_5 , START_DATE , TRAUMA , TYPE , TYPE_DISCHARGE , VALUE , WARD_DISCHARGE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_HOSP_SEC_UNSPEC
+
+PostproMATRICE_DIAB_HOSP_SEC_UNSPEC (FileOutputModule)
+inputs
+custom = RESULTDIAB_HOSP_SEC_UNSPEC
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_Hba1c from OUTPAT
+
+RESULTDIAB_Hba1ctoClean (FilterModule)
+inputs
+custom = OUTPAT
+parameters
+conditions = [{PERSON_ID = MISSING} ; { PROC_COD = "90.28.1" } ; { PROC_COD = "90281" }]
+boolExpr= OR
+end
+
+RESULTDIAB_Hba1ctoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_Hba1ctoClean
+parameters
+inputAttributes = [ PROC_START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_Hba1ctoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_Hba1ctoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_Hba1c (DropModule)
+inputs
+custom = RESULTDIAB_Hba1ctoRefine
+parameters
+params = [   DIAGNOSIS , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FIRST_ACCESS , GROUP_CODE , LHU_PROVIDER_CONCEPT_ID , MAX_WAITING_TIME , NUMBER_OF_PROC , PROC_BOOKING_DATE , PROC_COD , PROC_DATE , PROC_END_DATE , PROC_PRESCRIPTION , PROC_START_DATE , QUANTITY , REG_PROVIDER_ID , TYPE_PROC , VALUE , WARD_CODE , Aux ]
+end
+
+
+
+// Output RESULTDIAB_Hba1c
+
+PostproMATRICE_DIAB_Hba1c (FileOutputModule)
+inputs
+custom = RESULTDIAB_Hba1c
+parameters
+checksum = none
+compression = none
+end
+
+// create result of selection rule DIAB_VISIT from VISIT
+
+RESULTDIAB_VISITtoClean (FilterModule)
+inputs
+custom = VISIT
+parameters
+conditions = [{PERSON_ID = MISSING} ; { GROUP_CODE = "505" } ; { GROUP_CODE = "505" }]
+boolExpr= OR
+end
+
+RESULTDIAB_VISITtoDrop (RenameAttributesModule)
+inputs
+custom = RESULTDIAB_VISITtoClean
+parameters
+inputAttributes = [ PROC_START_DATE ]
+outputAttributes   = [ MINDATE ]
+end
+
+
+
+RESULTDIAB_VISITtoRefine (ExtendDataModule)
+inputs
+custom = RESULTDIAB_VISITtoDrop
+parameters
+  attributes = [ {DURATION: float} ]
+end
+
+RESULTDIAB_VISIT (DropModule)
+inputs
+custom = RESULTDIAB_VISITtoRefine
+parameters
+params = [   DIAGNOSIS , EXEMPTION_CODE , EXEMPTION_LOWWAGE , FIRST_ACCESS , GROUP_CODE , LHU_PROVIDER_CONCEPT_ID , MAX_WAITING_TIME , NUMBER_OF_PROC , PROC_BOOKING_DATE , PROC_COD , PROC_DATE , PROC_END_DATE , PROC_PRESCRIPTION , PROC_START_DATE , QUANTITY , REG_PROVIDER_ID , TYPE_PROC , VALUE , WARD_CODE , Aux , IsGeneralVisit ]
+end
+
+
+
+// Output RESULTDIAB_VISIT
+
+PostproMATRICE_DIAB_VISIT (FileOutputModule)
+inputs
+custom = RESULTDIAB_VISIT
+parameters
+checksum = none
+compression = none
+end
+postprocessMATRICE_1_select.txt
+
+1 of 1
+Displaying postprocessMATRICE_1_select.txt.

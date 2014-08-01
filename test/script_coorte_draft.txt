@@ -1,0 +1,38 @@
+//residenti vivi alla data DATE
+
+// Carica i parametri
+
+Parameters_Loader (ParametersModule)
+parameters 
+   params = [ {DATE : date}]
+end
+
+
+// Carica il file dei residenti
+Inhabitants_File (ScriptInputModule)
+parameters
+  scriptFilename = LoadPERSON.txt
+  inputName = PERSONFile
+  expectedSchema =  IADperson
+end
+
+
+// Filtra i residenti vivi alla data DATE
+Filter_Prevalent_Inhabitants (FilterModule)
+inputs
+   IADperson = Inhabitants_File
+parameters
+   conditions = [{DATE_OF_DEATH > $DATE};
+                     {DATE_OF_BIRTH <= $DATE};
+                       {STARTDATE<= $DATE};
+                       {ENDDATE > $DATE}]
+   boolExpr = AND
+end
+
+Prevalent_Inhabitants (ExtendDataModule)
+inputs
+ IADperson = Filter_Prevalent_Inhabitants
+parameters 
+ attributes = [ { Prevalent : boolean = true } ]
+end
+

@@ -1,0 +1,791 @@
+/***
+ *This script version has a wrong extend at the end, used as a test for the semantics checking code 
+ ***/
+HOSP (ScriptInputModule)
+parameters
+	scriptFilename = LoadHOSP.txt
+	inputName = HOSP
+	expectedSchema = IADhosp
+end
+EXE (ScriptInputModule)
+parameters
+	scriptFilename = LoadEXE.txt
+	inputName = EXE
+	expectedSchema = IADexe
+end
+PERSON (ScriptInputModule)
+parameters
+	scriptFilename = LoadPERSON.txt
+	inputName = PERSON
+	expectedSchema = IADperson
+end
+DRUGS (ScriptInputModule)
+parameters
+	scriptFilename = LoadDRUGS.txt
+	inputName = DRUGS
+	expectedSchema = IADdrug
+end
+OUTPAT (ScriptInputModule)
+parameters
+	scriptFilename = LoadOUTPAT.txt
+	inputName = OUTPAT
+	expectedSchema = IADoutpat
+end
+DDRUG (ScriptInputModule)
+parameters
+	scriptFilename = LoadDDRUG.txt
+	inputName = DDRUG
+	expectedSchema = IADdrug
+end
+
+// PREVALENT: mark prevalent at date 2011-01-01 
+ClFinalPrev12M (ExtendDataModule)
+inputs
+	IADperson = PERSON
+parameters
+  attributes = [ {IsPrev12M : boolean } ]
+end
+FinalPrev12M (ApplyFunction)
+inputs
+	custom = ClFinalPrev12M
+parameters
+	function = Id(true)
+	result   = IsPrev12M
+	conditions = [ {ENDDATE > 2011-01-01};{STARTDATE <= 2011-01-01} ]
+	boolExpr = AND
+end
+
+// PREVALENT: mark prevalent at date 2011-12-31
+ClFinalPrevDATEENDFUP (ExtendDataModule)
+inputs
+	custom = FinalPrev12M
+parameters
+  attributes = [ {IsPrevDATEENDFUP : boolean } ]
+end
+FinalPrevDATEENDFUP (ApplyFunction)
+inputs
+	custom = ClFinalPrevDATEENDFUP
+parameters
+	function = Id(true)
+	result   = IsPrevDATEENDFUP
+	conditions = [ {ENDDATE > 2011-12-31};{STARTDATE <= 2011-12-31} ]
+	boolExpr = AND
+end
+
+// PREVALENT: filter prevalent at either date 2011-01-01 or date 2011-12-31
+Cohort (FilterModule)
+inputs
+	custom = FinalPrevDATEENDFUP
+parameters
+	conditions = [{IsPrev12M = true};{IsPrevDATEENDFUP = true}]
+	boolExpr = OR
+end
+
+// DIAB: select from source HOSP 
+FFirst_DIAB_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  matches "250*"};{SECONDARY_DIAGNOSIS_1 matches "250*"};{SECONDARY_DIAGNOSIS_2 matches "250*"};{SECONDARY_DIAGNOSIS_3 matches "250*"};{SECONDARY_DIAGNOSIS_4 matches "250*"};{SECONDARY_DIAGNOSIS_5 matches "250*"}]
+	boolExpr = OR 
+end
+sortedFirst_DIAB_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_DIAB_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_DIAB_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_DIAB_HOSP : date } ]
+end
+
+// DIAB: select from source DRUGS 
+FFirst_DIAB_DRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+ClYearFirst_DIAB_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGS
+parameters
+  attributes = [ { YearFirst_DIAB_DRUGS: int } ]
+end
+YearFirst_DIAB_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DIAB_DRUGS
+	
+	
+end
+sortedYearFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+end
+NumberFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_DIAB_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DIAB_DRUGS : int };{ DateFirstFirst_DIAB_DRUGS : date } ]
+end
+FilterTwoFirst_DIAB_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DRUGS
+parameters
+	conditions = [{NumberFirst_DIAB_DRUGS>1}]
+	
+end
+FinalFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DRUGS) ]
+	results =  [ {First_DIAB_DRUGS : date} ]
+end
+
+// DIAB: select from source DDRUG 
+FFirst_DIAB_DDRUG (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+ClYearFirst_DIAB_DDRUG (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DDRUG
+parameters
+  attributes = [ { YearFirst_DIAB_DDRUG: int } ]
+end
+YearFirst_DIAB_DDRUG (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DDRUG
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_DIAB_DDRUG
+	
+	
+end
+sortedYearFirst_DIAB_DDRUG (SortModule)
+inputs
+	custom = YearFirst_DIAB_DDRUG
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DDRUG ]
+end
+NumberFirst_DIAB_DDRUG (AggregateModule)
+inputs
+	custom = sortedYearFirst_DIAB_DDRUG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DDRUG ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_DIAB_DDRUG : int };{ DateFirstFirst_DIAB_DDRUG : date } ]
+end
+FilterTwoFirst_DIAB_DDRUG (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DDRUG
+parameters
+	conditions = [{NumberFirst_DIAB_DDRUG>1}]
+	
+end
+FinalFirst_DIAB_DDRUG (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DDRUG
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DDRUG) ]
+	results =  [ {First_DIAB_DDRUG : date} ]
+end
+
+// DIAB: select from source EXE 
+FFirst_DIAB_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*250"}]
+	
+end
+sortedFirst_DIAB_EXE (SortModule)
+inputs
+	IADexe = FFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_DIAB_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_DIAB_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_DIAB_EXE : date } ]
+end
+
+// IHD: select from source HOSP 
+FFirst_IHD_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS = MISSING};{MAIN_DIAGNOSIS  matches "410*"};{SECONDARY_DIAGNOSIS_1 matches "410*"};{SECONDARY_DIAGNOSIS_2 matches "410*"};{SECONDARY_DIAGNOSIS_3 matches "410*"};{SECONDARY_DIAGNOSIS_4 matches "410*"};{SECONDARY_DIAGNOSIS_5 matches "410*"};{MAIN_DIAGNOSIS  matches "411*"};{SECONDARY_DIAGNOSIS_1 matches "411*"};{SECONDARY_DIAGNOSIS_2 matches "411*"};{SECONDARY_DIAGNOSIS_3 matches "411*"};{SECONDARY_DIAGNOSIS_4 matches "411*"};{SECONDARY_DIAGNOSIS_5 matches "411*"};{MAIN_DIAGNOSIS  matches "412*"};{SECONDARY_DIAGNOSIS_1 matches "412*"};{SECONDARY_DIAGNOSIS_2 matches "412*"};{SECONDARY_DIAGNOSIS_3 matches "412*"};{SECONDARY_DIAGNOSIS_4 matches "412*"};{SECONDARY_DIAGNOSIS_5 matches "412*"};{MAIN_DIAGNOSIS  matches "413*"};{SECONDARY_DIAGNOSIS_1 matches "413*"};{SECONDARY_DIAGNOSIS_2 matches "413*"};{SECONDARY_DIAGNOSIS_3 matches "413*"};{SECONDARY_DIAGNOSIS_4 matches "413*"};{SECONDARY_DIAGNOSIS_5 matches "413*"};{MAIN_DIAGNOSIS  matches "414*"};{SECONDARY_DIAGNOSIS_1 matches "414*"};{SECONDARY_DIAGNOSIS_2 matches "414*"};{SECONDARY_DIAGNOSIS_3 matches "414*"};{SECONDARY_DIAGNOSIS_4 matches "414*"};{SECONDARY_DIAGNOSIS_5 matches "414*"}]
+	boolExpr = OR 
+end
+sortedFirst_IHD_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_IHD_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_IHD_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_IHD_HOSP : date } ]
+end
+
+// IHD: select from source DRUGS 
+FFirst_IHD_DRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+ClYearFirst_IHD_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_IHD_DRUGS
+parameters
+  attributes = [ { YearFirst_IHD_DRUGS: int } ]
+end
+YearFirst_IHD_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_IHD_DRUGS
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_IHD_DRUGS
+	
+	
+end
+sortedYearFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = YearFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_IHD_DRUGS ]
+end
+NumberFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = sortedYearFirst_IHD_DRUGS
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_IHD_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_IHD_DRUGS : int };{ DateFirstFirst_IHD_DRUGS : date } ]
+end
+FilterTwoFirst_IHD_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_IHD_DRUGS
+parameters
+	conditions = [{NumberFirst_IHD_DRUGS>1}]
+	
+end
+FinalFirst_IHD_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_IHD_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_IHD_DRUGS) ]
+	results =  [ {First_IHD_DRUGS : date} ]
+end
+
+// IHD: select from source DDRUG 
+FFirst_IHD_DDRUG (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "C01DA*"}]
+	
+end
+ClYearFirst_IHD_DDRUG (ExtendDataModule)
+inputs
+	IADdrug = FFirst_IHD_DDRUG
+parameters
+  attributes = [ { YearFirst_IHD_DDRUG: int } ]
+end
+YearFirst_IHD_DDRUG (ApplyFunction)
+inputs
+	custom = ClYearFirst_IHD_DDRUG
+parameters
+	function = Year(DRUG_DISPENSING_DATE)
+	result   = YearFirst_IHD_DDRUG
+	
+	
+end
+sortedYearFirst_IHD_DDRUG (SortModule)
+inputs
+	custom = YearFirst_IHD_DDRUG
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_IHD_DDRUG ]
+end
+NumberFirst_IHD_DDRUG (AggregateModule)
+inputs
+	custom = sortedYearFirst_IHD_DDRUG
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_IHD_DDRUG ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_DISPENSING_DATE) ]
+	results =  [ { NumberFirst_IHD_DDRUG : int };{ DateFirstFirst_IHD_DDRUG : date } ]
+end
+FilterTwoFirst_IHD_DDRUG (FilterModule)
+inputs
+	custom = NumberFirst_IHD_DDRUG
+parameters
+	conditions = [{NumberFirst_IHD_DDRUG>1}]
+	
+end
+FinalFirst_IHD_DDRUG (AggregateModule)
+inputs
+	custom = FilterTwoFirst_IHD_DDRUG
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_IHD_DDRUG) ]
+	results =  [ {First_IHD_DDRUG : date} ]
+end
+
+// IHD: select from source EXE 
+FFirst_IHD_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*414"}]
+	
+end
+sortedFirst_IHD_EXE (SortModule)
+inputs
+	IADexe = FFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_IHD_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_IHD_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_IHD_EXE : date } ]
+end
+
+// HF: select from source HOSP 
+FFirst_HF_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  = MISSING };{MAIN_DIAGNOSIS  matches "428*"};{SECONDARY_DIAGNOSIS_1 matches "428*"};{SECONDARY_DIAGNOSIS_2 matches "428*"};{SECONDARY_DIAGNOSIS_3 matches "428*"};{SECONDARY_DIAGNOSIS_4 matches "428*"};{SECONDARY_DIAGNOSIS_5 matches "428*"};{MAIN_DIAGNOSIS  matches "39891*"};{SECONDARY_DIAGNOSIS_1 matches "39891*"};{SECONDARY_DIAGNOSIS_2 matches "39891*"};{SECONDARY_DIAGNOSIS_3 matches "39891*"};{SECONDARY_DIAGNOSIS_4 matches "39891*"};{SECONDARY_DIAGNOSIS_5 matches "39891*"};{MAIN_DIAGNOSIS  matches "40201*"};{SECONDARY_DIAGNOSIS_1 matches "40201*"};{SECONDARY_DIAGNOSIS_2 matches "40201*"};{SECONDARY_DIAGNOSIS_3 matches "40201*"};{SECONDARY_DIAGNOSIS_4 matches "40201*"};{SECONDARY_DIAGNOSIS_5 matches "40201*"};{MAIN_DIAGNOSIS  matches "40211*"};{SECONDARY_DIAGNOSIS_1 matches "40211*"};{SECONDARY_DIAGNOSIS_2 matches "40211*"};{SECONDARY_DIAGNOSIS_3 matches "40211*"};{SECONDARY_DIAGNOSIS_4 matches "40211*"};{SECONDARY_DIAGNOSIS_5 matches "40211*"};{MAIN_DIAGNOSIS  matches "40291*"};{SECONDARY_DIAGNOSIS_1 matches "40291*"};{SECONDARY_DIAGNOSIS_2 matches "40291*"};{SECONDARY_DIAGNOSIS_3 matches "40291*"};{SECONDARY_DIAGNOSIS_4 matches "40291*"};{SECONDARY_DIAGNOSIS_5 matches "40291*"};{MAIN_DIAGNOSIS  matches "40401*"};{SECONDARY_DIAGNOSIS_1 matches "40401*"};{SECONDARY_DIAGNOSIS_2 matches "40401*"};{SECONDARY_DIAGNOSIS_3 matches "40401*"};{SECONDARY_DIAGNOSIS_4 matches "40401*"};{SECONDARY_DIAGNOSIS_5 matches "40401*"};{MAIN_DIAGNOSIS  matches "40403*"};{SECONDARY_DIAGNOSIS_1 matches "40403*"};{SECONDARY_DIAGNOSIS_2 matches "40403*"};{SECONDARY_DIAGNOSIS_3 matches "40403*"};{SECONDARY_DIAGNOSIS_4 matches "40403*"};{SECONDARY_DIAGNOSIS_5 matches "40403*"};{MAIN_DIAGNOSIS  matches "40411*"};{SECONDARY_DIAGNOSIS_1 matches "40411*"};{SECONDARY_DIAGNOSIS_2 matches "40411*"};{SECONDARY_DIAGNOSIS_3 matches "40411*"};{SECONDARY_DIAGNOSIS_4 matches "40411*"};{SECONDARY_DIAGNOSIS_5 matches "40411*"};{MAIN_DIAGNOSIS  matches "40413*"};{SECONDARY_DIAGNOSIS_1 matches "40413*"};{SECONDARY_DIAGNOSIS_2 matches "40413*"};{SECONDARY_DIAGNOSIS_3 matches "40413*"};{SECONDARY_DIAGNOSIS_4 matches "40413*"};{SECONDARY_DIAGNOSIS_5 matches "40413*"};{MAIN_DIAGNOSIS  matches "40491*"};{SECONDARY_DIAGNOSIS_1 matches "40491*"};{SECONDARY_DIAGNOSIS_2 matches "40491*"};{SECONDARY_DIAGNOSIS_3 matches "40491*"};{SECONDARY_DIAGNOSIS_4 matches "40491*"};{SECONDARY_DIAGNOSIS_5 matches "40491*"};{MAIN_DIAGNOSIS  matches "40493*"};{SECONDARY_DIAGNOSIS_1 matches "40493*"};{SECONDARY_DIAGNOSIS_2 matches "40493*"};{SECONDARY_DIAGNOSIS_3 matches "40493*"};{SECONDARY_DIAGNOSIS_4 matches "40493*"};{SECONDARY_DIAGNOSIS_5 matches "40493*"}]
+	boolExpr = OR 
+end
+sortedFirst_HF_HOSP (SortModule)
+inputs
+	IADhosp = FFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+FinalFirst_HF_HOSP (AggregateModule)
+inputs
+	IADhosp = sortedFirst_HF_HOSP
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_HF_HOSP : date } ]
+end
+
+// HF: select from source EXE 
+FFirst_HF_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*428"}]
+	
+end
+sortedFirst_HF_EXE (SortModule)
+inputs
+	IADexe = FFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_HF_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HF_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HF_EXE : date } ]
+end
+
+// HYPERTE: select from source EXE 
+FFirst_HYPERTE_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*401"};{EXEMPTION_CODE  matches "*402"};{EXEMPTION_CODE  matches "*403"};{EXEMPTION_CODE  matches "*404"};{EXEMPTION_CODE  matches "*405"}]
+	boolExpr = OR 
+end
+sortedFirst_HYPERTE_EXE (SortModule)
+inputs
+	IADexe = FFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalFirst_HYPERTE_EXE (AggregateModule)
+inputs
+	IADexe = sortedFirst_HYPERTE_EXE
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_HYPERTE_EXE : date } ]
+end
+
+// FINAL: join Cohort with sources for diaseases
+sortedCohort (SortModule)
+inputs
+	custom = Cohort
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_DIAB_HOSP (SortModule)
+inputs
+	custom = FinalFirst_DIAB_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_1 (MergeModule)
+inputs
+	custom = sortedCohort
+	custom = sortedFinalFirst_DIAB_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_DIAB_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_2 (MergeModule)
+inputs
+	custom = Cohort_1
+	custom = sortedFinalFirst_DIAB_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_DIAB_DDRUG (SortModule)
+inputs
+	custom = FinalFirst_DIAB_DDRUG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_3 (MergeModule)
+inputs
+	custom = Cohort_2
+	custom = sortedFinalFirst_DIAB_DDRUG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_DIAB_EXE (SortModule)
+inputs
+	custom = FinalFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_4 (MergeModule)
+inputs
+	custom = Cohort_3
+	custom = sortedFinalFirst_DIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_IHD_HOSP (SortModule)
+inputs
+	custom = FinalFirst_IHD_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_5 (MergeModule)
+inputs
+	custom = Cohort_4
+	custom = sortedFinalFirst_IHD_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_IHD_DRUGS (SortModule)
+inputs
+	custom = FinalFirst_IHD_DRUGS
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_6 (MergeModule)
+inputs
+	custom = Cohort_5
+	custom = sortedFinalFirst_IHD_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_IHD_DDRUG (SortModule)
+inputs
+	custom = FinalFirst_IHD_DDRUG
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_7 (MergeModule)
+inputs
+	custom = Cohort_6
+	custom = sortedFinalFirst_IHD_DDRUG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_IHD_EXE (SortModule)
+inputs
+	custom = FinalFirst_IHD_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_8 (MergeModule)
+inputs
+	custom = Cohort_7
+	custom = sortedFinalFirst_IHD_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_HF_HOSP (SortModule)
+inputs
+	custom = FinalFirst_HF_HOSP
+parameters
+	fieldNames = [ PATIENT_ID ]
+end
+Cohort_9 (MergeModule)
+inputs
+	custom = Cohort_8
+	custom = sortedFinalFirst_HF_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+sortedFinalFirst_HF_EXE (SortModule)
+inputs
+	custom = FinalFirst_HF_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+Cohort_10 (MergeModule)
+inputs
+	custom = Cohort_9
+	custom = sortedFinalFirst_HF_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+sortedFinalFirst_HYPERTE_EXE (SortModule)
+inputs
+	custom = FinalFirst_HYPERTE_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+FinalJoinPrev (MergeModule)
+inputs
+	custom = Cohort_10
+	custom = sortedFinalFirst_HYPERTE_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// FINAL: gen diseases date 
+ClFinalDiseasesDate (ExtendDataModule)
+inputs
+	custom = FinalJoinPrev
+parameters
+  attributes = [  {DateDIAB: date }; {DateIHD: date }; {DateHF: date }; {DateHYPERTE: date } ]
+end
+FinalDiseasesDate_1 (ApplyFunction)
+inputs
+	custom = ClFinalDiseasesDate
+parameters
+	function = MIN( First_DIAB_HOSP, First_DIAB_DRUGS, First_DIAB_DDRUG, First_DIAB_EXE ) 
+	result   = DateDIAB
+	
+	
+end
+FinalDiseasesDate_2 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_1
+parameters
+	function = MIN( First_IHD_HOSP, First_IHD_DRUGS, First_IHD_DDRUG, First_IHD_EXE ) 
+	result   = DateIHD
+	
+	
+end
+FinalDiseasesDate_3 (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_2
+parameters
+	function = MIN( First_HF_HOSP, First_HF_EXE ) 
+	result   = DateHF
+	
+	
+end
+FinalDiseasesDate (ApplyFunction)
+inputs
+	custom = FinalDiseasesDate_3
+parameters
+	function = MIN( First_HYPERTE_EXE ) 
+	result   = DateHYPERTE
+	
+	
+end
+
+// FINAL: generate prevalent for diseases at 2011-01-01 
+ClDiseasesPrev (ExtendDataModule)
+inputs
+	custom = FinalDiseasesDate
+parameters
+  attributes = [  { DIABPrev : boolean = false }; { IHDPrev : boolean = false }; { HFPrev : boolean = false }; { HYPERTEPrev : boolean = false } ]
+end
+DiseasesPrev_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrev
+parameters
+	function = Id(true)
+	result   = DIABPrev
+	conditions = [ { DateDIAB < 2011-01-01 } ]
+	
+end
+DiseasesPrev_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_1
+parameters
+	function = Id(true)
+	result   = IHDPrev
+	conditions = [ { DateIHD < 2011-01-01 } ]
+	
+end
+DiseasesPrev_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrev_2
+parameters
+	function = Id(true)
+	result   = HFPrev
+	conditions = [ { DateHF < 2011-01-01 } ]
+	
+end
+DiseasesPrev (ApplyFunction)
+inputs
+	custom = DiseasesPrev_3
+parameters
+	function = Id(true)
+	result   = HYPERTEPrev
+	conditions = [ { DateHYPERTE < 2011-01-01 } ]
+	
+end
+
+// FINAL: generate prevalent for diseases at 2011-12-31 
+ClDiseasesPrevFinal (ExtendDataModule)
+inputs
+	custom = DiseasesPrev
+parameters
+  attributes = [  { DIABPrevENDFUP : boolean = false }; { IHDPrevENDFUP : boolean = false }; { HFPrevENDFUP : boolean = false }; { HYPERTEPrevENDFUP : boolean = false } ]
+end
+DiseasesPrevFinal_1 (ApplyFunction)
+inputs
+	custom = ClDiseasesPrevFinal
+parameters
+	function = Id(true)
+	result   = DIABPrevENDFUP
+	conditions = [ { DateDIAB < 2011-12-31 } ]
+	
+end
+DiseasesPrevFinal_2 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_1
+parameters
+	function = Id(true)
+	result   = IHDPrevENDFUP
+	conditions = [ { DateIHD < 2011-12-31 } ]
+	
+end
+DiseasesPrevFinal_3 (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_2
+parameters
+	function = Id(true)
+	result   = HFPrevENDFUP
+	conditions = [ { DateHF < 2011-12-31 } ]
+	
+end
+DiseasesPrevFinal (ApplyFunction)
+inputs
+	custom = DiseasesPrevFinal_3
+parameters
+	function = Id(true)
+	result   = HYPERTEPrevENDFUP
+	conditions = [ { DateHYPERTE < 2011-12-31 } ]
+	
+end
+
+// FINAL: rename variables
+RenamedFile (RenameAttributesModule)
+inputs
+	custom = DiseasesPrevFinal
+parameters
+	inputAttributes = [ PERSON_ID,DATE_OF_BIRTH, DATE_OF_DEATH,GENDER_CONCEPT_ID,STARTDATE, ENDDATE,BIRTH_LOCATION_CONCEPT_ID, CENSUS_LOCATION_CONCEPT_ID, LOCATION_CONCEPT_ID, LHU_LOCATION_CONCEPT_ID, GP_ID, STARTDATE_GP, IsPrev12M,IsPrevDATEENDFUP,DateDIAB,DIABPrev,DIABPrevENDFUP,DateIHD,IHDPrev,IHDPrevENDFUP,DateHF,HFPrev,HFPrevENDFUP,DateHYPERTE,HYPERTEPrev,HYPERTEPrevENDFUP ]
+	outputAttributes   = [ ID_SOGGETTO,DATA_NASCITA,DATA_MORTE,SESSO,DATA_INGRESSO, DATA_USCITA,CITTADINANZA,SEZIONE,COMUNE,DISTRETTO_RESIDENZA,MMG, DATA_MMG,IN_CARICO12M,IN_CARICO,DATA_DIAGN_DIAB,STADIO_DIAB_12M,STADIO_DIAB,DATA_DIAGN_IHD,STADIO_IHD_12M,STADIO_IHD,DATA_DIAGN_HF,STADIO_HF_12M,STADIO_HF,DATA_DIAGN_HYPERTE,STADIO_HYPERTE_12M,STADIO_HYPERTE ]
+end
+
+
+
+// FINAL: gen empty variables (temporary)
+FullVariables (ExtendDataModule)
+inputs
+	custom = RenamedFile
+parameters
+  attributes = [ {PROVA: string} ;{DISTRETTO_MMG: string } ;{DENSITA_COMUNE: string } ;{INDIRIZZO: string } ;{ENDDATE_GP: string } ;{STARTDATE_LHU: string } ;{ENDDATE_LHU: string } ;{INDICE_DEPRIVAZ: string } ;{MMG_12M: string } ;{NOME_FORMAASSOCIATIVA: string } ;{TIPO_FORMAASSOCIATIVA: string } ;{NUM_ESENZIONI: string } ;{FONTI_DIAB: string } ;{ESENZIONE_DIAB: string } ;{FONTI_HYPERTE: string } ;{ESENZIONE_HYPERTE: string } ;{ESENZIONE_IHD: string } ;{ESENZIONE_HF: string } ;{DATA_PRIMA_PRESCR_ANTICOLIN: string } ;{ANTICOLIN_12M: string } ;{ANTICOLIN_24M: string } ;{DATA_PRIMA_PRESCR_MEMANT: string } ;{ESENZIONE_DEMENZE: string } ;{TARIFFA_LORDO_ASS_SPEC_G: string } ;{TARIFFA_LORDO_DIA_IMM: string } ;{TARIFFA_LORDO_DIA_LIB: string } ;{TARIFFA_LORDO_ALTRO: string } ;{TARIFFA_LORDO_FARMACI: string } ;{TARIFFA_LORDO_OSPACDRGMED: string } ;{TARIFFA_LORDO_OSPACDRGCHIR: string } ;{TARIFFA_LORDO_OSPNAC: string } ;{TARIFFA_LORDO_OSPDHDRGMED: string } ;{TARIFFA_LORDO_OSPDHDRGCHIR: string } ;{TARIFFA_LORDO_OSPDHPOSTACUTO: string } ;{TARIFFA_LORDO_VISITE: string } ;{TARIFFA_LORDO_DIA_STRUM: string } ;{NUM_PRESC_FARM: string } ;{NUM_RIC: string } ;{NUM_CREATININ_DIAB: string } ;{NUM_EMOGLIC_DIAB: string } ;{NUM_MICROALB_DIAB: string } ;{NUM_PROFLIP_DIAB: string } ;{NUM_FUNDOC_DIAB: string } ;{NUM_STATINE_DIAB: string } ;{DEN_CREATININ_DIAB: string } ;{DEN_EMOGLIC_DIAB: string } ;{DEN_MICROALB_DIAB: string } ;{DEN_PROFLIP_DIAB: string } ;{DEN_FUNDOC_DIAB: string } ;{DEN_STATINE_DIAB: string } ;{NUM_CREATININ_HYPERTE: string } ;{NUM_PROFLIP_HYPERTE: string } ;{NUM_MICROALB_HYPERTE: string } ;{NUM_ECG_HYPERTE: string } ;{NUM_GLICEM_HYPERTE: string } ;{DEN_CREATININ_HYPERTE: string } ;{DEN_PROFLIP_HYPERTE: string } ;{DEN_MICROALB_HYPERTE: string } ;{DEN_ECG_HYPERTE: string } ;{DEN_GLICEM_HYPERTE: string } ;{NUM_PROFLIP_IHD: string } ;{NUM_GLICEM_IHD: string } ;{NUM_ACEINIB_IHD: string } ;{NUM_ANTIAGGREG_IHD: string } ;{NUM_BETABLOC_IHD: string } ;{NUM_STATINE_IHD: string } ;{NUM_ECG_IHD: string } ;{NUM_ERGOMETR_IHD: string } ;{DEN_PROFLIP_IHD: string } ;{DEN_GLICEM_IHD: string } ;{DEN_ACEINIB_IHD: string } ;{DEN_ANTIAGGREG_IHD: string } ;{DEN_BETABLOC_IHD: string } ;{DEN_STATINE_IHD: string } ;{DEN_ECG_IHD: string } ;{DEN_ERGOMETR_IHD: string } ;{NUM_CREATNAK_HF: string } ;{NUM_NAKDIUR_HF: string } ;{NUM_ACEINIB_HF: string } ;{NUM_BETABLOC_HF: string } ;{NUM_ECG_HF: string } ;{NUM_WALKTEST_HF: string } ;{NUM_BNP_HF: string } ;{DEN_CREATNAK_HF: string } ;{DEN_NAKDIUR_HF: string } ;{DEN_ACEINIB_HF: string } ;{DEN_BETABLOC_HF: string } ;{DEN_ECG_HF: string } ;{DEN_WALKTEST_HF: string } ;{DEN_BNP_HF: string } ;{NUM_ECG_DEMEN: string } ;{NUM_VISNEURO_DEMEN: string } ;{NUM_TESTMEM_DEMEN: string } ;{NUM_EMATOCHIM_DEMEN: string } ;{NUM_NEUROLATIP_DEMEN: string } ;{NUM_NEUROLTIP_DEMEN: string } ;{NUM_ASSDOM_DEMEN: string } ;{NUM_ASSRES_DEMEN: string } ;{NUM_ASSREDEM_DEMEN: string } ;{NUM_ASSSEMIRES_DEMEN: string } ;{NUM_ASSSEMIREDEM_DEMEN: string } ;{NUM_NEUROLATIVSTI_DEMEN: string } ;{DEN_ECG_DEMEN: string } ;{DEN_VISNEURO_DEMEN: string } ;{DEN_TESTMEM_DEMEN: string } ;{DEN_EMATOCHIM_DEMEN: string } ;{DEN_NEUROLATIP_DEMEN: string } ;{DEN_NEUROLTIP_DEMEN: string } ;{DEN_ASSDOM_DEMEN: string } ;{DEN_ASSRES_DEMEN: string } ;{DEN_ASSREDEM_DEMEN: string } ;{DEN_ASSSEMIRES_DEMEN: string } ;{DEN_ASSSEMIREDEM_DEMEN: string } ;{DEN_NEUROLATIVSTI_DEMEN: string } ]
+end
+
+// FINAL: gen constant variables (dates)
+WithConstantDates (ExtendDataModule)
+inputs
+	custom = FullVariables
+parameters
+  attributes = [ {DATA: date = 2011-01-01};{DATA_AGG: date =2012-12-31} ]
+end

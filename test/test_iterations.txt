@@ -1,0 +1,46 @@
+
+EXE (FileInputModule)
+parameters
+	// inputFileName = EXE_VUOTO.csv
+	inputFileName = FILE_TEST_BIVIO.csv
+	inputSchema   = IADexe
+end
+
+sortedExe (SortModule)
+inputs
+	IADexe = EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+BeforeOUT (FileOutputModule)
+inputs
+	IADexe = sortedExe
+parameters
+	checksum = none
+	compression = none
+end
+
+FILTER (FilterModule)
+inputs
+	IADexe = sortedExe
+parameters
+	conditions = [{EXE_END_DATE  > 2000-02-15}]
+end
+
+
+DROP (DropModule)
+inputs
+	IADexe = FILTER 
+parameters
+	params = [EXE_END_DATE]
+end
+
+AfterOUT (FileOutputModule)
+inputs
+	custom = DROP
+parameters
+	checksum = none
+	compression = none
+end
+

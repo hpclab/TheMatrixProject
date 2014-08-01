@@ -1,0 +1,25 @@
+AGGREGATE_TEST_FILE (FileInputModule)
+parameters
+	  inputFileName = AGGREGATE_TEST_2.csv
+      inputSchema   = AggregateTestSchema
+end
+
+TestAggregate (AggregateModule)
+inputs
+	AggregateTestSchema = AGGREGATE_TEST_FILE
+parameters
+	isInputSorted = true
+	groupBy =  [ REPEATED_INT ]
+	functions = [ MAX(INT) ]
+	results =  [ { RESULT : int } ]
+end
+
+/*
+TestFilter (FilterModule)
+inputs
+	AggregateTestSchema = TestAggregate
+parameters
+	conditions = [{ RESULT > 1 }] 
+	filterType = discard
+end
+*/

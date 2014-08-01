@@ -1,0 +1,59 @@
+
+EXE (FileInputModule)
+parameters
+	inputFileName = EXE_TEST.csv
+	inputSchema   = IADexe
+end
+
+
+/*
+filter (FilterModule)
+inputs
+  IADexe = EXE
+parameters
+  conditions = [{PERSON_ID>"10"}]
+  filterType = keep
+end
+*/
+
+
+extend (ExtendDataModule)
+inputs
+	IADexe = EXE
+parameters
+  attributes = [ { IsGeneralVisit: boolean = false} ]
+end
+
+
+sort (SortModule)
+inputs
+	IADexe = extend
+parameters
+	fieldNames = [EXEMPTION_CODE]
+end
+
+
+BeforeOUT (FileOutputModule)
+inputs
+	IADexe = sort
+parameters
+	checksum = none
+	compression = none
+end
+
+
+DROP (DropModule)
+inputs
+	IADexe = extend
+parameters
+	params = [EXE_END_DATE]
+end
+
+AfterOUT (FileOutputModule)
+inputs
+	custom = DROP
+parameters
+	checksum = none
+	compression = none
+end
+

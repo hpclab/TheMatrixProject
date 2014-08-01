@@ -1,0 +1,14 @@
+FILEA (FileInputModule)
+parameters
+ inputFileName = MERGEY_1K2F.csv
+ inputSchema = TestSchemaY
+ end
+
+ 
+ RENAME (RenameAttributesModule) 
+ inputs 
+   TestSchemaY = FILEA
+ parameters
+   inputAttributes = [ EXTKEY, ATTRIBUTEY ]
+   outputAttributes = [ PIPPO, PLUTO ]
+ end

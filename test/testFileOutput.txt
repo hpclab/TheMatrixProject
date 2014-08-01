@@ -1,0 +1,31 @@
+DRUGSFile (FileInputModule)
+parameters
+      inputFileName = PRODUCTMAP_TEST.csv
+      inputSchema   = IADdrug
+end
+
+
+DROP (DropModule)
+inputs
+	IADdrug = DRUGSFile
+parameters
+	params = [DRUG_EXPOSURE_START_DATE]
+end
+
+
+TEST_FILE_OUTPUT2 (FileOutputModule)
+inputs 
+	custom = DROP
+parameters
+	checksum = none
+	compression = none
+end
+
+
+TEST_FILE_OUTPUT (FileOutputModule)
+inputs 
+	custom = DROP
+parameters
+	checksum = none
+	compression = none
+end

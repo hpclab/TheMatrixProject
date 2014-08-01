@@ -1,0 +1,67 @@
+/* test of EXTENDDATAMODULE with function identity of different types: should always complete
+ */
+
+FILEP (FileInputModule)
+parameters
+      inputFileName = EXE.csv
+      inputSchema   = IADexe
+end
+
+
+// FINAL: gen diseases date 
+ClFinalDiseasesDate (ExtendDataModule)
+inputs
+	IADexe = FILEP
+parameters
+  attributes = [  {DateDIAB1: date }; {DateZibibbo2 : date}; {DateIHD3: date }; {DateHF4: date }; {DateHYPERTE5: date }; {DateMarroni6 : date} ]
+end
+
+/* Houston, why the new columns are added in reverse sorted order.... ????
+*/
+
+/*
+// date
+APPLY1 (ApplyFunction)
+inputs
+	IADoutpat = FILEP
+parameters
+	function = Id(PROC_START_DATE)
+	result   = PROC_END_DATE
+end
+
+// int
+APPLY2 (ApplyFunction)
+inputs
+	IADoutpat = APPLY1
+parameters
+	function = Id(PERSON_ID)
+	result   = GROUP_CODE
+end
+
+// string
+APPLY3 (ApplyFunction)
+inputs
+	IADoutpat = APPLY2
+parameters
+	function = Id(PROC_COD)
+	result   = WARD_CODE
+end
+
+// boolean
+APPLY4 (ApplyFunction)
+inputs
+	IADoutpat = APPLY3
+parameters
+	function = Id(MAX_WAITING_TIME)
+	result   = EXEMPTION_LOWWAGE
+end
+
+// float  (may be tricky, same field...)
+APPLY5 (ApplyFunction)
+inputs
+	IADoutpat = APPLY4
+parameters
+	function = Id(VALUE)
+	result   = VALUE
+end
+*/

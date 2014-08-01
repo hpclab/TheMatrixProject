@@ -1,0 +1,21 @@
+FILEX (FileInputModule)
+parameters
+      inputFileName = MERGEX_1K2F.csv
+      inputSchema   = TestSchemaX
+end
+
+FILEY (FileInputModule)
+parameters
+      inputFileName = MERGEY_B_1K2F.csv
+      inputSchema   = TestSchemaY
+end
+
+// FINAL: join the list of persons with sources for diabetes
+MERGEOUTPUT (MergeModule)
+inputs
+	TestSchemaX = FILEX
+	TestSchemaY = FILEY
+parameters
+	primaryKey = [ KEY ]
+	fieldNames = [ EXTKEY ]
+end

@@ -1,0 +1,14 @@
+PROVA_INPUT (FileInputModule)
+parameters
+      inputFileName = PRODUCTMAP_TEST.csv
+      inputSchema   = IADdrug
+end
+
+
+TEST_FILE_OUTPUT (FileOutputModule)
+inputs 
+	IADdrug = PROVA_INPUT
+parameters
+	checksum = none
+	compression = none
+end

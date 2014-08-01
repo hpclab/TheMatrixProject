@@ -1,0 +1,243 @@
+// questo script crea la lista dei pazienti con almeno un ricovero per diabete o almeno due prescrizioni di farmaci antidiabetici, con la piu’ bassa data tra i due
+
+// PREAMBOLO: parametri
+
+// Carica i parametri
+Parameters_Loader (ParametersModule)
+parameters
+  params = [ {DATE : date}]
+end
+
+
+// CREAZIONE DATASET PRIMI RICOVERI
+
+//si riferisce al file delle ospedalizzazioni
+Hosp_File (ScriptInputModule)
+parameters
+   scriptFilename = LoadHOSP.txt
+  // scriptParams = [$DATEUPDATE]
+   inputName = HOSPFile
+   expectedSchema = IADhosp
+end
+
+// filtra i ricoveri per diabete
+Filter_Diabetes_Discharges (FilterModule)
+inputs
+  IADhosp = Hosp_File
+parameters
+  conditions = [{MAIN_DIAGNOSIS  matches "250*"}]
+end
+
+// sceglie il primo ricovero per diabete
+First_Diabetes_Discharge (AggregateModule)
+inputs
+  IADhosp = Filter_Diabetes_Discharges
+parameters
+  isInputSorted = false
+  groupBy =  [ PATIENT_ID ]
+  functions = [ MIN( END_DATE ) ]
+ results =  [ { DateFirstDiabetesDischarge : date } ]
+end
+
+
+// CREAZIONE DATASET PRESCRIZIONI
+
+//si riferisce al file delle prescrizioni farmaceutiche
+Drug_File (ScriptInputModule)
+parameters
+   scriptFilename = LoadDRUGS.txt
+     inputName = DRUGSFile
+   expectedSchema = IADdrug
+end
+
+
+// filtra le prescrizioni di farmaci antidiabetici
+Filter_Antidiabetic_Prescriptions (FilterModule)
+inputs
+  IADdrug = Drug_File
+parameters
+  conditions = [{ATC  matches "A10*"}]
+end
+
+//genera l’anno di prescrizione
+Antidiabetic_Prescriptions_ExtendedYear  (ExtendDataModule)
+inputs
+   IADdrug = Filter_Antidiabetic_Prescriptions
+parameters
+   attributes = [ { PrescriptionYear : int  } ]
+end
+
+
+Antidiabetic_Prescriptions_Year (ApplyFunction)
+inputs
+ custom = Antidiabetic_Prescriptions_ExtendedYear
+parameters
+ function = Year ( DRUG_EXPOSURE_START_DATE)
+ result   = PrescriptionYear
+end
+
+
+// conta le prescrizioni annue
+Number_Antidiabetic_Prescritions (AggregateModule)
+inputs
+  custom = Antidiabetic_Prescriptions_Year
+parameters
+  isInputSorted = false
+
+  groupBy =  [ PERSON_ID, PrescriptionYear]
+  functions = [ COUNT( PERSON_ID ), SUM(DURATION) , MIN(DRUG_EXPOSURE_START_DATE) , MAX(DRUG_EXPOSURE_START_DATE)]
+ results =  [ { NumberAntidiabeticPrescriptions : int };{ TotalDuration : int };{ DateFirstAntidiabeticPrescription : date };{ DateLastAntidiabeticPrescription : int } ]
+end
+
+// filtra i soggetti con abbastanza prescrizioni in almeno un anno
+Filter_Enough_Antidiabetic_Prescriptions (FilterModule)
+inputs
+  custom = Number_Antidiabetic_Prescritions
+parameters
+  conditions = [{NumberAntidiabeticPrescriptions>1 } ]
+end
+
+// sceglie la prima prescrizione per diabete
+First_Diabetes_Prescription (AggregateModule)
+inputs
+  custom = Filter_Enough_Antidiabetic_Prescriptions
+parameters
+  isInputSorted = false
+  groupBy =  [ PATIENT_ID ]
+  functions = [ MIN( DateFirstAntidiabeticPrescription) ]
+ results =  [ { DateFirstAntidiabeticPrescription : date } ]
+end
+
+
+//JOIN DEI DUE PEZZI
+
+// marca tutte le righe del dataset dei ricoveri con una variabile booleana identicamente uguale a “true”
+Marked_Diabetes_Discharges  (ExtendDataModule)
+inputs
+   custom = First_Diabetes_Discharge
+parameters
+   attributes = [ { HadDischarge : boolean = true } ]
+end
+
+// ordina il file Marked_Diabetes_Discharges per PATIENT_ID (e' necessario per poi fare il join)
+Sorted_Diabetes_Discharges (SortModule)
+inputs
+  custom = Marked_Diabetes_Discharges
+parameters
+  fieldNames = [PATIENT_ID]
+end
+
+// marca tutte le righe del dataset delle prescrizioni con una variabile booleana identicamente uguale a “true”
+Marked_Antidiabetics_Prescriptions  (ExtendDataModule)
+inputs
+   custom = First_Diabetes_Prescription
+parameters
+   attributes = [ { HadPrescriptions : boolean = true } ]
+ end
+
+// ordina il file Marked_Antidiabetics_Prescriptions per PERSON_ID
+Sorted_Antidiabetics_Prescriptions  (SortModule)
+inputs
+  custom = Marked_Antidiabetics_Prescriptions
+parameters
+  fieldNames = [PERSON_ID]
+end
+
+// fa il join dei due file Sorted_Antidiabetics_Prescriptions e Sorted_Diabetes_Discharges; questo file dovrebbe avere tutti gli attributi non missing solo di quelle righe che provengono da entrambi i file; negli altri casi alcuni attributi sono missing
+Joined_Diabetes_Sources (MergeModule)
+inputs
+  custom = Sorted_Antidiabetics_Prescriptions
+ custom = Sorted_Diabetes_Discharges
+parameters
+  primaryKey = [PERSON_ID]
+  fieldNames = [PATIENT_ID]
+end
+
+/*
+
+Empty_Diabetes_Capture_Sources (ExtendDataModule)
+inputs
+ custom = Joined_Diabetes_Sources
+parameters
+ attributes = [ { DataSource: string } ]
+end
+
+Diabetes_Capture_Sources_CondHOSP (ApplyFunction)
+inputs
+ custom = Empty_Diabetes_Capture_Sources
+parameters
+ function = Id("HOSP")
+ result   = DataSource
+ conditions =  [{ HadDischarge = true }]
+end
+
+Diabetes_Capture_Sources (ApplyFunction)
+inputs
+ custom = Diabetes_Capture_Sources_CondHOSP
+parameters
+ function = Concat( DataSource,  " DRUG")
+ result   = DataSource
+ conditions = [{HadPrescriptions = true}]
+end
+
+Empty_DiabetesPatients (ExtendDataModule)
+inputs
+custom = Diabetes_Capture_Sources
+parameters
+attributes = [ {TrimmedDataSource: string }; { DateDiabetes: date } ]
+end
+
+
+DiabetesPatients_partial (ApplyFunction)
+inputs
+custom = Empty_DiabetesPatients
+parameters
+function = Trim(DataSource)
+result   = TrimmedDataSource
+end
+
+// definisce i prevalenti alla data $DATE
+DiabetesPatients_WithDate (ExtendDataModule)
+inputs
+custom = DiabetesPatients_partial
+parameters
+attributes = [ { DiabetesDate: date }]
+end
+
+DiabetesPatients (ApplyFunction)
+inputs
+custom = DiabetesPatients_WithDate
+parameters
+function = Min(DateFirstAntidiabeticPrescription,DateFirstDiabetesDischarge)
+result   = DiabetesDate
+end
+
+// definisce i prevalenti alla data $DATE
+EmptyPrevalentDiabetes(ExtendDataModule)
+inputs
+custom = DiabetesPatients
+parameters
+attributes = [ { PrevDiabetes: boolean= false }]
+end
+
+PrevalentDiabetesUnclean (ApplyFunction)
+inputs
+custom = EmptyPrevalentDiabetes
+parameters
+
+function = Id(true)
+
+result   =  PrevDiabetes
+
+conditions = [ { DiabetesDate<=$DATE}]
+end
+
+PrevalentDiabetes (FilterModule)
+inputs
+custom = PrevalentDiabetesUnclean
+parameters
+
+conditions = [ { PrevDiabetes = true }]
+end
+
+*/

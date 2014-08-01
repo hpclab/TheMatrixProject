@@ -1,0 +1,51 @@
+// file to test the buffer and multiple output behaviour
+
+FILEY (FileInputModule)
+parameters
+      inputFileName = BUFFERMULTI_1K2F.csv
+      inputSchema   = TestSchemaY
+end
+
+
+ONE (ApplyFunction)
+inputs
+	TestSchemaY = FILEY 
+parameters
+	function = Id("test")
+	result   = ATTRIBUTEY2
+end
+
+
+TWO (ApplyFunction)
+inputs
+	TestSchemaY = FILEY 
+parameters
+	function = Id("test")
+	result   = ATTRIBUTEY2
+end
+
+
+FILEOUTPUT_TEST_MULTI_1 (FileOutputModule)
+inputs 
+	TestSchemaY = ONE
+parameters
+	checksum = none
+	compression = none
+end
+
+FILEOUTPUT_TEST_MULTI_2 (FileOutputModule)
+inputs 
+	TestSchemaY = TWO
+parameters
+	checksum = none
+	compression = none
+end
+
+/*****
+// FINAL: join the two list, should make the full list back
+MERGEOUTPUT (UnionModule)
+inputs
+	TestSchemaY = ONE 
+	TestSchemaY = TWO
+end
+*****/

@@ -1,0 +1,170 @@
+HOSP (ScriptInputModule)
+parameters
+	scriptFilename = LoadHOSP.txt
+	inputName = HOSP
+	expectedSchema = IADhosp
+end
+EXE (ScriptInputModule)
+parameters
+	scriptFilename = LoadEXE.txt
+	inputName = EXE
+	expectedSchema = IADexe
+end
+PERSON (ScriptInputModule)
+parameters
+	scriptFilename = LoadPERSON.txt
+	inputName = PERSON
+	expectedSchema = IADperson
+end
+DRUGS (ScriptInputModule)
+parameters
+	scriptFilename = LoadDRUGS.txt
+	inputName = DRUGS
+	expectedSchema = IADdrug
+end
+
+/********************* ATTENZIONE : VANNO INSERITI DEI SORTING MODULE PRIMA DELLE AGGREGATE *********/
+
+// DIAB: select from source HOSP 
+FFirst_DIAB_HOSP (FilterModule)
+inputs
+	IADhosp = HOSP
+parameters
+	conditions = [{MAIN_DIAGNOSIS  matches "250*"};{SECONDARY_DIAGNOSIS_1 matches "250*"};{SECONDARY_DIAGNOSIS_2 matches "250*"};{SECONDARY_DIAGNOSIS_3 matches "250*"};{SECONDARY_DIAGNOSIS_4 matches "250*"};{SECONDARY_DIAGNOSIS_5 matches "250*"}]
+	boolExpr = OR 
+end
+
+FFirst_DIAB_HOSP_sorted (SortModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP
+parameters
+	fieldNames = [PATIENT_ID]
+end
+
+FinalFirst_DIAB_HOSP (AggregateModule)
+inputs
+	IADhosp = FFirst_DIAB_HOSP_sorted
+parameters
+	isInputSorted = false
+	groupBy =  [ PATIENT_ID ]
+	functions = [ MIN(START_DATE) ]
+	results =  [ { First_DIAB_HOSP : date } ]
+end
+
+// DIAB: select from source DRUGS 
+FFirst_DIAB_DRUGS (FilterModule)
+inputs
+	IADdrug = DRUGS
+parameters
+	conditions = [{ATC matches "A10*"}]
+	
+end
+ClYearFirst_DIAB_DRUGS (ExtendDataModule)
+inputs
+	IADdrug = FFirst_DIAB_DRUGS
+parameters
+  attributes = [ { YearFirst_DIAB_DRUGS: int } ]
+end
+YearFirst_DIAB_DRUGS (ApplyFunction)
+inputs
+	custom = ClYearFirst_DIAB_DRUGS
+parameters
+	function = Year (DRUG_EXPOSURE_START_DATE)
+	result   = YearFirst_DIAB_DRUGS
+	
+	
+end
+
+YearFirst_DIAB_DRUGS_sorted (SortModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS
+parameters
+	fieldNames = [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+end
+
+NumberFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = YearFirst_DIAB_DRUGS_sorted
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearFirst_DIAB_DRUGS ]
+	functions = [ COUNT( PERSON_ID ), MIN(DRUG_EXPOSURE_START_DATE) ]
+	results =  [ { NumberFirst_DIAB_DRUGS : int };{ DateFirstFirst_DIAB_DRUGS : date } ]
+end
+FilterTwoFirst_DIAB_DRUGS (FilterModule)
+inputs
+	custom = NumberFirst_DIAB_DRUGS
+parameters
+	conditions = [{NumberFirst_DIAB_DRUGS>1}]
+	
+end
+
+FinalFirst_DIAB_DRUGS (AggregateModule)
+inputs
+	custom = FilterTwoFirst_DIAB_DRUGS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstFirst_DIAB_DRUGS) ]
+	results =  [ {First_DIAB_DRUGS : date} ]
+end
+
+// DIAB: select from source EXE 
+FFirst_DIAB_EXE (FilterModule)
+inputs
+	IADexe = EXE
+parameters
+	conditions = [{EXEMPTION_CODE  matches "*250"}]
+	
+end
+
+FFirst_DIAB_EXE_sorted (SortModule)
+inputs
+	IADexe = FFirst_DIAB_EXE
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+FinalFirst_DIAB_EXE (AggregateModule)
+inputs
+	IADexe = FFirst_DIAB_EXE_sorted
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(EXE_START_DATE) ]
+	results =  [ { First_DIAB_EXE : date } ]
+end
+
+PERSON_sorted (SortModule)
+inputs
+	IADperson = PERSON
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+
+// FINAL: join the list of persons with sources for diabetes
+PERSON_1 (MergeModule)
+inputs
+	IADperson = PERSON_sorted
+	custom = FinalFirst_DIAB_HOSP
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PATIENT_ID ]
+end
+PERSON_2 (MergeModule)
+inputs
+	custom = PERSON_1
+	custom = FinalFirst_DIAB_DRUGS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+FinalJoinPrev (MergeModule)
+inputs
+	custom = PERSON_2
+	custom = FinalFirst_DIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end

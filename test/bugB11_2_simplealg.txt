@@ -1,0 +1,129 @@
+declareSchema IADvalidPERSON = [{PERSON_ID : string} ;  {N_GP : int } ; {MUNICIPALITY_GP : string } ; {GENDER_CONCEPT_ID : string } ; {YearIn : int } ; {YearOut : int } ; {AgeBand2009 : int } ; {AgeBand2012 : int }; {RowPERSON  : int}  ; {LHU_GP  : string}]
+
+declareSchema IADvalidEXE = [ { EXEMPTION_CODE : string } ; { EXE_END_DATE : date } ; { EXE_START_DATE : date } ; { PERSON_ID : string } ; {RowPERSON  : int}  ; {Aux : string} ]
+PERSONrow (FileInputModule)
+parameters
+	inputFileName = Valid_PERSON.csv
+	inputSchema   = IADvalidPERSON
+end
+
+PERSON (DropModule)
+inputs
+	IADvalidPERSON = PERSONrow
+parameters
+	params = [ RowPERSON ]
+end
+
+
+
+// Sort PERSON
+
+sortedPERSON (SortModule)
+inputs
+	custom = PERSON
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort (AggregateModule)
+inputs
+	custom = sortedPERSON
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(PERSON_ID) ]
+	results =  [ { Freq: int } ]
+end
+
+// input result from selection DIAB_EXE
+
+RESULTDIAB_EXE (ScriptInputModule)
+parameters
+	scriptFilename = bugB11_1_select.txt
+	inputName = PostproMATRICE_DIAB_EXE
+	expectedSchema = custom
+end
+
+// CREATE LIST OF SUBJECTS FOR EACH SIMPLE ALGORITHM
+
+// DIAB_EXE
+
+RESULTDIAB_EXEDIAB_EXE_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_EXE
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	boolExpr= OR
+end
+
+// DIAB_EXE: apply rule at least one
+
+sortedRESULTDIAB_EXEDIAB_EXE_fix (SortModule)
+inputs
+	custom = RESULTDIAB_EXEDIAB_EXE_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_EXE (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_EXEDIAB_EXE_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_EXE : date } ; { DateMaxDIAB_EXE : date } ]
+end
+
+// DIAB_EXE: dates
+
+SubjectsAlmostCleanDIAB_EXE (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_EXE
+parameters
+	inputAttributes = [ DateMinDIAB_EXE ]
+	outputAttributes   = [ DateDIAB_EXE ]
+end
+
+
+
+SubjectsCleanDIAB_EXE (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_EXE
+parameters
+	params = [ DateMaxDIAB_EXE ]
+end
+
+
+
+// Join all Simple Algorithms
+
+FinalJoinSimpleAlg (MergeModule)
+inputs
+	custom = UniqueCohort
+	custom = SubjectsCleanDIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// Join Simple Algorithms with PERSON
+
+FinalJoinSimpleAlgPERSON (MergeModule)
+inputs
+	custom = FinalJoinSimpleAlg
+	custom = PERSON
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// Output Subjects Simple Algorithms
+
+PostproMATRICE_2_SimpleAlgorithms (FileOutputModule)
+inputs
+	custom = FinalJoinSimpleAlgPERSON
+parameters
+	checksum = none
+	compression = none
+end

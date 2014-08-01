@@ -1,0 +1,28 @@
+/* test of declare schema : we redefine the test schemas for merge */
+
+declareSchema TestSchemaX = [ {KEY : int }; {ATTR_X : string}; {ATTR_X2 : string} ]
+declareSchema TestSchemaY = [ {EXTKEY : int }; {ATTRIBUTEY : string}; {ATTRIBUTEY2 : string} ]
+
+/*					.put(new Symbol<String>("KEY", null, DataType.INT))
+					.put(new Symbol<String>("ATTR_X", null, DataType.STRING))
+					.put(new Symbol<String>("ATTR_X2", null, DataType.STRING));
+
+					.put(new Symbol<String>("EXTKEY", null, DataType.INT))
+					.put(new Symbol<String>("ATTRIBUTEY", null, DataType.STRING))
+					.put(new Symbol<String>("ATTRIBUTEY2", null, DataType.STRING));
+
+*/
+
+FILEX (FileInputModule)
+parameters
+      inputFileName = MERGEX_1K2F.csv
+      inputSchema   = TestSchemaX
+end
+
+FILEOUTPUT_TEST_CUSTOM_OUT (FileOutputModule)
+inputs 
+	TestSchemaX = FILEX
+parameters
+	checksum = none
+	compression = none
+end

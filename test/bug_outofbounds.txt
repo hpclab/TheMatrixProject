@@ -1,0 +1,107 @@
+declareSchema bugschema = [{PERSON_ID : string} ;  {MINDATE : date } ; {DURATION : float } ]
+
+/*
+
+RESULTDIAB_Hba1c (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_Hba1c
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_VISIT
+
+RESULTDIAB_VISIT (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_VISIT
+	expectedSchema = custom
+end
+
+
+*/
+
+RESULTDIAB_Hba1c (FileInputModule)
+parameters
+	inputFileName = dati_bug_cast.csv
+	inputSchema   = bugschema
+end
+
+RESULTDIAB_VISIT (FileInputModule)
+parameters
+	inputFileName = dati_bug_outofbounds.csv
+	inputSchema   = bugschema
+end
+
+// DIAB_VISIT_Hba1c: apply rule [1] and [2] within 60 days
+
+CleanDIAB_VISIT_Hba1c1 (DropModule)
+inputs
+	bugschema = RESULTDIAB_Hba1c
+parameters
+	params = [ DURATION ]
+	end
+
+RenamedCleanDIAB_VISIT_Hba1c1 (RenameAttributesModule)
+inputs
+	custom = CleanDIAB_VISIT_Hba1c1
+parameters
+	inputAttributes = [ MINDATE ]
+	outputAttributes   = [ Date1 ]
+end
+
+
+
+SortedCleanDIAB_VISIT_Hba1c1 (SortModule)
+inputs
+	custom = RenamedCleanDIAB_VISIT_Hba1c1
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+CleanDIAB_VISIT_Hba1c2 (DropModule)
+inputs
+	bugschema = RESULTDIAB_VISIT
+parameters
+	params = [ DURATION ]
+end
+
+
+
+RenamedCleanDIAB_VISIT_Hba1c2 (RenameAttributesModule)
+inputs
+	custom = CleanDIAB_VISIT_Hba1c2
+parameters
+	inputAttributes = [ MINDATE ]
+	outputAttributes   = [ Date2 ]
+end
+
+
+
+SortedCleanDIAB_VISIT_Hba1c2 (SortModule)
+inputs
+	custom = RenamedCleanDIAB_VISIT_Hba1c2
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+ProductDIAB_VISIT_Hba1c (ProductModule)
+inputs
+	custom = SortedCleanDIAB_VISIT_Hba1c1
+	custom = SortedCleanDIAB_VISIT_Hba1c2
+parameters
+	IDfield = PERSON_ID
+	functions = [ elapsedTimeInRange(SortedCleanDIAB_VISIT_Hba1c1.Date1 , SortedCleanDIAB_VISIT_Hba1c2.Date2 , 0, 30)]
+	
+end
+
+
+SubjectsDIAB_VISIT_Hba1c (AggregateModule)
+inputs
+	custom = ProductDIAB_VISIT_Hba1c
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(Date2), MAX(Date2) ]
+	results =  [ { DateMinDIAB_VISIT_Hba1c : date } ; { DateMaxDIAB_VISIT_Hba1c : date } ]
+end

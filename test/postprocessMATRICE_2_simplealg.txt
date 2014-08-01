@@ -1,0 +1,2049 @@
+declareSchema IADvalidPERSON = [{PERSON_ID : string} ;  {N_GP : int } ; {MUNICIPALITY_GP : string } ; {GENDER_CONCEPT_ID : string } ; {YearIn : int } ; {YearOut : int } ; {AgeBand2009 : int } ; {AgeBand2012 : int }; {RowPERSON  : int}  ; {LHU_GP  : string}]
+
+declareSchema IADvalidHOSP = [ { AUTOPTIC : string } ; { BIRTH_WEIGTH : float } ; { BOOKING_DATE : date } ; { CITIZENSHIP : string } ; { DATE_MAIN_PROC : string } ; { DH_CAUSE : string } ; { DRG : string } ; { END_DATE : date } ; { EXTERNAL_CAUSE : string } ; { LENGTH_DH : int } ; { MAIN_DIAGNOSIS : string } ; { MAIN_PROC : string } ; { MARITAL_STATUS : string } ; { ORIGIN : string } ; { PERSON_ID : string } ; { PRIORITY : string } ; { REGIME : string } ; { SECONDARY_DIAGNOSIS_1 : string } ; { SECONDARY_DIAGNOSIS_2 : string } ; { SECONDARY_DIAGNOSIS_3 : string } ; { SECONDARY_DIAGNOSIS_4 : string } ; { SECONDARY_DIAGNOSIS_5 : string } ; { SECONDARY_PROC_1 : string } ; { SECONDARY_PROC_2 : string } ; { SECONDARY_PROC_3 : string } ; { SECONDARY_PROC_4 : string } ; { SECONDARY_PROC_5 : string } ; { START_DATE : date } ; { TRAUMA : string } ; { TYPE : string } ; { TYPE_DISCHARGE : string } ; { VALUE : float } ; { WARD_DISCHARGE : string } ; {RowPERSON  : int}  ]
+
+declareSchema IADvalidOUTPAT = [ { DIAGNOSIS : string } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FIRST_ACCESS : boolean } ; { GROUP_CODE : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { MAX_WAITING_TIME : boolean } ; { NUMBER_OF_PROC : int } ; { PERSON_ID : string } ; { PROC_BOOKING_DATE : date } ; { PROC_COD : string } ; { PROC_DATE : date } ; { PROC_END_DATE : date } ; { PROC_PRESCRIPTION : date } ; { PROC_START_DATE : date } ; { QUANTITY : int } ; { REG_PROVIDER_ID : string } ; { TYPE_PROC : string } ; { VALUE : float } ; { WARD_CODE : string } ; {RowPERSON  : int}  ; {Aux : string} ]
+
+declareSchema IADvalidEXE = [ { EXEMPTION_CODE : string } ; { EXE_END_DATE : date } ; { EXE_START_DATE : date } ; { PERSON_ID : string } ; {RowPERSON  : int}  ; {Aux : string} ]
+
+declareSchema IADvalidDRUGS = [ { ATC : string } ; { COST : float } ; { DRUG_DISPENSING_DATE : date } ; { DRUG_PRESCRIPTION : date } ; { DURATION : float } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FOREIGN_COUNTRY : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { NUMBER_OF_BOXES : float } ; { PERSON_ID : string } ; { PRODUCT_CODE : string } ; { REG_PROVIDER_ID : string } ; {RowPERSON  : int}  ; {duration_of_box : float} ]
+
+declareSchema IADvalidDDRUG = [ { ATC : string } ; { COST : float } ; { DRUG_DISPENSING_DATE : date } ; { DRUG_PRESCRIPTION : date } ; { DURATION : float } ; { EXEMPTION_CODE : string } ; { EXEMPTION_LOWWAGE : boolean } ; { FOREIGN_COUNTRY : string } ; { LHU_PROVIDER_CONCEPT_ID : string } ; { NUMBER_OF_BOXES : float } ; { PERSON_ID : string } ; { PRODUCT_CODE : string } ; { REG_PROVIDER_ID : string } ; {RowPERSON  : int}  ; {duration_of_box : float} ]
+
+
+PERSONrow (FileInputModule)
+parameters
+	inputFileName = Valid_PERSON.csv
+	inputSchema   = IADvalidPERSON
+end
+
+PERSON (DropModule)
+inputs
+	IADvalidPERSON = PERSONrow
+parameters
+	params = [ RowPERSON ]
+end
+
+
+
+// Sort PERSON
+
+sortedPERSON (SortModule)
+inputs
+	custom = PERSON
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort (AggregateModule)
+inputs
+	custom = sortedPERSON
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ COUNT(PERSON_ID) ]
+	results =  [ { Freq: int } ]
+end
+
+// input result from selection DIAB_DRUGS_INSULIN
+
+RESULTDIAB_DRUGS_INSULIN (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_DRUGS_INSULIN
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_DRUGS_ORAL
+
+RESULTDIAB_DRUGS_ORAL (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_DRUGS_ORAL
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_DRUGS_OTHER
+
+RESULTDIAB_DRUGS_OTHER (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_DRUGS_OTHER
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_EXE
+
+RESULTDIAB_EXE (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_EXE
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_DRG
+
+RESULTDIAB_HOSP_DRG (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_DRG
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_MAIN_COMPL
+
+RESULTDIAB_HOSP_MAIN_COMPL (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_MAIN_COMPL
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_MAIN_INSDEV
+
+RESULTDIAB_HOSP_MAIN_INSDEV (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_MAIN_INSDEV
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_MAIN_T2
+
+RESULTDIAB_HOSP_MAIN_T2 (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_MAIN_T2
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_MAIN_UNSPEC
+
+RESULTDIAB_HOSP_MAIN_UNSPEC (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_MAIN_UNSPEC
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_SEC_COMPL
+
+RESULTDIAB_HOSP_SEC_COMPL (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_SEC_COMPL
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_SEC_INSDEV
+
+RESULTDIAB_HOSP_SEC_INSDEV (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_SEC_INSDEV
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_SEC_T2
+
+RESULTDIAB_HOSP_SEC_T2 (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_SEC_T2
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_HOSP_SEC_UNSPEC
+
+RESULTDIAB_HOSP_SEC_UNSPEC (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_HOSP_SEC_UNSPEC
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_Hba1c
+
+RESULTDIAB_Hba1c (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_Hba1c
+	expectedSchema = custom
+end
+
+// input result from selection DIAB_VISIT
+
+RESULTDIAB_VISIT (ScriptInputModule)
+parameters
+	scriptFilename = postprocessMATRICE_1_select.txt
+	inputName = PostproMATRICE_DIAB_VISIT
+	expectedSchema = custom
+end
+
+// CREATE LIST OF SUBJECTS FOR EACH SIMPLE ALGORITHM
+
+// DIAB_EXE
+
+RESULTDIAB_EXEDIAB_EXE_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_EXE
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	boolExpr= OR
+end
+
+// DIAB_EXE: apply rule at least one
+
+sortedRESULTDIAB_EXEDIAB_EXE_fix (SortModule)
+inputs
+	custom = RESULTDIAB_EXEDIAB_EXE_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_EXE (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_EXEDIAB_EXE_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_EXE : date } ; { DateMaxDIAB_EXE : date } ]
+end
+
+// DIAB_EXE: dates
+
+SubjectsAlmostCleanDIAB_EXE (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_EXE
+parameters
+	inputAttributes = [ DateMinDIAB_EXE ]
+	outputAttributes   = [ DateDIAB_EXE ]
+end
+
+
+
+SubjectsCleanDIAB_EXE (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_EXE
+parameters
+	params = [ DateMaxDIAB_EXE ]
+end
+
+
+
+// DIAB_Hba1c
+
+RESULTDIAB_Hba1cDIAB_Hba1c_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_Hba1c
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	boolExpr= OR
+end
+
+// DIAB_Hba1c: apply rule at least two in 365 days
+
+ClYearDIAB_Hba1c (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_Hba1cDIAB_Hba1c_fix
+parameters
+  attributes = [ { YearDIAB_Hba1c: int } ]
+end
+
+YearDIAB_Hba1c (ApplyFunction)
+inputs
+	custom = ClYearDIAB_Hba1c
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_Hba1c
+	
+	
+end
+
+sortedYearDIAB_Hba1c (SortModule)
+inputs
+	custom = YearDIAB_Hba1c
+parameters
+	fieldNames = [ PERSON_ID,YearDIAB_Hba1c ]
+end
+
+NumberDIAB_Hba1c (AggregateModule)
+inputs
+	custom = sortedYearDIAB_Hba1c
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearDIAB_Hba1c ]
+	functions = [ COUNT( PERSON_ID ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { NumberDIAB_Hba1c : int };{ DateFirstDIAB_Hba1c : date } ; { DateLastDIAB_Hba1c : date } ]
+end
+
+FilterTwoDIAB_Hba1c (FilterModule)
+inputs
+	custom = NumberDIAB_Hba1c
+parameters
+	conditions = [{NumberDIAB_Hba1c>=2}]
+	
+end
+
+SubjectsDIAB_Hba1c (AggregateModule)
+inputs
+	custom = FilterTwoDIAB_Hba1c
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstDIAB_Hba1c), MIN(DateLastDIAB_Hba1c) ]
+	results =  [ { DateMinDIAB_Hba1c : date } ; { DateMaxDIAB_Hba1c : date } ]
+end
+
+// DIAB_Hba1c: dates
+
+SubjectsAlmostCleanDIAB_Hba1c (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_Hba1c
+parameters
+	inputAttributes = [ DateMinDIAB_Hba1c ]
+	outputAttributes   = [ DateDIAB_Hba1c ]
+end
+
+
+
+SubjectsCleanDIAB_Hba1c (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_Hba1c
+parameters
+	params = [ DateMaxDIAB_Hba1c ]
+end
+
+
+
+// DIAB_VISIT
+
+RESULTDIAB_VISITDIAB_VISIT_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_VISIT
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_VISIT: apply rule at least 3 in 720 days
+
+ClYearDIAB_VISIT (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_VISITDIAB_VISIT_fix
+parameters
+  attributes = [ { YearDIAB_VISIT: int } ]
+end
+
+YearDIAB_VISIT (ApplyFunction)
+inputs
+	custom = ClYearDIAB_VISIT
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_VISIT
+	
+	
+end
+
+sortedYearDIAB_VISIT (SortModule)
+inputs
+	custom = YearDIAB_VISIT
+parameters
+	fieldNames = [ PERSON_ID,YearDIAB_VISIT ]
+end
+
+NumberDIAB_VISIT (AggregateModule)
+inputs
+	custom = sortedYearDIAB_VISIT
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearDIAB_VISIT ]
+	functions = [ COUNT( PERSON_ID ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { NumberDIAB_VISIT : int };{ DateFirstDIAB_VISIT : date } ; { DateLastDIAB_VISIT : date } ]
+end
+
+ClGroupedYearsDIAB_VISIT (ExtendDataModule)
+inputs
+	custom = NumberDIAB_VISIT
+parameters
+  attributes = [   { Year1 : int } ; { Div1 : float } ; { Group1 : int } ; { Year2 : int } ; { Div2 : float } ; { Group2 : int } ; { Year3 : int } ; { Div3 : float } ; { Group3 : int } ]
+end
+
+GroupedYearsDIAB_VISIT_1 (ApplyFunction)
+inputs
+	custom = ClGroupedYearsDIAB_VISIT
+parameters
+	function = Sum(YearDIAB_VISIT,1)
+	result   = Year1
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_2 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_1
+parameters
+	function = Division(Year1,3)
+	result   = Div1
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_3 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_2
+parameters
+	function = Floor(Div1)
+	result   = Group1
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_4 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_3
+parameters
+	function = Sum(Year1,1)
+	result   = Year2
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_5 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_4
+parameters
+	function = Division(Year2,3)
+	result   = Div2
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_6 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_5
+parameters
+	function = Floor(Div2)
+	result   = Group2
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_7 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_6
+parameters
+	function = Sum(Year2,1)
+	result   = Year3
+	
+	
+end
+
+GroupedYearsDIAB_VISIT_8 (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_7
+parameters
+	function = Division(Year3,3)
+	result   = Div3
+	
+	
+end
+
+GroupedYearsDIAB_VISIT (ApplyFunction)
+inputs
+	custom = GroupedYearsDIAB_VISIT_8
+parameters
+	function = Floor(Div3)
+	result   = Group3
+	
+	
+end
+
+AggregatedDIAB_VISIT1 (AggregateModule)
+inputs
+	custom = GroupedYearsDIAB_VISIT
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM(NumberDIAB_VISIT), MIN(DateFirstDIAB_VISIT), MAX(DateLastDIAB_VISIT) ]
+	results =  [ { NumberDIAB_VISIT : int} ; { DateFirstDIAB_VISIT : date } ; { DateLastDIAB_VISIT : date } ]
+end
+
+FilterNAggDIAB_VISIT1 (FilterModule)
+inputs
+	custom = AggregatedDIAB_VISIT1
+parameters
+	conditions = [{NumberDIAB_VISIT>=3}]
+	
+end
+
+AggregatedDIAB_VISIT2 (AggregateModule)
+inputs
+	custom = GroupedYearsDIAB_VISIT
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM(NumberDIAB_VISIT), MIN(DateFirstDIAB_VISIT), MAX(DateLastDIAB_VISIT) ]
+	results =  [ { NumberDIAB_VISIT : int} ; { DateFirstDIAB_VISIT : date } ; { DateLastDIAB_VISIT : date } ]
+end
+
+FilterNAggDIAB_VISIT2 (FilterModule)
+inputs
+	custom = AggregatedDIAB_VISIT2
+parameters
+	conditions = [{NumberDIAB_VISIT>=3}]
+	
+end
+
+AggregatedDIAB_VISIT3 (AggregateModule)
+inputs
+	custom = GroupedYearsDIAB_VISIT
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM(NumberDIAB_VISIT), MIN(DateFirstDIAB_VISIT), MAX(DateLastDIAB_VISIT) ]
+	results =  [ { NumberDIAB_VISIT : int} ; { DateFirstDIAB_VISIT : date } ; { DateLastDIAB_VISIT : date } ]
+end
+
+FilterNAggDIAB_VISIT3 (FilterModule)
+inputs
+	custom = AggregatedDIAB_VISIT3
+parameters
+	conditions = [{NumberDIAB_VISIT>=3}]
+	
+end
+
+UnionDIAB_VISIT_1 (UnionModule)
+inputs
+	custom = FilterNAggDIAB_VISIT1
+	custom = FilterNAggDIAB_VISIT2
+end
+
+
+GroupsDIAB_VISIT (UnionModule)
+inputs
+	custom = UnionDIAB_VISIT_1
+	custom = FilterNAggDIAB_VISIT3
+end
+
+
+SubjectsDIAB_VISIT (AggregateModule)
+inputs
+	custom = GroupsDIAB_VISIT
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstDIAB_VISIT), MIN(DateLastDIAB_VISIT) ]
+	results =  [ { DateMinDIAB_VISIT : date } ; { DateMaxDIAB_VISIT : date } ]
+end
+
+// DIAB_VISIT: dates
+
+SubjectsAlmostCleanDIAB_VISIT (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_VISIT
+parameters
+	inputAttributes = [ DateMinDIAB_VISIT ]
+	outputAttributes   = [ DateDIAB_VISIT ]
+end
+
+
+
+SubjectsCleanDIAB_VISIT (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_VISIT
+parameters
+	params = [ DateMaxDIAB_VISIT ]
+end
+
+
+
+// DIAB_VISIT_Hba1c
+
+RESULTDIAB_Hba1cDIAB_VISIT_Hba1c_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_Hba1c
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_VISIT_Hba1c: apply rule [1] and [2] within 60 days
+
+// This rule has not been implemented yet so an empty file is create
+
+EmptyDIAB_VISIT_Hba1c (FilterModule)
+inputs
+	custom = RESULTDIAB_Hba1cDIAB_VISIT_Hba1c_fix
+parameters
+	conditions = [{PERSON_ID = MISSING}]
+	
+end
+
+SubjectsDIAB_VISIT_Hba1c (AggregateModule)
+inputs
+	custom = EmptyDIAB_VISIT_Hba1c
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [  MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_VISIT_Hba1c : date } ; { DateMaxDIAB_VISIT_Hba1c : date } ]
+end
+
+// DIAB_VISIT_Hba1c: dates
+
+SubjectsAlmostCleanDIAB_VISIT_Hba1c (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_VISIT_Hba1c
+parameters
+	inputAttributes = [ DateMinDIAB_VISIT_Hba1c ]
+	outputAttributes   = [ DateDIAB_VISIT_Hba1c ]
+end
+
+
+
+SubjectsCleanDIAB_VISIT_Hba1c (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_VISIT_Hba1c
+parameters
+	params = [ DateMaxDIAB_VISIT_Hba1c ]
+end
+
+
+
+// DIAB_HOSP_DRG
+
+RESULTDIAB_HOSP_DRGDIAB_HOSP_DRG_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_DRG
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_DRG: apply rule at least one
+
+sortedRESULTDIAB_HOSP_DRGDIAB_HOSP_DRG_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_DRGDIAB_HOSP_DRG_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_DRG (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_DRGDIAB_HOSP_DRG_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_DRG : date } ; { DateMaxDIAB_HOSP_DRG : date } ]
+end
+
+// DIAB_HOSP_DRG: dates
+
+SubjectsAlmostCleanDIAB_HOSP_DRG (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_DRG
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_DRG ]
+	outputAttributes   = [ DateDIAB_HOSP_DRG ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_DRG (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_DRG
+parameters
+	params = [ DateMaxDIAB_HOSP_DRG ]
+end
+
+
+
+// DIAB_DRUGS_ORAL
+
+RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORAL_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORAL
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_ORAL: apply rule at least two in 365 days
+
+ClYearDIAB_DRUGS_ORAL (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORAL_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_ORAL: int } ]
+end
+
+YearDIAB_DRUGS_ORAL (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_ORAL
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_ORAL
+	
+	
+end
+
+sortedYearDIAB_DRUGS_ORAL (SortModule)
+inputs
+	custom = YearDIAB_DRUGS_ORAL
+parameters
+	fieldNames = [ PERSON_ID,YearDIAB_DRUGS_ORAL ]
+end
+
+NumberDIAB_DRUGS_ORAL (AggregateModule)
+inputs
+	custom = sortedYearDIAB_DRUGS_ORAL
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearDIAB_DRUGS_ORAL ]
+	functions = [ COUNT( PERSON_ID ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { NumberDIAB_DRUGS_ORAL : int };{ DateFirstDIAB_DRUGS_ORAL : date } ; { DateLastDIAB_DRUGS_ORAL : date } ]
+end
+
+FilterTwoDIAB_DRUGS_ORAL (FilterModule)
+inputs
+	custom = NumberDIAB_DRUGS_ORAL
+parameters
+	conditions = [{NumberDIAB_DRUGS_ORAL>=2}]
+	
+end
+
+SubjectsDIAB_DRUGS_ORAL (AggregateModule)
+inputs
+	custom = FilterTwoDIAB_DRUGS_ORAL
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstDIAB_DRUGS_ORAL), MIN(DateLastDIAB_DRUGS_ORAL) ]
+	results =  [ { DateMinDIAB_DRUGS_ORAL : date } ; { DateMaxDIAB_DRUGS_ORAL : date } ]
+end
+
+// DIAB_DRUGS_ORAL: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_ORAL (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_ORAL
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_ORAL ]
+	outputAttributes   = [ DateDIAB_DRUGS_ORAL ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_ORAL (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_ORAL
+parameters
+	params = [ DateMaxDIAB_DRUGS_ORAL ]
+end
+
+
+
+// DIAB_DRUGS_INSULIN
+
+RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSULIN_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULIN
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_INSULIN: apply rule at least two in 365 days
+
+ClYearDIAB_DRUGS_INSULIN (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSULIN_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_INSULIN: int } ]
+end
+
+YearDIAB_DRUGS_INSULIN (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_INSULIN
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_INSULIN
+	
+	
+end
+
+sortedYearDIAB_DRUGS_INSULIN (SortModule)
+inputs
+	custom = YearDIAB_DRUGS_INSULIN
+parameters
+	fieldNames = [ PERSON_ID,YearDIAB_DRUGS_INSULIN ]
+end
+
+NumberDIAB_DRUGS_INSULIN (AggregateModule)
+inputs
+	custom = sortedYearDIAB_DRUGS_INSULIN
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearDIAB_DRUGS_INSULIN ]
+	functions = [ COUNT( PERSON_ID ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { NumberDIAB_DRUGS_INSULIN : int };{ DateFirstDIAB_DRUGS_INSULIN : date } ; { DateLastDIAB_DRUGS_INSULIN : date } ]
+end
+
+FilterTwoDIAB_DRUGS_INSULIN (FilterModule)
+inputs
+	custom = NumberDIAB_DRUGS_INSULIN
+parameters
+	conditions = [{NumberDIAB_DRUGS_INSULIN>=2}]
+	
+end
+
+SubjectsDIAB_DRUGS_INSULIN (AggregateModule)
+inputs
+	custom = FilterTwoDIAB_DRUGS_INSULIN
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstDIAB_DRUGS_INSULIN), MIN(DateLastDIAB_DRUGS_INSULIN) ]
+	results =  [ { DateMinDIAB_DRUGS_INSULIN : date } ; { DateMaxDIAB_DRUGS_INSULIN : date } ]
+end
+
+// DIAB_DRUGS_INSULIN: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_INSULIN (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_INSULIN
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_INSULIN ]
+	outputAttributes   = [ DateDIAB_DRUGS_INSULIN ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_INSULIN (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_INSULIN
+parameters
+	params = [ DateMaxDIAB_DRUGS_INSULIN ]
+end
+
+
+
+// DIAB_DRUGS_OTHER
+
+RESULTDIAB_DRUGS_OTHERDIAB_DRUGS_OTHER_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_OTHER
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_OTHER: apply rule at least two in 365 days
+
+ClYearDIAB_DRUGS_OTHER (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_OTHERDIAB_DRUGS_OTHER_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_OTHER: int } ]
+end
+
+YearDIAB_DRUGS_OTHER (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_OTHER
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_OTHER
+	
+	
+end
+
+sortedYearDIAB_DRUGS_OTHER (SortModule)
+inputs
+	custom = YearDIAB_DRUGS_OTHER
+parameters
+	fieldNames = [ PERSON_ID,YearDIAB_DRUGS_OTHER ]
+end
+
+NumberDIAB_DRUGS_OTHER (AggregateModule)
+inputs
+	custom = sortedYearDIAB_DRUGS_OTHER
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID,YearDIAB_DRUGS_OTHER ]
+	functions = [ COUNT( PERSON_ID ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { NumberDIAB_DRUGS_OTHER : int };{ DateFirstDIAB_DRUGS_OTHER : date } ; { DateLastDIAB_DRUGS_OTHER : date } ]
+end
+
+FilterTwoDIAB_DRUGS_OTHER (FilterModule)
+inputs
+	custom = NumberDIAB_DRUGS_OTHER
+parameters
+	conditions = [{NumberDIAB_DRUGS_OTHER>=2}]
+	
+end
+
+SubjectsDIAB_DRUGS_OTHER (AggregateModule)
+inputs
+	custom = FilterTwoDIAB_DRUGS_OTHER
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(DateFirstDIAB_DRUGS_OTHER), MIN(DateLastDIAB_DRUGS_OTHER) ]
+	results =  [ { DateMinDIAB_DRUGS_OTHER : date } ; { DateMaxDIAB_DRUGS_OTHER : date } ]
+end
+
+// DIAB_DRUGS_OTHER: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_OTHER (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_OTHER
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_OTHER ]
+	outputAttributes   = [ DateDIAB_DRUGS_OTHER ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_OTHER (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_OTHER
+parameters
+	params = [ DateMaxDIAB_DRUGS_OTHER ]
+end
+
+
+
+// DIAB_HOSP_MAIN_UNSPEC
+
+RESULTDIAB_HOSP_MAIN_UNSPECDIAB_HOSP_MAIN_UNSPEC_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_UNSPEC
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_MAIN_UNSPEC: apply rule at least one
+
+sortedRESULTDIAB_HOSP_MAIN_UNSPECDIAB_HOSP_MAIN_UNSPEC_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_UNSPECDIAB_HOSP_MAIN_UNSPEC_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_MAIN_UNSPEC (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_MAIN_UNSPECDIAB_HOSP_MAIN_UNSPEC_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_MAIN_UNSPEC : date } ; { DateMaxDIAB_HOSP_MAIN_UNSPEC : date } ]
+end
+
+// DIAB_HOSP_MAIN_UNSPEC: dates
+
+SubjectsAlmostCleanDIAB_HOSP_MAIN_UNSPEC (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_MAIN_UNSPEC
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_MAIN_UNSPEC ]
+	outputAttributes   = [ DateDIAB_HOSP_MAIN_UNSPEC ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_MAIN_UNSPEC (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_MAIN_UNSPEC
+parameters
+	params = [ DateMaxDIAB_HOSP_MAIN_UNSPEC ]
+end
+
+
+
+// DIAB_HOSP_SEC_UNSPEC
+
+RESULTDIAB_HOSP_SEC_UNSPECDIAB_HOSP_SEC_UNSPEC_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_UNSPEC
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_SEC_UNSPEC: apply rule at least one
+
+sortedRESULTDIAB_HOSP_SEC_UNSPECDIAB_HOSP_SEC_UNSPEC_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_UNSPECDIAB_HOSP_SEC_UNSPEC_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_SEC_UNSPEC (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_SEC_UNSPECDIAB_HOSP_SEC_UNSPEC_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_SEC_UNSPEC : date } ; { DateMaxDIAB_HOSP_SEC_UNSPEC : date } ]
+end
+
+// DIAB_HOSP_SEC_UNSPEC: dates
+
+SubjectsAlmostCleanDIAB_HOSP_SEC_UNSPEC (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_SEC_UNSPEC
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_SEC_UNSPEC ]
+	outputAttributes   = [ DateDIAB_HOSP_SEC_UNSPEC ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_SEC_UNSPEC (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_SEC_UNSPEC
+parameters
+	params = [ DateMaxDIAB_HOSP_SEC_UNSPEC ]
+end
+
+
+
+// DIAB_HOSP_MAIN_T2
+
+RESULTDIAB_HOSP_MAIN_T2DIAB_HOSP_MAIN_T2_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_T2
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_MAIN_T2: apply rule at least one
+
+sortedRESULTDIAB_HOSP_MAIN_T2DIAB_HOSP_MAIN_T2_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_T2DIAB_HOSP_MAIN_T2_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_MAIN_T2 (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_MAIN_T2DIAB_HOSP_MAIN_T2_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_MAIN_T2 : date } ; { DateMaxDIAB_HOSP_MAIN_T2 : date } ]
+end
+
+// DIAB_HOSP_MAIN_T2: dates
+
+SubjectsAlmostCleanDIAB_HOSP_MAIN_T2 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_MAIN_T2
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_MAIN_T2 ]
+	outputAttributes   = [ DateDIAB_HOSP_MAIN_T2 ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_MAIN_T2 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_MAIN_T2
+parameters
+	params = [ DateMaxDIAB_HOSP_MAIN_T2 ]
+end
+
+
+
+// DIAB_HOSP_SEC_T2
+
+RESULTDIAB_HOSP_SEC_T2DIAB_HOSP_SEC_T2_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_T2
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_SEC_T2: apply rule at least one
+
+sortedRESULTDIAB_HOSP_SEC_T2DIAB_HOSP_SEC_T2_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_T2DIAB_HOSP_SEC_T2_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_SEC_T2 (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_SEC_T2DIAB_HOSP_SEC_T2_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_SEC_T2 : date } ; { DateMaxDIAB_HOSP_SEC_T2 : date } ]
+end
+
+// DIAB_HOSP_SEC_T2: dates
+
+SubjectsAlmostCleanDIAB_HOSP_SEC_T2 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_SEC_T2
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_SEC_T2 ]
+	outputAttributes   = [ DateDIAB_HOSP_SEC_T2 ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_SEC_T2 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_SEC_T2
+parameters
+	params = [ DateMaxDIAB_HOSP_SEC_T2 ]
+end
+
+
+
+// DIAB_HOSP_MAIN_COMPL
+
+RESULTDIAB_HOSP_MAIN_COMPLDIAB_HOSP_MAIN_COMPL_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_COMPL
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_MAIN_COMPL: apply rule at least one
+
+sortedRESULTDIAB_HOSP_MAIN_COMPLDIAB_HOSP_MAIN_COMPL_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_COMPLDIAB_HOSP_MAIN_COMPL_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_MAIN_COMPL (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_MAIN_COMPLDIAB_HOSP_MAIN_COMPL_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_MAIN_COMPL : date } ; { DateMaxDIAB_HOSP_MAIN_COMPL : date } ]
+end
+
+// DIAB_HOSP_MAIN_COMPL: dates
+
+SubjectsAlmostCleanDIAB_HOSP_MAIN_COMPL (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_MAIN_COMPL
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_MAIN_COMPL ]
+	outputAttributes   = [ DateDIAB_HOSP_MAIN_COMPL ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_MAIN_COMPL (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_MAIN_COMPL
+parameters
+	params = [ DateMaxDIAB_HOSP_MAIN_COMPL ]
+end
+
+
+
+// DIAB_HOSP_SEC_COMPL
+
+RESULTDIAB_HOSP_SEC_COMPLDIAB_HOSP_SEC_COMPL_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_COMPL
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_SEC_COMPL: apply rule at least one
+
+sortedRESULTDIAB_HOSP_SEC_COMPLDIAB_HOSP_SEC_COMPL_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_COMPLDIAB_HOSP_SEC_COMPL_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_SEC_COMPL (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_SEC_COMPLDIAB_HOSP_SEC_COMPL_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_SEC_COMPL : date } ; { DateMaxDIAB_HOSP_SEC_COMPL : date } ]
+end
+
+// DIAB_HOSP_SEC_COMPL: dates
+
+SubjectsAlmostCleanDIAB_HOSP_SEC_COMPL (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_SEC_COMPL
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_SEC_COMPL ]
+	outputAttributes   = [ DateDIAB_HOSP_SEC_COMPL ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_SEC_COMPL (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_SEC_COMPL
+parameters
+	params = [ DateMaxDIAB_HOSP_SEC_COMPL ]
+end
+
+
+
+// DIAB_HOSP_MAIN_INSDEV
+
+RESULTDIAB_HOSP_MAIN_INSDEVDIAB_HOSP_MAIN_INSDEV_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_INSDEV
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_MAIN_INSDEV: apply rule at least one
+
+sortedRESULTDIAB_HOSP_MAIN_INSDEVDIAB_HOSP_MAIN_INSDEV_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_MAIN_INSDEVDIAB_HOSP_MAIN_INSDEV_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_MAIN_INSDEV (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_MAIN_INSDEVDIAB_HOSP_MAIN_INSDEV_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_MAIN_INSDEV : date } ; { DateMaxDIAB_HOSP_MAIN_INSDEV : date } ]
+end
+
+// DIAB_HOSP_MAIN_INSDEV: dates
+
+SubjectsAlmostCleanDIAB_HOSP_MAIN_INSDEV (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_MAIN_INSDEV
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_MAIN_INSDEV ]
+	outputAttributes   = [ DateDIAB_HOSP_MAIN_INSDEV ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_MAIN_INSDEV (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_MAIN_INSDEV
+parameters
+	params = [ DateMaxDIAB_HOSP_MAIN_INSDEV ]
+end
+
+
+
+// DIAB_HOSP_SEC_INSDEV
+
+RESULTDIAB_HOSP_SEC_INSDEVDIAB_HOSP_SEC_INSDEV_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_INSDEV
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_HOSP_SEC_INSDEV: apply rule at least one
+
+sortedRESULTDIAB_HOSP_SEC_INSDEVDIAB_HOSP_SEC_INSDEV_fix (SortModule)
+inputs
+	custom = RESULTDIAB_HOSP_SEC_INSDEVDIAB_HOSP_SEC_INSDEV_fix
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+SubjectsDIAB_HOSP_SEC_INSDEV (AggregateModule)
+inputs
+	custom = sortedRESULTDIAB_HOSP_SEC_INSDEVDIAB_HOSP_SEC_INSDEV_fix
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [ MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIAB_HOSP_SEC_INSDEV : date } ; { DateMaxDIAB_HOSP_SEC_INSDEV : date } ]
+end
+
+// DIAB_HOSP_SEC_INSDEV: dates
+
+SubjectsAlmostCleanDIAB_HOSP_SEC_INSDEV (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_HOSP_SEC_INSDEV
+parameters
+	inputAttributes = [ DateMinDIAB_HOSP_SEC_INSDEV ]
+	outputAttributes   = [ DateDIAB_HOSP_SEC_INSDEV ]
+end
+
+
+
+SubjectsCleanDIAB_HOSP_SEC_INSDEV (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_HOSP_SEC_INSDEV
+parameters
+	params = [ DateMaxDIAB_HOSP_SEC_INSDEV ]
+end
+
+
+
+// DIAB_DRUGS_ORDDD09
+
+RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORDDD09_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORAL
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_ORDDD09: apply rule DDD>30 in 2008
+
+ClYearDIAB_DRUGS_ORDDD09 (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORDDD09_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_ORDDD09: int } ]
+end
+
+YearDIAB_DRUGS_ORDDD09 (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_ORDDD09
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_ORDDD09
+	
+	
+end
+
+FilterYearDIAB_DRUGS_ORDDD09 (FilterModule)
+inputs
+	custom = YearDIAB_DRUGS_ORDDD09
+parameters
+	conditions = [{YearDIAB_DRUGS_ORDDD09=2008}]
+	
+end
+
+sortedFilterYearDIAB_DRUGS_ORDDD09 (SortModule)
+inputs
+	custom = FilterYearDIAB_DRUGS_ORDDD09
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+NumberDIAB_DRUGS_ORDDD09 (AggregateModule)
+inputs
+	custom = sortedFilterYearDIAB_DRUGS_ORDDD09
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM( DURATION ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DurationDIAB_DRUGS_ORDDD09 : float };{ DateMinDIAB_DRUGS_ORDDD09 : date } ; { DateMaxDIAB_DRUGS_ORDDD09 : date } ]
+end
+
+ClPercDIAB_DRUGS_ORDDD09 (ExtendDataModule)
+inputs
+	custom = NumberDIAB_DRUGS_ORDDD09
+parameters
+  attributes = [ { PercDIAB_DRUGS_ORDDD09: float } ]
+end
+
+PercDIAB_DRUGS_ORDDD09 (ApplyFunction)
+inputs
+	custom = ClPercDIAB_DRUGS_ORDDD09
+parameters
+	function = Division(DurationDIAB_DRUGS_ORDDD09,365.25)
+	result   = PercDIAB_DRUGS_ORDDD09
+	
+	
+end
+
+FilterPercDIAB_DRUGS_ORDDD09 (FilterModule)
+inputs
+	custom = PercDIAB_DRUGS_ORDDD09
+parameters
+	conditions = [{PercDIAB_DRUGS_ORDDD09>0.3}]
+	
+end
+
+SubjectsDIAB_DRUGS_ORDDD09 (DropModule)
+inputs
+	custom = FilterPercDIAB_DRUGS_ORDDD09
+parameters
+	params = [ PercDIAB_DRUGS_ORDDD09, DurationDIAB_DRUGS_ORDDD09 ]
+end
+
+
+
+// DIAB_DRUGS_ORDDD09: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_ORDDD09 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_ORDDD09
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_ORDDD09 ]
+	outputAttributes   = [ DateDIAB_DRUGS_ORDDD09 ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_ORDDD09 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_ORDDD09
+parameters
+	params = [ DateMaxDIAB_DRUGS_ORDDD09 ]
+end
+
+
+
+// DIAB_DRUGS_ORDDD12
+
+RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORDDD12_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORAL
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_ORDDD12: apply rule DDD>30 in 2011
+
+ClYearDIAB_DRUGS_ORDDD12 (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORALDIAB_DRUGS_ORDDD12_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_ORDDD12: int } ]
+end
+
+YearDIAB_DRUGS_ORDDD12 (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_ORDDD12
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_ORDDD12
+	
+	
+end
+
+FilterYearDIAB_DRUGS_ORDDD12 (FilterModule)
+inputs
+	custom = YearDIAB_DRUGS_ORDDD12
+parameters
+	conditions = [{YearDIAB_DRUGS_ORDDD12=2011}]
+	
+end
+
+sortedFilterYearDIAB_DRUGS_ORDDD12 (SortModule)
+inputs
+	custom = FilterYearDIAB_DRUGS_ORDDD12
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+NumberDIAB_DRUGS_ORDDD12 (AggregateModule)
+inputs
+	custom = sortedFilterYearDIAB_DRUGS_ORDDD12
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM( DURATION ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DurationDIAB_DRUGS_ORDDD12 : float };{ DateMinDIAB_DRUGS_ORDDD12 : date } ; { DateMaxDIAB_DRUGS_ORDDD12 : date } ]
+end
+
+ClPercDIAB_DRUGS_ORDDD12 (ExtendDataModule)
+inputs
+	custom = NumberDIAB_DRUGS_ORDDD12
+parameters
+  attributes = [ { PercDIAB_DRUGS_ORDDD12: float } ]
+end
+
+PercDIAB_DRUGS_ORDDD12 (ApplyFunction)
+inputs
+	custom = ClPercDIAB_DRUGS_ORDDD12
+parameters
+	function = Division(DurationDIAB_DRUGS_ORDDD12,365.25)
+	result   = PercDIAB_DRUGS_ORDDD12
+	
+	
+end
+
+FilterPercDIAB_DRUGS_ORDDD12 (FilterModule)
+inputs
+	custom = PercDIAB_DRUGS_ORDDD12
+parameters
+	conditions = [{PercDIAB_DRUGS_ORDDD12>0.3}]
+	
+end
+
+SubjectsDIAB_DRUGS_ORDDD12 (DropModule)
+inputs
+	custom = FilterPercDIAB_DRUGS_ORDDD12
+parameters
+	params = [ PercDIAB_DRUGS_ORDDD12, DurationDIAB_DRUGS_ORDDD12 ]
+end
+
+
+
+// DIAB_DRUGS_ORDDD12: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_ORDDD12 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_ORDDD12
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_ORDDD12 ]
+	outputAttributes   = [ DateDIAB_DRUGS_ORDDD12 ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_ORDDD12 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_ORDDD12
+parameters
+	params = [ DateMaxDIAB_DRUGS_ORDDD12 ]
+end
+
+
+
+// DIAB_DRUGS_INSDDD09
+
+RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSDDD09_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULIN
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_INSDDD09: apply rule DDD>10 in 2008
+
+ClYearDIAB_DRUGS_INSDDD09 (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSDDD09_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_INSDDD09: int } ]
+end
+
+YearDIAB_DRUGS_INSDDD09 (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_INSDDD09
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_INSDDD09
+	
+	
+end
+
+FilterYearDIAB_DRUGS_INSDDD09 (FilterModule)
+inputs
+	custom = YearDIAB_DRUGS_INSDDD09
+parameters
+	conditions = [{YearDIAB_DRUGS_INSDDD09=2008}]
+	
+end
+
+sortedFilterYearDIAB_DRUGS_INSDDD09 (SortModule)
+inputs
+	custom = FilterYearDIAB_DRUGS_INSDDD09
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+NumberDIAB_DRUGS_INSDDD09 (AggregateModule)
+inputs
+	custom = sortedFilterYearDIAB_DRUGS_INSDDD09
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM( DURATION ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DurationDIAB_DRUGS_INSDDD09 : float };{ DateMinDIAB_DRUGS_INSDDD09 : date } ; { DateMaxDIAB_DRUGS_INSDDD09 : date } ]
+end
+
+ClPercDIAB_DRUGS_INSDDD09 (ExtendDataModule)
+inputs
+	custom = NumberDIAB_DRUGS_INSDDD09
+parameters
+  attributes = [ { PercDIAB_DRUGS_INSDDD09: float } ]
+end
+
+PercDIAB_DRUGS_INSDDD09 (ApplyFunction)
+inputs
+	custom = ClPercDIAB_DRUGS_INSDDD09
+parameters
+	function = Division(DurationDIAB_DRUGS_INSDDD09,365.25)
+	result   = PercDIAB_DRUGS_INSDDD09
+	
+	
+end
+
+FilterPercDIAB_DRUGS_INSDDD09 (FilterModule)
+inputs
+	custom = PercDIAB_DRUGS_INSDDD09
+parameters
+	conditions = [{PercDIAB_DRUGS_INSDDD09>0.1}]
+	
+end
+
+SubjectsDIAB_DRUGS_INSDDD09 (DropModule)
+inputs
+	custom = FilterPercDIAB_DRUGS_INSDDD09
+parameters
+	params = [ PercDIAB_DRUGS_INSDDD09, DurationDIAB_DRUGS_INSDDD09 ]
+end
+
+
+
+// DIAB_DRUGS_INSDDD09: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_INSDDD09 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_INSDDD09
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_INSDDD09 ]
+	outputAttributes   = [ DateDIAB_DRUGS_INSDDD09 ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_INSDDD09 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_INSDDD09
+parameters
+	params = [ DateMaxDIAB_DRUGS_INSDDD09 ]
+end
+
+
+
+// DIAB_DRUGS_INSDDD12
+
+RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSDDD12_fix (FilterModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULIN
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIAB_DRUGS_INSDDD12: apply rule DDD>10 in 2011
+
+ClYearDIAB_DRUGS_INSDDD12 (ExtendDataModule)
+inputs
+	custom = RESULTDIAB_DRUGS_INSULINDIAB_DRUGS_INSDDD12_fix
+parameters
+  attributes = [ { YearDIAB_DRUGS_INSDDD12: int } ]
+end
+
+YearDIAB_DRUGS_INSDDD12 (ApplyFunction)
+inputs
+	custom = ClYearDIAB_DRUGS_INSDDD12
+parameters
+	function = Year(MINDATE)
+	result   = YearDIAB_DRUGS_INSDDD12
+	
+	
+end
+
+FilterYearDIAB_DRUGS_INSDDD12 (FilterModule)
+inputs
+	custom = YearDIAB_DRUGS_INSDDD12
+parameters
+	conditions = [{YearDIAB_DRUGS_INSDDD12=2011}]
+	
+end
+
+sortedFilterYearDIAB_DRUGS_INSDDD12 (SortModule)
+inputs
+	custom = FilterYearDIAB_DRUGS_INSDDD12
+parameters
+	fieldNames = [ PERSON_ID ]
+end
+
+NumberDIAB_DRUGS_INSDDD12 (AggregateModule)
+inputs
+	custom = sortedFilterYearDIAB_DRUGS_INSDDD12
+parameters
+	isInputSorted = false
+	groupBy =  [ PERSON_ID ]
+	functions = [ SUM( DURATION ), MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DurationDIAB_DRUGS_INSDDD12 : float };{ DateMinDIAB_DRUGS_INSDDD12 : date } ; { DateMaxDIAB_DRUGS_INSDDD12 : date } ]
+end
+
+ClPercDIAB_DRUGS_INSDDD12 (ExtendDataModule)
+inputs
+	custom = NumberDIAB_DRUGS_INSDDD12
+parameters
+  attributes = [ { PercDIAB_DRUGS_INSDDD12: float } ]
+end
+
+PercDIAB_DRUGS_INSDDD12 (ApplyFunction)
+inputs
+	custom = ClPercDIAB_DRUGS_INSDDD12
+parameters
+	function = Division(DurationDIAB_DRUGS_INSDDD12,365.25)
+	result   = PercDIAB_DRUGS_INSDDD12
+	
+	
+end
+
+FilterPercDIAB_DRUGS_INSDDD12 (FilterModule)
+inputs
+	custom = PercDIAB_DRUGS_INSDDD12
+parameters
+	conditions = [{PercDIAB_DRUGS_INSDDD12>0.1}]
+	
+end
+
+SubjectsDIAB_DRUGS_INSDDD12 (DropModule)
+inputs
+	custom = FilterPercDIAB_DRUGS_INSDDD12
+parameters
+	params = [ PercDIAB_DRUGS_INSDDD12, DurationDIAB_DRUGS_INSDDD12 ]
+end
+
+
+
+// DIAB_DRUGS_INSDDD12: dates
+
+SubjectsAlmostCleanDIAB_DRUGS_INSDDD12 (RenameAttributesModule)
+inputs
+	custom = SubjectsDIAB_DRUGS_INSDDD12
+parameters
+	inputAttributes = [ DateMinDIAB_DRUGS_INSDDD12 ]
+	outputAttributes   = [ DateDIAB_DRUGS_INSDDD12 ]
+end
+
+
+
+SubjectsCleanDIAB_DRUGS_INSDDD12 (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIAB_DRUGS_INSDDD12
+parameters
+	params = [ DateMaxDIAB_DRUGS_INSDDD12 ]
+end
+
+
+
+// DIABNO_MISS
+
+// DIABNO_MISS: create result of selection rule  from all sources 
+
+UnionDIABNO_MISS_1 (UnionModule)
+inputs
+	custom = RESULTDIAB_DRUGS_ORAL
+	custom = RESULTDIAB_DRUGS_INSULIN
+end
+
+
+UnionDIABNO_MISS_2 (UnionModule)
+inputs
+	custom = UnionDIABNO_MISS_1
+	custom = RESULTDIAB_Hba1c
+end
+
+
+UnionDIABNO_MISS_3 (UnionModule)
+inputs
+	custom = UnionDIABNO_MISS_2
+	custom = RESULTDIAB_VISIT
+end
+
+
+ALLDIABNO_MISS (UnionModule)
+inputs
+	custom = UnionDIABNO_MISS_3
+	custom = RESULTDIAB_HOSP_MAIN_UNSPEC
+end
+
+
+ALLDIABNO_MISS_fix (FilterModule)
+inputs
+	custom = ALLDIABNO_MISS
+parameters
+	conditions = [{PERSON_ID!=MISSING}]
+	
+end
+
+// DIABNO_MISS: apply rule noone for 3 years
+
+// This rule has not been implemented yet so an empty file is create
+
+EmptyDIABNO_MISS (FilterModule)
+inputs
+	custom = ALLDIABNO_MISS_fix
+parameters
+	conditions = [{PERSON_ID = MISSING}]
+	
+end
+
+SubjectsDIABNO_MISS (AggregateModule)
+inputs
+	custom = EmptyDIABNO_MISS
+parameters
+	isInputSorted = true
+	groupBy =  [ PERSON_ID ]
+	functions = [  MIN(MINDATE), MAX(MINDATE) ]
+	results =  [ { DateMinDIABNO_MISS : date } ; { DateMaxDIABNO_MISS : date } ]
+end
+
+// DIABNO_MISS: dates
+
+SubjectsAlmostCleanDIABNO_MISS (RenameAttributesModule)
+inputs
+	custom = SubjectsDIABNO_MISS
+parameters
+	inputAttributes = [ DateMinDIABNO_MISS ]
+	outputAttributes   = [ DateDIABNO_MISS ]
+end
+
+
+
+SubjectsCleanDIABNO_MISS (DropModule)
+inputs
+	custom = SubjectsAlmostCleanDIABNO_MISS
+parameters
+	params = [ DateMaxDIABNO_MISS ]
+end
+
+
+
+// Join all Simple Algorithms
+
+UniqueCohort_1 (MergeModule)
+inputs
+	custom = UniqueCohort
+	custom = SubjectsCleanDIAB_EXE
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_2 (MergeModule)
+inputs
+	custom = UniqueCohort_1
+	custom = SubjectsCleanDIAB_Hba1c
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_3 (MergeModule)
+inputs
+	custom = UniqueCohort_2
+	custom = SubjectsCleanDIAB_VISIT
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_4 (MergeModule)
+inputs
+	custom = UniqueCohort_3
+	custom = SubjectsCleanDIAB_VISIT_Hba1c
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_5 (MergeModule)
+inputs
+	custom = UniqueCohort_4
+	custom = SubjectsCleanDIAB_HOSP_DRG
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_6 (MergeModule)
+inputs
+	custom = UniqueCohort_5
+	custom = SubjectsCleanDIAB_DRUGS_ORAL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_7 (MergeModule)
+inputs
+	custom = UniqueCohort_6
+	custom = SubjectsCleanDIAB_DRUGS_INSULIN
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_8 (MergeModule)
+inputs
+	custom = UniqueCohort_7
+	custom = SubjectsCleanDIAB_DRUGS_OTHER
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_9 (MergeModule)
+inputs
+	custom = UniqueCohort_8
+	custom = SubjectsCleanDIAB_HOSP_MAIN_UNSPEC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_10 (MergeModule)
+inputs
+	custom = UniqueCohort_9
+	custom = SubjectsCleanDIAB_HOSP_SEC_UNSPEC
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_11 (MergeModule)
+inputs
+	custom = UniqueCohort_10
+	custom = SubjectsCleanDIAB_HOSP_MAIN_T2
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_12 (MergeModule)
+inputs
+	custom = UniqueCohort_11
+	custom = SubjectsCleanDIAB_HOSP_SEC_T2
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_13 (MergeModule)
+inputs
+	custom = UniqueCohort_12
+	custom = SubjectsCleanDIAB_HOSP_MAIN_COMPL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_14 (MergeModule)
+inputs
+	custom = UniqueCohort_13
+	custom = SubjectsCleanDIAB_HOSP_SEC_COMPL
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_15 (MergeModule)
+inputs
+	custom = UniqueCohort_14
+	custom = SubjectsCleanDIAB_HOSP_MAIN_INSDEV
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_16 (MergeModule)
+inputs
+	custom = UniqueCohort_15
+	custom = SubjectsCleanDIAB_HOSP_SEC_INSDEV
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_17 (MergeModule)
+inputs
+	custom = UniqueCohort_16
+	custom = SubjectsCleanDIAB_DRUGS_ORDDD09
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_18 (MergeModule)
+inputs
+	custom = UniqueCohort_17
+	custom = SubjectsCleanDIAB_DRUGS_ORDDD12
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_19 (MergeModule)
+inputs
+	custom = UniqueCohort_18
+	custom = SubjectsCleanDIAB_DRUGS_INSDDD09
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+UniqueCohort_20 (MergeModule)
+inputs
+	custom = UniqueCohort_19
+	custom = SubjectsCleanDIAB_DRUGS_INSDDD12
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+FinalJoinSimpleAlg (MergeModule)
+inputs
+	custom = UniqueCohort_20
+	custom = SubjectsCleanDIABNO_MISS
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// Join Simple Algorithms with PERSON
+
+FinalJoinSimpleAlgPERSON (MergeModule)
+inputs
+	custom = FinalJoinSimpleAlg
+	custom = PERSON
+parameters
+	primaryKey = [ PERSON_ID ]
+	fieldNames = [ PERSON_ID ]
+end
+
+// Output Subjects Simple Algorithms
+
+PostproMATRICE_2_SimpleAlgorithms (FileOutputModule)
+inputs
+	custom = FinalJoinSimpleAlgPERSON
+parameters
+	checksum = none
+	compression = none
+end

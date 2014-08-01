@@ -1,0 +1,22 @@
+DROGA (ScriptInputModule)
+parameters
+	scriptFilename = testFileOutput.txt
+	inputName = TEST_FILE_OUTPUT
+	expectedSchema = custom
+end
+
+ATC (ApplyFunction)
+inputs
+	custom = DROGA
+parameters
+	function = Atc(PRODUCT_CODE)
+	result   = ATC
+end
+
+OUTPUT_scriptinput (FileOutputModule)
+inputs 
+	custom = ATC
+parameters
+	checksum = none
+	compression = none
+end

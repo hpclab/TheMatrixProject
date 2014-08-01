@@ -1,0 +1,238 @@
+//costruzione dataset cardiopatia ischemica (CI)
+
+// PREAMBOLO: parametri
+
+// Carica i parametri
+Parameters_Loader (ParametersModule)
+parameters
+ params = [ {DATE : date}]
+end
+
+
+//si riferisce al file delle prescrizioni farmaceutiche
+Drug_File (ScriptInputModule)
+parameters
+  scriptFilename = LoadDRUGS.txt
+  inputName = DRUGFile
+  expectedSchema = IADdrug
+end
+
+
+//si riferisce al file delle prescrizioni ambulatoriali
+Outpat_File (ScriptInputModule)
+parameters
+   scriptFilename = LoadOUTPAT.txt
+ // scriptParams = [$DATEDATA]
+  inputName = OUTPATFile
+  expectedSchema = IADoutpat
+end
+
+//si riferisce al file delle esenzioni
+Exe_File (ScriptInputModule)
+parameters
+  scriptFilename = LoadEXE.txt
+  inputName = HOSPFile
+  expectedSchema = IADexe
+end
+
+
+
+//INIZIO COSTRUZIONE DEI DATASET
+
+//ECG seguita da prescrizione di betabloccante entro 90 gg
+
+//poiche’ si useranno dei ProductModule si ordinano i file
+SortedOutpat_File (SortModule)
+inputs
+   IADoutpat = Outpat_File
+parameters
+   fieldNames = [ PatientId, PROC_DATE ]
+end
+
+SortedDrug_File (SortModule)
+inputs
+   IADdrug = Drug_File
+parameters
+   fieldNames = [ PatientId, DRUG_EXPOSURE_START_DATE ]
+end
+
+//si prendono tutte le coppie (ECG,betabloccante) in cui il betabloccante e’ prescritto entro 90 gg dall’ECG
+PrescriptionExam_Relation (ProductModule)
+inputs
+   IADoutpat = SortedOutpat_File
+   IADdrug = SortedDrug_File
+parameters
+   IDfield = PatientID
+   functions = [ equalsTo(
+                       SortedOutpat_File.PROC_COD,
+                   "89.41", "89.42", "89.43", "89.44", "89.44.1", "89.44.2", "92.05.1"
+                     ),
+                     match (
+                       SortedDrug_File.ATC,
+                       "C07*", "C08*"
+                     ),
+		elapsedTimeInRange(
+			SortedDrug_File.DRUG_EXPOSURE_START_DATE,
+			SortedOutpat_File.PROC_DATE,
+			0,90)
+
+       ]
+   boolExpr = AND
+end
+
+// sceglie la prima ECG cui e’ seguita una prescrizione di betabloccante
+First_ECG_betabloc (AggregateModule)
+inputs
+ custom = PrescriptionExam_Relation
+parameters
+ isInputSorted = false
+ groupBy =  [ PATIENT_ID ]
+ functions = [ min( PROC_DATE) ]
+results =  [ { DateFirstECG_betabloc : date } ]
+end
+
+//ESENZIONE PER CI
+
+// filtra le esenzioni per CI
+Filter_CI_Exemptions (FilterModule)
+inputs
+ IADexe = Exe_File
+parameters
+ conditions = [{EXEMPTION_CODE  matches "*414"}]
+end
+
+// sceglie la prima esenzione per CI
+First_CI_Exemption (AggregateModule)
+inputs
+ IADexe = Filter_CI_Exemptions
+parameters
+ isInputSorted = false
+ groupBy =  [ PERSON_ID ]
+ functions = [ min( EXE_START_DATE ) ]
+results =  [ { DateFirstCIExe : date } ]
+end
+
+//JOIN
+
+// marca tutte le righe del dataset delle esenzioni con una variabile booleana identicamente uguale a “true”
+Marked_CI_Exe  (ExtendDataModule)
+inputs
+  custom = First_CI_Exemption
+parameters
+  attributes = [ { HadExe : boolean = true } ]
+end
+
+// ordina il file Marked_CI_Exe  (e' necessario per poi fare il join)
+Sorted_CI_Exe (SortModule)
+inputs
+ custom = Marked_CI_Exe
+parameters
+ fieldNames = [PERSON_ID]
+end
+
+// marca tutte le righe del dataset delle ECG con una variabile booleana identicamente uguale a “true”
+Marked_ECG_betabloc  (ExtendDataModule)
+inputs
+  custom = First_ECG_betabloc
+parameters
+  attributes = [ { HadECG_betabloc : boolean = true } ]
+end
+
+// ordina il file Marked_Antidiabetics_Prescriptions per PERSON_ID
+Sorted_Marked_ECG_betabloc  (SortModule)
+inputs
+ custom = Marked_ECG_betabloc
+parameters
+ fieldNames = [PERSON_ID]
+end
+
+// fa il join dei due file
+Joined_CI_Sources (MergeModule)
+inputs
+ custom = Sorted_CI_Exe
+custom = Sorted_Marked_ECG_betabloc // giusto?
+parameters
+ primaryKey = [PERSON_ID]
+ fieldNames = [PERSON_ID]
+end
+
+Empty_CI_Capture_Sources (ExtendDataModule)
+inputs
+custom = Joined_CI_Sources
+parameters
+attributes = [ { DataSource: string } ]
+end
+
+
+//  EDO: non capisco qui cosa deve fare
+//
+CI_Capture_Sources_CondEXE (ApplyFunction)
+inputs
+custom = Empty_CI_Capture_Sources
+parameters
+function = Id("EXE")
+result   = DataSource
+conditions =  [{ HadExe = true }] 
+end
+
+CI_Capture_Sources (ApplyFunction)
+inputs
+custom = CI_Capture_Sources_CondEXE
+parameters
+function = Concat ( DataSource,  " ECG_betabloc")
+result   = DataSource
+conditions = [{HadExe = true}]
+end
+
+Empty_CIPatients (ExtendDataModule)
+inputs
+custom = CI_Capture_Sources
+parameters
+attributes = [ {TrimmedDataSource: string }; { DateCI: date } ]
+end
+
+
+CIPatients_partial (ApplyFunction)
+inputs
+custom = Empty_CIPatients
+parameters
+function = Trim (DataSource)
+result   = TrimmedDataSource
+end
+
+
+CIPatients (ApplyFunction)
+inputs
+custom = CIPatients_partial
+parameters
+function = Min(DateFirstECG_betabloc,DateFirstCIExe)
+result   = DateCI
+end
+
+
+
+// definisce i prevalenti alla data $DATE
+EmptyPrevalentCI(ExtendDataModule)
+inputs
+custom = CIPatients
+parameters
+attributes = [ { PrevCI: boolean= false }]
+end
+
+PrevalentCIUnclean (ApplyFunction)
+inputs
+custom = EmptyPrevalentCI
+parameters
+
+function = Id(true)
+
+result   =  PrevCI
+conditions = [ { DateCI<=$DATE}]
+end
+
+PrevalentCI (FilterModule)
+inputs
+custom = PrevalentCIUnclean
+parameters
+conditions = [ { PrevCI = true }]
+end

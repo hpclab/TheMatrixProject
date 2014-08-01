@@ -1,0 +1,112 @@
+// SCRIPT3 - cardiopatia ischemica
+
+// data model:
+// PERSON_ID (tipo stringa), CI (tipo data)
+
+// condizione: soggetti vivi e presenti alla data DATA; 
+// assumiamo che uno script precedente ce li abbia gia' filtrati
+// 
+// la variabile
+// CI contiene il minimo tra CI11ECG_betabloc e dataIMA (*), ed
+// e' missing per i soggetti che hanno nulle entrambe le variabili
+
+// (*) nota : prima si usava CI11_coronar_nitroder, ora usiamo il risultato di un altro script, cfr file 120217_bozza.txt
+
+
+// non abbiamo parametri per noi,  ma per il sottoscript si
+
+// Carica i parametri
+Parameters_Loader (ParametersModule)
+parameters
+	params = [{DATE:date}]
+end
+// verificare questo int ??
+
+
+
+// dobbiamo invocare una file input con il file risultato dello script (oppure chiamare lo script!!!!)
+
+
+// ci serve un modulo nuovo
+// usiamo lo stesso nome dello stream di output generato nel file 
+// che viene qui richiamato; olter che per semplicita' , 
+// questo puo' servire a rendere opzionale il parametro inputName
+
+Fill_CI11ECG_betabloc (ScriptInputModule)
+parameters
+	scriptFilename = script1.txt 
+	// assumiamo di sapere in quale directory
+	// e' necessaria la desinenza del file?
+
+	scriptParams = [$DATE]
+	// parametri dati come lista unidimensionale, in ordine
+	// in questo caso passiamo un parametro direttamente al sottoscript
+
+	inputName = Fill_CI11ECG_betabloc
+	// il nome usato nello script chiamato per indicare l'output
+	// opzionale se c'e' un solo output
+	// qui dobbiamo supportare i nomi con spazi interni
+
+        expectedSchema = custom
+end
+
+// NOTA : finche' non abbiamo la possibilita' di verificare 
+// se i file siano gia' ordinati, li dobbiamo riordinare 
+Sorted_CI11ECG_betabloc (SortModule)
+inputs
+	custom = Fill_CI11ECG_betabloc
+	// occhio che questo tipo dipende dall'output dello script!
+parameters
+	fieldNames = [PERSON_ID]
+end
+
+Fill_dataIMA (ScriptInputModule)
+parameters
+	scriptFilename = script0.txt 
+
+	scriptParams = [$DATE]
+
+	inputName = Fill_dataIMA
+        expectedSchema = custom
+end
+
+Sorted_dataIMA (SortModule)
+inputs
+	custom = Fill_dataIMA
+parameters
+	fieldNames = [PERSON_ID]
+end
+
+Merged_Dates (MergeModule)
+inputs
+	custom = Sorted_CI11ECG_betabloc
+	custom = Sorted_dataIMA
+parameters
+	primaryKey = [ PERSON_ID ] 
+	fieldNames = [ PERSON_ID ]
+end
+
+// estende il tracciato record con un nuovo campo
+// Nota: questo non e' un file vuoto
+Extended_Dates (ExtendDataModule)
+inputs 
+	custom = Merged_Dates
+parameters
+	attributes = [{CI:date}]
+end
+
+Computed_CI  (ApplyFunction)
+inputs
+	custom = Extended_Dates	
+parameters
+	function = min(CI11ECG_betabloc,dataIMA)
+//	params = [CI11ECG_betabloc,dataIMA]
+
+// assumiamo che la funzione min gestisca opportunamente i missing
+// nel caso si implementeranno piu' funzioni min (min_undef, min_def ...)
+
+	result = CI
+end
+
+
+// da finire con l'output
