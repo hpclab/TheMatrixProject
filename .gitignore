@@ -4,3 +4,4 @@ data_errors.text
 timeline.txt
 *.dot
 .DS_Store
+test/
