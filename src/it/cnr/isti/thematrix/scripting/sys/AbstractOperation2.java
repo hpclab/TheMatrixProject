@@ -23,6 +23,8 @@ package it.cnr.isti.thematrix.scripting.sys;
  * where the two types T1 and T2 match (that is, T1==T2)
  * 
  * @author edoardovacchi
+ * @param <T> 
+ * @param <R> 
  */
 public abstract class AbstractOperation2<T,R> extends AbstractOperation<T,T,R> {
     public AbstractOperation2(String id) { super(id); }

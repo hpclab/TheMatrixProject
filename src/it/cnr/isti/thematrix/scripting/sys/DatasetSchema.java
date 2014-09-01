@@ -41,13 +41,14 @@ import org.json.simple.JSONValue;
  */
 public class DatasetSchema extends SymbolTable {
     
-    
+	private static final long serialVersionUID = 1379504326017778021L;
+	
 	/**
 	 * Extend a schema with a new Symbol.
 	 * 
 	 * @param schema
 	 * @param s
-	 * @return
+	 * @return the new DatasetSchema
 	 */
     public static DatasetSchema extend(DatasetSchema schema, Symbol<?> s) {
 //         List<Symbol<?>> xs = (List<Symbol<?>>) Collections.singletonList((Symbol<?>)s);
@@ -59,7 +60,7 @@ public class DatasetSchema extends SymbolTable {
     /**
      * Generate a new schema name from the name of an existing schema, adds an hash code.
      * @param schema
-     * @return
+     * @return a new schema name from the name of an existing schema
      */
     private static String generateName(DatasetSchema schema) {
     	 return schema.name+schema.hashCode()+"$custom";
@@ -71,7 +72,7 @@ public class DatasetSchema extends SymbolTable {
 	 * 
 	 * @param schema
 	 * @param newAttributes
-	 * @return
+	 * @return a schema extended with a List of new Symbols
 	 */
     public static DatasetSchema extend(DatasetSchema schema, List<Symbol<?>> newAttributes) {
         DatasetSchema newSchema = new DatasetSchema(generateName(schema));
@@ -87,7 +88,7 @@ public class DatasetSchema extends SymbolTable {
 	 * @param schema
 	 * @param newAttributes
 	 * @param prefix
-	 * @return
+	 * @return a schema extended with a List of new Symbols
 	 */
     public static DatasetSchema extend(DatasetSchema schema, List<Symbol<?>> newAttributes, String prefix) {
     	DatasetSchema newSchema = new DatasetSchema(schema.name+"|"+prefix+"$custom");
@@ -203,9 +204,9 @@ public class DatasetSchema extends SymbolTable {
     }
     
     /**
-     * Convert the argument schema into a JSON String
+     * Converts the argument schema into a JSON String
      * @param schema
-     * @return
+     * @return he argument schema into a JSON String
      */
 	public static String toJSON(DatasetSchema schema)
 	{
@@ -224,8 +225,8 @@ public class DatasetSchema extends SymbolTable {
 
 	/**
 	 * Convert the argument JSON string into a DatasetSchema
-	 * @param content
-	 * @return
+	 * @param jsonContent 
+	 * @return a DatasetSchema
 	 */
 	public static DatasetSchema fromJSON(String jsonContent)
 	{

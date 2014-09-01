@@ -125,6 +125,7 @@ public abstract class MatrixModule extends DatasetRecord {
      * two subsequent call to this method does not change any observable result 
      * (e.g., this method should not advance the internal pointer)
      * 
+     * @return true until the dataset has reached its last record
      * 
      */
     public abstract boolean hasMore();
@@ -231,11 +232,8 @@ public abstract class MatrixModule extends DatasetRecord {
 	 * This method is needed for relinking purposes of modules that
 	 * have more than one input. It substitute the first input parameter with 
 	 * the second input parameter.
-	 * 
-	 * @param m1
-	 *            old input module
-	 * @param m2
-	 *            new input module
+     * @param old old input module
+     * @param brand_new   new input module
 	 */
     public void substituteInput(MatrixModule old, MatrixModule brand_new)
     {

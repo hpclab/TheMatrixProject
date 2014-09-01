@@ -181,7 +181,7 @@ public final class TempFileManager {
 	 * First checks presence in IAD directory, if not return results as path for the file.
 	 * It expects a file in the format of filename.extension.
 	 * @param filename
-	 * @return
+	 * @return the path of a file
 	 */
 	// FIXME: this method should be moved elsewhere
 	public static File getPathForFile(String filename)

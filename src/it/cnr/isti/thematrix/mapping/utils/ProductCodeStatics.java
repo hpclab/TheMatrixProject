@@ -46,7 +46,7 @@ public class ProductCodeStatics
 	 * Handles the case of not existing values writing in Log
 	 * 
 	 * @param code
-	 * @return
+	 * @return the ATC of the given product code
 	 */
 	public static String getAtc(String product_code)
 	{
@@ -69,7 +69,7 @@ public class ProductCodeStatics
 	 * 
 	 * TODO: Handle the case of not existing values (write in Log?)
 	 * @param code
-	 * @return
+	 * @return the Duration of the given product code
 	 */
 	public static Float getDuration(String product_code)
 	{
@@ -103,7 +103,6 @@ public class ProductCodeStatics
 	
 	/**
 	 * Performs the actual load of the file from the disk
-	 * @return
 	 */
 	private static void loadFromCSV()
 	{		

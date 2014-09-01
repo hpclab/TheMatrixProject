@@ -37,14 +37,16 @@ public class Mapping implements ICheckable
 	@XmlElement
 	private String sourceAttribute;
 	
-	/**
+	/**
+	 * @return 
 	 */
 	public String getSourceTable()
 	{
 		return sourceTable;
 	}
 	
-	/**
+	/**
+	 * @return 
 	 */
 	public String getSourceAttribute()
 	{

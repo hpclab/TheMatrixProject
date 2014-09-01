@@ -157,6 +157,9 @@ public class CSVFile {
 	
 	/**
 	 * Creates a new instance of <code>CSVFile</code>. Stores the necessary data, but does not open the file
+	 * @param path 
+	 * @param fileName 
+	 * @param version 
 	 */
 	public CSVFile(String path, String fileName, String version) {
 		this.completePath = path + fileName;
@@ -168,6 +171,10 @@ public class CSVFile {
 	}
 	/**
 	 * Creates a new instance of <code>CSVFile</code> setting the compression type. Stores the necessary data, but does not open the file
+	 * @param path 
+	 * @param fileName 
+	 * @param version 
+	 * @param compression 
 	 */
 	public CSVFile(String path, String fileName, String version, CompressionType compression) {
 		
@@ -187,7 +194,7 @@ public class CSVFile {
 	 * 
 	 * @param attribute
 	 *            the IAD name of the column
-	 * @return
+	 * @return the whole specified column of values from the in-memory buffer
 	 */
 	public Collection<String> getColumnValues(String attribute) {
 		return getColumnValues(attribute, null);
@@ -215,7 +222,7 @@ public class CSVFile {
 	 *            the IAD name of the column
 	 * @param defaultValue
 	 *            default String for new column creation; disallowed if null
-	 * @return
+	 * @return the whole specified column of values from the in-memory buffer
 	 */
 	public Collection<String> getColumnValues(String attribute, String defaultValue) {
 		int numberColumn = this.header.indexOf(attribute);
@@ -328,9 +335,8 @@ public class CSVFile {
 
 	/**
 	 * Method to add a whole row of values to the in-memory buffer
-	 * 
-	 * @param must
-	 *            be the proper size, null is an acceptable value
+	 * @param values 
+	 * 	must be the proper size, null is an acceptable value
 	 */
 	public void setValueRow(Collection<String> values) {
 		if (values.size() == content.size()) {
@@ -451,7 +457,7 @@ public class CSVFile {
 	 * 
 	 * FIXME deprecate this method and build a sensible iterator interface for this class
 	 * 
-	 * @return
+	 * @return true if the CSV file has a next row.
 	 */
 	public boolean hasNext() {
 		lazyReadInit();
@@ -610,6 +616,7 @@ public class CSVFile {
 
 	/**
 	 * Get the number of rows discarded so far when reading a CSV file, because of field number mismatches.
+	 * @return the number of rows discarded so far when reading a CSV file
 	 */
 	public int getDiscardedRowCount() {
 		return discardedRowCount;
@@ -651,7 +658,8 @@ public class CSVFile {
 	 * Implements the next-row existence check to iterate over the the data in memory; can trigger loading a new batch.
 	 * Will replace hasNext()
 	 * 
-	 * @return
+	 * @return the next-row existence
+	 * @throws NullPointerException 
 	 */
 	public boolean hasMore() throws NullPointerException {
 		if (rowCursor < rowsInBuffer)
@@ -855,6 +863,7 @@ public class CSVFile {
 	 *            The path in which to search the dataset file.
 	 * @param datasetName
 	 *            The name of the dataset.
+	 * @param ignoreXML 
 	 * 
 	 * @return a <code>Boolean</code> value, true if both conditions are met, false otherwise.
 	 */
@@ -900,6 +909,7 @@ public class CSVFile {
 	 * configuration.
 	 * 
 	 * @param path
+	 * @param datasetName 
 	 * @return true if control succeeds.
 	 * @throws JAXBException
 	 * @throws IOException
@@ -929,6 +939,8 @@ public class CSVFile {
 	 * configuration.
 	 * 
 	 * @param path
+	 * @param datasetName 
+	 * @param compressionType 
 	 * @return true if control succeeds.
 	 * @throws JAXBException
 	 * @throws IOException
@@ -955,6 +967,12 @@ public class CSVFile {
 	 * method to create a meta.xml file related to the CSV dump with compression type parameter specified.
 	 * 
 	 * FIXME deprecated as it misses the schema, which is now mandatory
+	 * @param path 
+	 * @param fileName 
+	 * @param version 
+	 * @param compressionType 
+	 * @throws IOException 
+	 * @throws NoSuchAlgorithmException 
 	 * 
 	 * @throws JAXBException
 	 */
@@ -969,9 +987,13 @@ public class CSVFile {
 	 * method to create a meta.xml file related to the CSV dump
 	 * 
 	 * FIXME deprecated as it misses the schema, which is now mandatory
+	 * @param path 
+	 * @param fileName 
+	 * @param version 
 	 * 
 	 * @throws JAXBException
 	 * @throws IOException if file doesn't exists
+	 * @throws NoSuchAlgorithmException 
 	 */
 	@Deprecated
 	public static void createMetaXml(String path, String fileName, String version) 

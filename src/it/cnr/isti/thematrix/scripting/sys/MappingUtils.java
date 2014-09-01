@@ -55,8 +55,9 @@ public class MappingUtils {
 	/**
 	 * Prints all the schemata as XML to the class PrintStream (by default System.out)
 	 * using void or simple mappings.
+	 * @param useVoid
+	 * 	true to generate a file with only void mappings
 	 * 
-	 * @param true to generate a file with only void mappings
 	 */
 	public static void IADSchemataToXMLMapping(boolean useVoid) {
 

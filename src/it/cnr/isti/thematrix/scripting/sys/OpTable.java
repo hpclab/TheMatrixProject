@@ -34,7 +34,7 @@ public class OpTable extends HashMap<String, Operation<?,?,?>> {
      *        or to one of its arguments. This is usage-dependent)
      * @param operation  name of the operation
      * @param implObj instance of the operation
-     * @return
+     * @return the modified table
      */
     public OpTable put(DataType type, String operation, Operation<?,?,?> implObj) {
         super.put(type.toString()+separator+operation, implObj);

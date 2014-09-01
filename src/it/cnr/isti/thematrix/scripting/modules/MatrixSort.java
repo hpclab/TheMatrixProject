@@ -246,7 +246,7 @@ public class MatrixSort extends MatrixModule
 	 * Get the input module, needed for postprocessing the graph. Use with great
 	 * care.
 	 * 
-	 * @return
+	 * @return the input module
 	 */
 	public MatrixModule getInput() {
 		return inputTable;

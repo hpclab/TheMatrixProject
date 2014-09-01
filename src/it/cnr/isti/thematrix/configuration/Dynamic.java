@@ -322,8 +322,6 @@ public class Dynamic {
 	 * 
 	 * TODO maybe we should do something like<br>
 	 * <code>String joinedPath = new File(path1, path2).toString();</code>
-	 * 
-	 * @return
 	 */
 	static public void setPaths() {
 		// check that basePath is not null?
@@ -360,7 +358,7 @@ public class Dynamic {
 	/**
 	 * Returns the word size of the current JVM (32 or 64 bit).
 	 * 
-	 * @return
+	 * @return the word size of the current JVM
 	 */
 	public boolean isJvm64bit() {
 		return jvm64bit;

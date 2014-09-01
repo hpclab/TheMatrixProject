@@ -23,6 +23,9 @@ package it.cnr.isti.thematrix.scripting.sys;
  * two values of type T1 and T2 returns a third value of type R.
  * 
  * @author edoardovacchi
+ * @param <T1> 
+ * @param <T2> 
+ * @param <R> 
  */
 public interface Operation<T1,T2,R> {
     public R apply(T1 op1, T2 op2);

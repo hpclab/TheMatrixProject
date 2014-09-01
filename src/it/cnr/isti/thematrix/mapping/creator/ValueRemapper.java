@@ -143,6 +143,7 @@ public class ValueRemapper {
 	 * 
 	 * @throws JAXBException
 	 *             , BadFormattedMappingException
+	 * @throws SyntaxErrorInMappingException 
 	 */
 	public static void applyMappingToCsvHeader(CSVFile csv, String datasetName) throws JAXBException,
 			SyntaxErrorInMappingException {

@@ -48,7 +48,7 @@ public class WardStatics {
 	 * Handles the case of not existing values by writing in Logs
 	 * 
 	 * @param ward
-	 * @return
+	 * @return the TYPE_WARD of the given WARD
 	 * @throws Exception 
 	 */
 	public static String getTYPE_WARD(String ward)
@@ -72,8 +72,6 @@ public class WardStatics {
 	 * FIXME this code is the same in several classes. There should be a single function doing the csv load, with
 	 * parameters such as the file name, the Bean to use and the class to create.
 	 * 
-	 * @return
-	 * @throws Exception
 	 */
 	private static void loadFromCSV()
 	{		

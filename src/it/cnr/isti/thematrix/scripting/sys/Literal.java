@@ -25,6 +25,7 @@ import it.cnr.isti.thematrix.scripting.utils.DataType;
  * at which it was found in the source file.
  * 
  * @author edoardovacchi
+ * @param <T> 
  */
 public class Literal<T> extends Symbol<T> {
 	private final int row, col;

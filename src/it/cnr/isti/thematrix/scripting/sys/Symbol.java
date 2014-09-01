@@ -29,6 +29,7 @@ import it.cnr.isti.thematrix.scripting.utils.DataType;
  * Types are represented by values of the enum type {@link DataType}
  *
  * @author edoardovacchi
+ * @param <T> 
  */
 public class Symbol<T> {
 
@@ -141,7 +142,7 @@ public class Symbol<T> {
 	 * 
 	 * TODO check these values
 	 * 
-	 * @return
+	 * @return the expected size in the output file
 	 */
     public int expectedOutputSizeCSV(){
     	switch (this.type){
@@ -174,6 +175,7 @@ public class Symbol<T> {
      * 
      * @param s a Symbol, not null
      * @param t the DataType we expect to find in the Symbol
+     * @throws RuntimeException 
      */
     public static void assertType(Symbol<?> s, DataType t) throws RuntimeException {
     	if (s==null) throw new RuntimeException ("Symbol.assertType() of null");

@@ -21,6 +21,8 @@ package it.cnr.isti.thematrix.scripting.utils;
 /**
  *
  * @author edoardovacchi
+ * @param <A> 
+ * @param <B> 
  */
 public class Tuple2<A,B> {
     public final  A _1;

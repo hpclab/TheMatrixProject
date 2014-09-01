@@ -73,7 +73,7 @@ public class ConfigChecker {
 	
 	/**
 	 * Perform minimal sanity checks on the data structures produced while parsing the xml mapping configuration file.
-	 * @return
+	 * @return true if checks passed
 	 */
 	public static boolean checkMapping()
 	{

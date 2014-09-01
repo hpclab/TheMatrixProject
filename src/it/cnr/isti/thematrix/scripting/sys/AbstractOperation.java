@@ -23,6 +23,9 @@ package it.cnr.isti.thematrix.scripting.sys;
  * with a nicer {@link #toString()} method
  * 
  * @author edoardovacchi
+ * @param <T1> 
+ * @param <T2> 
+ * @param <R> 
  */
 public abstract class AbstractOperation<T1,T2,R> implements Operation<T1,T2,R> {
     protected final String id;
