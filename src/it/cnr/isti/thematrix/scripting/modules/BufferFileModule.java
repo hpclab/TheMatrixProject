@@ -19,7 +19,6 @@
 package it.cnr.isti.thematrix.scripting.modules;
 
 import it.cnr.isti.thematrix.common.Enums.ChecksumType;
-import it.cnr.isti.thematrix.common.Enums.CompressionType;
 import it.cnr.isti.thematrix.configuration.Dynamic;
 import it.cnr.isti.thematrix.configuration.LogST;
 import it.cnr.isti.thematrix.mapping.utils.TempFileManager;
@@ -28,9 +27,7 @@ import it.cnr.isti.thematrix.scripting.sys.MatrixModule;
 import it.cnr.isti.thematrix.scripting.sys.TheMatrixSys;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Module implements single-writer, multiple-reader buffering on a disk file (with stream replication) between TheMatrix
@@ -374,6 +371,7 @@ public class BufferFileModule extends MatrixModule {
 
 	/**
 	 * Print out main internal vars to ease debugging.
+	 * @param s 
 	 */
 	public void printDebug(String s) {
 		String z="";

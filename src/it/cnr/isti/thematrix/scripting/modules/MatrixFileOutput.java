@@ -364,8 +364,8 @@ public class MatrixFileOutput extends MatrixModule
 	
 	/**
 	 * The total number of records written so far by this Output module
+	 * @return The total number of records written so far by this Output module
 	 * 
-	 *  
 	 */
 	public int getRowsTotal() {
 		return rowsTotal;

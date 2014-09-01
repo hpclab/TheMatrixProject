@@ -365,6 +365,7 @@ class Block extends ArrayList<DatasetRecord> implements Comparable<Object>
 	/**
 	 * Returns true if the record belongs to the block
 	 * @param record
+	 * @return 
 	 * 
 	 */
 	public boolean support(DatasetRecord record)
@@ -387,6 +388,7 @@ class Block extends ArrayList<DatasetRecord> implements Comparable<Object>
 	
 	/**
 	 * Return the key value of the block (the index of the db)
+	 * @return the key value of the block (the index of the db)
 	 * 
 	 */
 	public Object getKeyValue()

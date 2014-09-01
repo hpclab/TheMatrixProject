@@ -18,14 +18,15 @@
  */
 package it.cnr.isti.thematrix.scripting.functions;
 
-import it.cnr.isti.thematrix.scripting.sys.DatasetRecord;
 import it.cnr.isti.thematrix.scripting.sys.Operation;
 import it.cnr.isti.thematrix.scripting.sys.Symbol;
+
 import java.util.List;
 
 /**
  *
  * @author edoardovacchi
+ * @param <R> 
  */
 public abstract class AbstractSymbolListOperation<R> implements Operation<List<Symbol<?>>,Void,R> {
     private final String name;

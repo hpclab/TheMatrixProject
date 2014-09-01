@@ -292,6 +292,7 @@ public class BufferModule extends MatrixModule {
 
 	/**
 	 * Print out main internal vars to ease debugging.
+	 * @param s 
 	 */
 	public void printDebug(String s) {
 		String z="";

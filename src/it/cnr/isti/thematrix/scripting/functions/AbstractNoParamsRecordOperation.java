@@ -18,9 +18,9 @@
  */
 package it.cnr.isti.thematrix.scripting.functions;
 
-import it.cnr.isti.thematrix.scripting.sys.DatasetRecord;
 import it.cnr.isti.thematrix.scripting.sys.Operation;
 import it.cnr.isti.thematrix.scripting.sys.Symbol;
+
 import java.util.List;
 
 /**
@@ -28,6 +28,7 @@ import java.util.List;
  * a value of type R
  * 
  * @author edoardovacchi
+ * @param <R> 
  */
 public abstract class AbstractNoParamsRecordOperation<R> implements Operation<List<Symbol<?>>,Void,R> {
     protected final String id;

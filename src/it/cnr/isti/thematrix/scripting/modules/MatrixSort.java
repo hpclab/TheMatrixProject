@@ -224,6 +224,7 @@ public class MatrixSort extends MatrixModule
 	 * UNTESTED set the sort module for using an already existing input file; we
 	 * need this as the condition is detected after class creation. The method
 	 * shall be called after setup, this is a bit of a problem later on.
+	 * @param fullname 
 	 */
 	public void overrideInputFile(String fullname) {
 		LogST.logP(0, "MatrixSort:overrideInputFile() changing input to "

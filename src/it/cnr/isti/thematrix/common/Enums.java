@@ -176,7 +176,7 @@ public class Enums {
 	 * TODO launch a subclass of RuntTime Exception instead
 	 * 
 	 * @param path
-	 * @param fileName
+	 * @param filename 
 	 * 
 	 * @return the extension of the file on disk, if it exists.
 	 */
@@ -205,7 +205,7 @@ public class Enums {
 	 * instead
 	 * 
 	 * @param path
-	 * @param fileName
+	 * @param filename 
 	 * 
 	 * @return the String extension of the file on disk, if it exists, or null.
 	 */
