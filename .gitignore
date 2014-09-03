@@ -5,3 +5,4 @@ timeline.txt
 *.dot
 .DS_Store
 test/
+javadoc/

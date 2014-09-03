@@ -1,0 +1,6 @@
+<project name="TheMatrixProject" default="createjar">    
+  <property name="projectHome" location="." />
+  <target name="createjar">
+    <jar destfile="${projectHome}/TheMatrixB.jar" basedir="${projectHome}/build/classes" />
+  </target>    
+</project>
