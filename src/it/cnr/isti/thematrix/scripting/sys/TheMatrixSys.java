@@ -86,14 +86,14 @@ public class TheMatrixSys {
 	 * 
 	 * TODO refactor, move elsewhere.
 	 */
-	public final static String TheMatrixProgramVersion = "TheMatrix--1.51.10";
+	public final static String TheMatrixProgramVersion = "TheMatrix--1.52.00";
 
 	/**
 	 * Release date
 	 * 
 	 * TODO refactor, move elsewhere
 	 */
-	public final static String TheMatrixReleaseDate = "2014-03-25";
+	public final static String TheMatrixReleaseDate = "2014-09-03";
 
 	protected static SchemaTable predefinedSchemata = new SchemaTable();
 	protected static OpTable opTable = new OpTable();
