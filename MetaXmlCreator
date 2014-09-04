@@ -1,3 +1,17 @@
 #! /bin/sh
 echo "Starting MetaXmlCreator"
-java -Xms128m -Xmx1024m -XX:MaxPermSize=256m -classpath TheMatrixB.jar:libs/Dexter.jar:libs/Lexter.jar:libs/Neverlang.jar:libs/commons-io-2.4.jar:libs/jopt-simple-4.3.jar:libs/junit-4.11.jar:libs/mysql-connector-java-5.1.18.jar:libs/ojdbc6-11.1.0.7.0.jar:libs/sqljdbc4.jar:libs/super-csv-2.1.0.jar:libs/json-simple-1.1.1.jar it.cnr.isti.thematrix.tools.MetaXmlCreator $1
+
+CP=TheMatrixB.jar
+CP=$CP:lib/Dexter.jar
+CP=$CP:lib/Lexter.jar
+CP=$CP:lib/Neverlang.jar
+CP=$CP:lib/commons-io-2.4.jar
+CP=$CP:lib/jopt-simple-4.3.jar
+CP=$CP:lib/junit-4.11.jar
+CP=$CP:lib/mysql-connector-java-5.1.18.jar
+CP=$CP:lib/ojdbc6-11.1.0.7.0.jar
+CP=$CP:lib/sqljdbc4.jar
+CP=$CP:lib/super-csv-2.1.0.jar
+CP=$CP:lib/json-simple-1.1.1.jar
+
+java -Xms128m -Xmx1024m -XX:MaxPermSize=256m -classpath $CP it.cnr.isti.thematrix.tools.MetaXmlCreator $1
