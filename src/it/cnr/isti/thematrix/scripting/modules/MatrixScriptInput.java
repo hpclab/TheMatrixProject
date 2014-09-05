@@ -306,7 +306,9 @@ public class MatrixScriptInput extends MatrixModule
     
     
     /**
-     * FIXME - document method!
+     * Does a sanity check on the parameters of the module.
+     * It checks whether there is at least one output module and
+     * the input name matches with an existent module.
      */
     private void checkForError()
     {
