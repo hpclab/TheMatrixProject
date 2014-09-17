@@ -1,0 +1,24 @@
+thematrix:
+  mainclass: "it.cnr.isti.thematrix.scripting.sys.TheMatrixSys"
+  params:
+    - "--fullIADschema 1"
+    - "--scriptPath scripts"
+    - "--logLevel 0"
+
+xmlcreator:
+  mainclass: "it.cnr.isti.thematrix.tools.MetaXmlCreator"
+
+classpath:
+  - "TheMatrixB.jar"
+  - "lib/Dexter.jar"
+  - "lib/Lexter.jar"
+  - "lib/Neverlang.jar"
+  - "lib/commons-io-2.4.jar"
+  - "lib/externalsortinginjava-0.1.7.jar"
+  - "lib/jopt-simple-4.5.jar"
+  - "lib/json-simple-1.1.1.jar"
+  - "lib/junit-4.11.jar"
+  - "lib/mysql-connector-java-5.1.18.jar"
+  - "lib/ojdbc6-11.1.0.7.0.jar"
+  - "lib/sqljdbc4.jar"
+  - "lib/super-csv-2.1.0.jar"

@@ -35,6 +35,7 @@ cp settings.xml $DIR
 cp TheMatrix $DIR
 cp TheMatrixWIN.bat $DIR
 cp TheMatrixB.jar $DIR
+cp launchOptions.yml $DIR
 
 # zip the directory (delete if already present)
 ZIPFILE=$DIR.zip
